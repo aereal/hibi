@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .ts src/**/*",
+    "lint": "eslint --ext .ts,.tsx **/*",
     "build": "next build",
     "gcp-build": "run-p -l lint build",
     "start": "next start",
@@ -18,11 +18,13 @@
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:react/recommended",
       "plugin:prettier/recommended",
       "prettier/@typescript-eslint"
     ],
     "plugins": [
-      "@typescript-eslint"
+      "@typescript-eslint",
+      "react"
     ],
     "parser": "@typescript-eslint/parser",
     "env": {
@@ -33,7 +35,10 @@
       "ecmaVersion": 2018,
       "sourceType": "module",
       "createDefaultProgram": true,
-      "project": "./tsconfig.json"
+      "project": "./tsconfig.json",
+      "ecmaFeatures": {
+        "jsx": true
+      }
     },
     "rules": {
       "no-use-before-define": "off",
@@ -60,6 +65,11 @@
         }
       ],
       "@typescript-eslint/no-unused-vars": 0
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
     }
   },
   "devDependencies": {
