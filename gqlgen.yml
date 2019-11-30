@@ -1,0 +1,16 @@
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+- schema.graphql
+exec:
+  filename: api/gql/handler_gen.go
+  package: gql
+model:
+  filename: api/gql/dto/dto_gen.go
+  package: dto
+resolver:
+  filename: api/gql/resolvers/resolver.go
+  package: resolvers
+  type: Resolver
+autobind: []

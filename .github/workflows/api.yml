@@ -1,0 +1,39 @@
+---
+
+name: api
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-go@v1.1.2
+        with:
+          go-version: 1.12.13
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: install
+        run: go get -v all
+      - name: test
+        run: go test -cover -v ./...
+      - name: setup google cloud
+        uses: actions/gcloud/auth@master
+        env:
+          GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+        if: github.ref == 'master'
+      - name: deploy
+        uses: actions/gcloud/cli@master
+        with:
+          args: app deploy --quiet --project hibi-260613 
+        env:
+          CI: true
+        if: github.ref == 'master'

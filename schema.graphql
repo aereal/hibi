@@ -1,0 +1,19 @@
+type Query {
+  diary(id: ID!): Diary
+}
+
+# type Mutation {}
+
+type Diary {
+  name: String!
+  articles: ArticleConnection!
+}
+
+type ArticleConnection {
+  nodes: [Article!]!
+}
+
+type Article {
+  id: ID!
+  title: String
+}
