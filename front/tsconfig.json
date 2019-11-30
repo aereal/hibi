@@ -21,6 +21,8 @@
     "target": "es2018"
   },
   "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "pages/**/*.ts",
     "pages/**/*.tsx"
   ],
