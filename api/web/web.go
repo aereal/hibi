@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	gqlgenhandler "github.com/99designs/gqlgen/handler"
 	"github.com/dimfeld/httptreemux"
+	"github.com/rs/cors"
 	"go.opencensus.io/plugin/ochttp"
 )
 
@@ -47,7 +48,13 @@ func (w *Web) handler() http.Handler {
 		fmt.Fprintln(w, "OK")
 	}))
 	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
-	router.UsingContext().POST("/graphql", graphqlHandler)
+	allow := cors.New(cors.Options{
+		Debug:            true,
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+	router.UsingContext().Handler(http.MethodOptions, "/graphql", allow.Handler(graphqlHandler))
+	router.UsingContext().Handler(http.MethodPost, "/graphql", allow.Handler(graphqlHandler))
 	return router
 }
 
