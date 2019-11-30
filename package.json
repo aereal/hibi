@@ -5,6 +5,10 @@
   "author": "aereal <aereal@aereal.org>",
   "license": "Unlicense",
   "private": true,
+  "scripts": {
+    "start": "node front/dist/index.js",
+    "gcp-build": "yarn workspace front gcp-build"
+  },
   "workspaces": [
     "front"
   ]
