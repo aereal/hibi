@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.49.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.8
 	github.com/99designs/gqlgen v0.10.2
+	github.com/99designs/gqlgen-contrib v0.0.0-20191030030013-7aa27db3321a
 	github.com/aws/aws-sdk-go v1.25.43 // indirect
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect

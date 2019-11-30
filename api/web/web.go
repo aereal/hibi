@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
+	"github.com/99designs/gqlgen-contrib/gqlopencensus"
 	"github.com/99designs/gqlgen/graphql"
 	gqlgenhandler "github.com/99designs/gqlgen/handler"
 	"github.com/dimfeld/httptreemux"
@@ -45,7 +46,7 @@ func (w *Web) handler() http.Handler {
 	router.UsingContext().GET("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "OK")
 	}))
-	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema)
+	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
 	router.UsingContext().POST("/graphql", graphqlHandler)
 	return router
 }
