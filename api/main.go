@@ -13,6 +13,7 @@ import (
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/aereal/hibi/api/web"
 	"go.opencensus.io/trace"
+	"golang.org/x/xerrors"
 )
 
 var onGAE bool
@@ -48,14 +49,14 @@ func run() error {
 
 	w, err := web.New(onGAE)
 	if err != nil {
-		return fmt.Errorf("failed to build web: %w", err)
+		return xerrors.Errorf("failed to build web: %w", err)
 	}
 	server := w.Server(port)
 	go graceful(ctx, server, 5*time.Second)
 
 	log.Printf("starting server; accepting request on %s", server.Addr)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		return fmt.Errorf("cannot start server: %w", err)
+		return xerrors.Errorf("cannot start server: %w", err)
 	}
 
 	return nil
