@@ -1,0 +1,93 @@
+{
+  "name": "front",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .ts,.tsx **/*",
+    "build": "next build",
+    "gcp-build": "run-p -l lint build",
+    "start": "next start",
+    "dev": "next"
+  },
+  "prettier": {
+    "trailingComma": "es5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:react/recommended",
+      "plugin:prettier/recommended",
+      "prettier/@typescript-eslint"
+    ],
+    "plugins": [
+      "@typescript-eslint",
+      "react"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module",
+      "createDefaultProgram": true,
+      "project": "./tsconfig.json",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "rules": {
+      "no-use-before-define": "off",
+      "@typescript-eslint/no-use-before-define": [
+        "warn",
+        {
+          "functions": false,
+          "classes": false,
+          "variables": false,
+          "typedefs": false
+        }
+      ],
+      "@typescript-eslint/array-type": [
+        "warn",
+        {
+          "default": "array-simple",
+          "readonly": "array-simple"
+        }
+      ],
+      "@typescript-eslint/interface-name-prefix": [
+        "error",
+        {
+          "prefixWithI": "never"
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": 0
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.14",
+    "@types/react": "^16.9.13",
+    "@typescript-eslint/eslint-plugin": "^2.9.0",
+    "@typescript-eslint/parser": "^2.9.0",
+    "eslint": "^6.7.1",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.17.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "next": "^9.1.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  }
+}

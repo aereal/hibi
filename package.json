@@ -1,0 +1,15 @@
+{
+  "name": "hibi",
+  "version": "1.0.0",
+  "repository": "git@github.com:aereal/hibi.git",
+  "author": "aereal <aereal@aereal.org>",
+  "license": "Unlicense",
+  "private": true,
+  "scripts": {
+    "start": "next start",
+    "gcp-build": "yarn workspace front gcp-build && cp -R front/.next ."
+  },
+  "workspaces": [
+    "front"
+  ]
+}

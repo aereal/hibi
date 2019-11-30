@@ -1,0 +1,49 @@
+---
+
+name: front
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/checkout@v1
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      -
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: install
+        run: yarn install --frozen-lockfile
+      - name: lint
+        uses: reviewdog/action-eslint@v1.0.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          eslint_flags: '--ext .ts front/src/**/*'
+      - name: build
+        run: yarn workspace front build
+      - name: setup google cloud
+        uses: actions/gcloud/auth@master
+        env:
+          GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+        if: github.ref == 'master'
+      - name: deploy
+        uses: actions/gcloud/cli@master
+        with:
+          args: app deploy --quiet --project hibi-260613 ./front.app.yml
+        env:
+          CI: true
+        if: github.ref == 'master'
