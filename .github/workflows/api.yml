@@ -33,7 +33,7 @@ jobs:
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
-          args: app deploy --quiet --project hibi-260613 
+          args: app deploy --quiet --project hibi-260613 ./api.app.yml
         env:
           CI: true
         if: github.ref == 'master'

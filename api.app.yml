@@ -2,3 +2,4 @@
 
 runtime: go112
 main: ./api/
+service: api
