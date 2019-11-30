@@ -30,4 +30,4 @@ jobs:
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
-          args: app deploy --project ${{ secrets.GCLOUD_PROJECT }}
+          args: app deploy --quiet --project ${{ secrets.GCLOUD_PROJECT }}
