@@ -27,3 +27,7 @@ jobs:
         uses: actions/gcloud/auth@master
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+      - name: deploy
+        uses: actions/gcloud/cli@master
+        with:
+          args: app deploy --project ${{ secrets.GCLOUD_PROJECT }}
