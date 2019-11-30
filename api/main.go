@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	"github.com/aereal/hibi/api/gql"
+	"github.com/aereal/hibi/api/gql/resolvers"
 	"github.com/aereal/hibi/api/web"
 	"go.opencensus.io/trace"
 	"golang.org/x/xerrors"
@@ -47,7 +49,11 @@ func run() error {
 		trace.RegisterExporter(exporter)
 	}
 
-	w, err := web.New(onGAE)
+	schema := gql.NewExecutableSchema(gql.Config{
+		Resolvers: resolvers.New(),
+	})
+
+	w, err := web.New(onGAE, schema)
 	if err != nil {
 		return xerrors.Errorf("failed to build web: %w", err)
 	}
