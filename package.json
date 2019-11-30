@@ -1,0 +1,11 @@
+{
+  "name": "hibi",
+  "version": "1.0.0",
+  "repository": "git@github.com:aereal/hibi.git",
+  "author": "aereal <aereal@aereal.org>",
+  "license": "Unlicense",
+  "private": true,
+  "workspaces": [
+    "front"
+  ]
+}
