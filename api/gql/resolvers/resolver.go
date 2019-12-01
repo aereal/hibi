@@ -22,6 +22,9 @@ func (r *rootResolver) Query() gql.QueryResolver {
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*dto.Diary, error) {
-	diary := &dto.Diary{}
+	diary := &dto.Diary{
+		Articles: &dto.ArticleConnection{},
+	}
+	diary.Articles.Nodes = append(diary.Articles.Nodes, &dto.Article{ID: "1"})
 	return diary, nil
 }
