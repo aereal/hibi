@@ -1,0 +1,12 @@
+#import "../organisms/article.fragment.gql"
+
+query ListArticles($diaryID: ID!) {
+  diary(id: $diaryID) {
+    name
+    articles {
+      nodes {
+        ...ArticleFragment
+      }
+    }
+  }
+}
