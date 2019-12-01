@@ -7,7 +7,10 @@
     "build": "next build",
     "gcp-build": "run-p -l lint build",
     "start": "next start",
-    "dev": "next"
+    "dev": "run-p -l dev:*",
+    "dev:next": "next",
+    "dev:codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql --watch",
+    "codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql"
   },
   "prettier": {
     "trailingComma": "es5"
