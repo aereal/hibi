@@ -1,8 +1,12 @@
 import React, { FC } from "react";
-import articleFragment from "./article.fragment.gql";
+import { ArticleFragment } from "./__generated__/ArticleFragment";
 
-export const Article: FC = () => (
+interface ArticleProps {
+  readonly article: ArticleFragment;
+}
+
+export const Article: FC<ArticleProps> = ({ article }) => (
   <div>
-    <h1>Article</h1>
+    <h1>{article.title}</h1>
   </div>
 );

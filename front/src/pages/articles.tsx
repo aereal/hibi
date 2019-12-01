@@ -5,6 +5,7 @@ import {
   ListArticles,
   ListArticlesVariables,
 } from "./__generated__/ListArticles";
+import { Article } from "../organisms/article";
 
 export const ArticlesPage: FC = () => {
   const { loading, data } = useQuery<ListArticles, ListArticlesVariables>(
@@ -28,6 +29,9 @@ export const ArticlesPage: FC = () => {
         Diary: {JSON.stringify(data.diary.name)}{" "}
         {data.diary.articles.nodes.length} articles
       </h1>
+      {data.diary.articles.nodes.map((article, i) => (
+        <Article article={article} key={i} />
+      ))}
     </>
   );
 };
