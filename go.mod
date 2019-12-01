@@ -10,6 +10,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.43 // indirect
 	github.com/dimfeld/httptreemux v5.0.1+incompatible
 	github.com/golang/groupcache v0.0.0-20191027212112-611e8accdfc9 // indirect
+	github.com/rs/cors v1.7.0
 	github.com/vektah/gqlparser v1.2.0
 	go.opencensus.io v0.22.2
 	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
