@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,9 +11,11 @@ import (
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/resolvers"
+	"github.com/aereal/hibi/api/repository"
 	"github.com/aereal/hibi/api/web"
 	"go.opencensus.io/trace"
 	"golang.org/x/xerrors"
@@ -49,8 +52,22 @@ func run() error {
 		trace.RegisterExporter(exporter)
 	}
 
+	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
+	if projectID == "" {
+		return errors.New("GOOGLE_CLOUD_PROJECT must be defined")
+	}
+	client, err := firestore.NewClient(ctx, projectID)
+	if err != nil {
+		return xerrors.Errorf("failed to build firestore client: %w", err)
+	}
+
+	repo, err := repository.New(client)
+	if err != nil {
+		return xerrors.Errorf("failed to build repo: %w", err)
+	}
+
 	schema := gql.NewExecutableSchema(gql.Config{
-		Resolvers: resolvers.New(),
+		Resolvers: resolvers.New(repo),
 	})
 
 	w, err := web.New(onGAE, schema)

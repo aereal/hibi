@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	cloud.google.com/go v0.49.0 // indirect
+	cloud.google.com/go/firestore v1.1.0
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.8
 	github.com/99designs/gqlgen v0.10.2
 	github.com/99designs/gqlgen-contrib v0.0.0-20191030030013-7aa27db3321a

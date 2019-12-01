@@ -7,13 +7,16 @@ import (
 
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
+	"github.com/aereal/hibi/api/repository"
 )
 
-func New() gql.ResolverRoot {
-	return &rootResolver{}
+func New(repo *repository.Repository) gql.ResolverRoot {
+	return &rootResolver{repo: repo}
 }
 
-type rootResolver struct{}
+type rootResolver struct {
+	repo *repository.Repository
+}
 
 func (r *rootResolver) Query() gql.QueryResolver {
 	return &queryResolver{r}
