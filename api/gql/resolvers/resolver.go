@@ -9,6 +9,7 @@ import (
 	"github.com/aereal/hibi/api/gql/dto"
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
+	"gopkg.in/russross/blackfriday.v2"
 )
 
 func New(repo *repository.Repository) gql.ResolverRoot {
@@ -58,5 +59,6 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 type articleBodyResolver struct{ *rootResolver }
 
 func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody) (string, error) {
-	return "", nil
+	rendered := blackfriday.Run([]byte(body.Markdown))
+	return string(rendered), nil
 }
