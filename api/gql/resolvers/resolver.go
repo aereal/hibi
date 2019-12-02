@@ -7,24 +7,66 @@ import (
 
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
+	"github.com/aereal/hibi/api/models"
+	"github.com/aereal/hibi/api/repository"
+	"gopkg.in/russross/blackfriday.v2"
 )
 
-func New() gql.ResolverRoot {
-	return &rootResolver{}
+func New(repo *repository.Repository) gql.ResolverRoot {
+	return &rootResolver{repo: repo}
 }
 
-type rootResolver struct{}
+type rootResolver struct {
+	repo *repository.Repository
+}
 
 func (r *rootResolver) Query() gql.QueryResolver {
 	return &queryResolver{r}
 }
 
+func (r *rootResolver) Diary() gql.DiaryResolver {
+	return &diaryResolver{r}
+}
+
+func (r *rootResolver) ArticleBody() gql.ArticleBodyResolver {
+	return &articleBodyResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
-func (r *queryResolver) Diary(ctx context.Context, id string) (*dto.Diary, error) {
-	diary := &dto.Diary{
-		Articles: &dto.ArticleConnection{},
+func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
+	diary, err := r.repo.FindDiary(ctx, id)
+	if err != nil {
+		return nil, err
 	}
-	diary.Articles.Nodes = append(diary.Articles.Nodes, &dto.Article{ID: "1"})
 	return diary, nil
+}
+
+type diaryResolver struct{ *rootResolver }
+
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first+1, orderBy.Field, orderBy.Direction)
+	if err != nil {
+		return nil, err
+	}
+	conn := &dto.ArticleConnection{
+		PageInfo: &dto.PageInfo{},
+	}
+	for _, article := range articles {
+		conn.Nodes = append(conn.Nodes, article)
+	}
+	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
+	conn.PageInfo.HasNextPage = len(articles) > first
+	conn.TotalCount = len(articles)
+	if conn.TotalCount > first {
+		conn.TotalCount = first
+	}
+	return conn, nil
+}
+
+type articleBodyResolver struct{ *rootResolver }
+
+func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody) (string, error) {
+	rendered := blackfriday.Run([]byte(body.Markdown))
+	return string(rendered), nil
 }

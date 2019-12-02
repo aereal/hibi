@@ -2,16 +2,25 @@
 
 package dto
 
-type Article struct {
-	ID    string  `json:"id"`
-	Title *string `json:"title"`
-}
+import (
+	"github.com/aereal/hibi/api/models"
+	"github.com/aereal/hibi/api/repository"
+)
 
 type ArticleConnection struct {
-	Nodes []*Article `json:"nodes"`
+	Nodes      []*models.Article `json:"nodes"`
+	PageInfo   *PageInfo         `json:"pageInfo"`
+	TotalCount int               `json:"totalCount"`
 }
 
-type Diary struct {
-	Name     string             `json:"name"`
-	Articles *ArticleConnection `json:"articles"`
+type ArticleOrder struct {
+	Field     repository.ArticleOrderField `json:"field"`
+	Direction repository.OrderDirection    `json:"direction"`
+}
+
+type PageInfo struct {
+	EndCursor       *string `json:"endCursor"`
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor"`
 }

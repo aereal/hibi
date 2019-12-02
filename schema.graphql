@@ -5,15 +5,48 @@ type Query {
 # type Mutation {}
 
 type Diary {
+  id: ID!
   name: String!
-  articles: ArticleConnection!
+  articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+}
+
+input ArticleOrder {
+  field: ArticleOrderField!
+  direction: OrderDirection!
+}
+
+enum ArticleOrderField {
+  PUBLISHED_AT
+}
+
+enum OrderDirection {
+  ASC
+  DESC
 }
 
 type ArticleConnection {
   nodes: [Article!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type Article {
   id: ID!
   title: String
+  body: ArticleBody!
+  publishedAt: Time!
 }
+
+type ArticleBody {
+  markdown: String!
+  html: String!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+scalar Time

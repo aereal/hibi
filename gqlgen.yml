@@ -14,3 +14,14 @@ resolver:
   package: resolvers
   type: Resolver
 autobind: []
+models:
+  Diary:
+    model: github.com/aereal/hibi/api/models.Diary
+  Article:
+    model: github.com/aereal/hibi/api/models.Article
+  ArticleBody:
+    model: github.com/aereal/hibi/api/models.ArticleBody
+  OrderDirection:
+    model: github.com/aereal/hibi/api/repository.OrderDirection
+  ArticleOrderField:
+    model: github.com/aereal/hibi/api/repository.ArticleOrderField
