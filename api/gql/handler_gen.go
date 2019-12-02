@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/aereal/hibi/api/gql/dto"
 	"github.com/aereal/hibi/api/models"
+	"github.com/aereal/hibi/api/repository"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -65,7 +66,7 @@ type ComplexityRoot struct {
 	}
 
 	Diary struct {
-		Articles func(childComplexity int, first int) int
+		Articles func(childComplexity int, first int, orderBy *dto.ArticleOrder) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 	}
@@ -86,7 +87,7 @@ type ArticleBodyResolver interface {
 	HTML(ctx context.Context, obj *models.ArticleBody) (string, error)
 }
 type DiaryResolver interface {
-	Articles(ctx context.Context, obj *models.Diary, first int) (*dto.ArticleConnection, error)
+	Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
 }
 type QueryResolver interface {
 	Diary(ctx context.Context, id string) (*models.Diary, error)
@@ -180,7 +181,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Diary.Articles(childComplexity, args["first"].(int)), true
+		return e.complexity.Diary.Articles(childComplexity, args["first"].(int), args["orderBy"].(*dto.ArticleOrder)), true
 
 	case "Diary.id":
 		if e.complexity.Diary.ID == nil {
@@ -294,7 +295,21 @@ var parsedSchema = gqlparser.MustLoadSchema(
 type Diary {
   id: ID!
   name: String!
-  articles(first: Int!): ArticleConnection!
+  articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+}
+
+input ArticleOrder {
+  field: ArticleOrderField!
+  direction: OrderDirection!
+}
+
+enum ArticleOrderField {
+  PUBLISHED_AT
+}
+
+enum OrderDirection {
+  ASC
+  DESC
 }
 
 type ArticleConnection {
@@ -341,6 +356,14 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 		}
 	}
 	args["first"] = arg0
+	var arg1 *dto.ArticleOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		arg1, err = ec.unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg1
 	return args, nil
 }
 
@@ -838,7 +861,7 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Diary().Articles(rctx, obj, args["first"].(int))
+		return ec.resolvers.Diary().Articles(rctx, obj, args["first"].(int), args["orderBy"].(*dto.ArticleOrder))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2265,6 +2288,30 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputArticleOrder(ctx context.Context, obj interface{}) (dto.ArticleOrder, error) {
+	var it dto.ArticleOrder
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+			it.Field, err = ec.unmarshalNArticleOrderField2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐArticleOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "direction":
+			var err error
+			it.Direction, err = ec.unmarshalNOrderDirection2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2837,6 +2884,21 @@ func (ec *executionContext) marshalNArticleConnection2ᚖgithubᚗcomᚋaereal�
 	return ec._ArticleConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNArticleOrderField2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐArticleOrderField(ctx context.Context, v interface{}) (repository.ArticleOrderField, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	return repository.ArticleOrderField(tmp), err
+}
+
+func (ec *executionContext) marshalNArticleOrderField2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐArticleOrderField(ctx context.Context, sel ast.SelectionSet, v repository.ArticleOrderField) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -2871,6 +2933,21 @@ func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
 	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐOrderDirection(ctx context.Context, v interface{}) (repository.OrderDirection, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	return repository.OrderDirection(tmp), err
+}
+
+func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐOrderDirection(ctx context.Context, sel ast.SelectionSet, v repository.OrderDirection) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -3145,6 +3222,18 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalOArticleOrder2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx context.Context, v interface{}) (dto.ArticleOrder, error) {
+	return ec.unmarshalInputArticleOrder(ctx, v)
+}
+
+func (ec *executionContext) unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx context.Context, v interface{}) (*dto.ArticleOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOArticleOrder2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

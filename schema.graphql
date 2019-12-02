@@ -7,7 +7,21 @@ type Query {
 type Diary {
   id: ID!
   name: String!
-  articles(first: Int!): ArticleConnection!
+  articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+}
+
+input ArticleOrder {
+  field: ArticleOrderField!
+  direction: OrderDirection!
+}
+
+enum ArticleOrderField {
+  PUBLISHED_AT
+}
+
+enum OrderDirection {
+  ASC
+  DESC
 }
 
 type ArticleConnection {

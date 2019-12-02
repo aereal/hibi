@@ -4,12 +4,18 @@ package dto
 
 import (
 	"github.com/aereal/hibi/api/models"
+	"github.com/aereal/hibi/api/repository"
 )
 
 type ArticleConnection struct {
 	Nodes      []*models.Article `json:"nodes"`
 	PageInfo   *PageInfo         `json:"pageInfo"`
 	TotalCount int               `json:"totalCount"`
+}
+
+type ArticleOrder struct {
+	Field     repository.ArticleOrderField `json:"field"`
+	Direction repository.OrderDirection    `json:"direction"`
 }
 
 type PageInfo struct {

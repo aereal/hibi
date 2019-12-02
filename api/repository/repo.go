@@ -39,9 +39,21 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 	return diary, nil
 }
 
-func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit int) ([]*models.Article, error) {
+type ArticleOrderField string
+
+const (
+	ArticleOrderFieldPublishedAt = "PUBLISHED_AT"
+)
+
+var (
+	articleFieldMapping = map[ArticleOrderField]string{
+		ArticleOrderFieldPublishedAt: "PublishedAt",
+	}
+)
+
+func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Article, error) {
 	iter := r.articles().
-		OrderBy("PublishedAt", firestore.Desc).
+		OrderBy(articleFieldMapping[orderField], firestoreOrderDirectionMapping[dir]).
 		Where("DiaryID", "==", diaryID).
 		Limit(limit).
 		Documents(ctx)
@@ -88,3 +100,17 @@ type articleDTO struct {
 	MarkdownBody string
 	PublishedAt  time.Time
 }
+
+type OrderDirection string
+
+const (
+	OrderDirectionAsc  OrderDirection = "ASC"
+	OrderDirectionDesc OrderDirection = "DESC"
+)
+
+var (
+	firestoreOrderDirectionMapping = map[OrderDirection]firestore.Direction{
+		OrderDirectionAsc:  firestore.Asc,
+		OrderDirectionDesc: firestore.Desc,
+	}
+)

@@ -21,3 +21,7 @@ models:
     model: github.com/aereal/hibi/api/models.Article
   ArticleBody:
     model: github.com/aereal/hibi/api/models.ArticleBody
+  OrderDirection:
+    model: github.com/aereal/hibi/api/repository.OrderDirection
+  ArticleOrderField:
+    model: github.com/aereal/hibi/api/repository.ArticleOrderField

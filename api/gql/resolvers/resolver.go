@@ -44,8 +44,8 @@ func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, er
 
 type diaryResolver struct{ *rootResolver }
 
-func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int) (*dto.ArticleConnection, error) {
-	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first+1)
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first+1, orderBy.Field, orderBy.Direction)
 	if err != nil {
 		return nil, err
 	}
