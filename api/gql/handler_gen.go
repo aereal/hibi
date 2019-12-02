@@ -37,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	ArticleBody() ArticleBodyResolver
 	Diary() DiaryResolver
 	Query() QueryResolver
 }
@@ -72,6 +73,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type ArticleBodyResolver interface {
+	HTML(ctx context.Context, obj *models.ArticleBody) (string, error)
+}
 type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, first int) (*dto.ArticleConnection, error)
 }
@@ -539,13 +543,13 @@ func (ec *executionContext) _ArticleBody_html(ctx context.Context, field graphql
 		Object:   "ArticleBody",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.HTML, nil
+		return ec.resolvers.ArticleBody().HTML(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2046,13 +2050,22 @@ func (ec *executionContext) _ArticleBody(ctx context.Context, sel ast.SelectionS
 		case "markdown":
 			out.Values[i] = ec._ArticleBody_markdown(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "html":
-			out.Values[i] = ec._ArticleBody_html(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ArticleBody_html(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

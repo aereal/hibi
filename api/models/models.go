@@ -16,5 +16,4 @@ type Article struct {
 
 type ArticleBody struct {
 	Markdown string
-	HTML     string
 }

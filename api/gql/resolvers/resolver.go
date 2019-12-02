@@ -27,6 +27,10 @@ func (r *rootResolver) Diary() gql.DiaryResolver {
 	return &diaryResolver{r}
 }
 
+func (r *rootResolver) ArticleBody() gql.ArticleBodyResolver {
+	return &articleBodyResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
@@ -49,4 +53,10 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 		conn.Nodes = append(conn.Nodes, article)
 	}
 	return conn, nil
+}
+
+type articleBodyResolver struct{ *rootResolver }
+
+func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody) (string, error) {
+	return "", nil
 }

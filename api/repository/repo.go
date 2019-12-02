@@ -71,7 +71,6 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 			Title: &dto.Title,
 			Body: &models.ArticleBody{
 				Markdown: dto.MarkdownBody,
-				HTML:     "", //TODO
 			},
 			PublishedAt: dto.PublishedAt,
 		})
