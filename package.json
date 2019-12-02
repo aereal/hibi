@@ -11,5 +11,8 @@
   },
   "workspaces": [
     "front"
-  ]
+  ],
+  "resolutions": {
+    "merge-anything": "2.4.2"
+  }
 }
