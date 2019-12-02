@@ -5,6 +5,7 @@ type Query {
 # type Mutation {}
 
 type Diary {
+  id: ID!
   name: String!
   articles: ArticleConnection!
 }

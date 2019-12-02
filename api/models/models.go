@@ -1,6 +1,7 @@
 package models
 
 type Diary struct {
+	ID   string
 	Name string
 }
 

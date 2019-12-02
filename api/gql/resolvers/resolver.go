@@ -38,6 +38,7 @@ type diaryResolver struct{ *rootResolver }
 
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary) (*dto.ArticleConnection, error) {
 	conn := &dto.ArticleConnection{}
+	r.repo.FindArticlesOf(ctx, obj)
 	article := &models.Article{
 		ID: "1",
 		Body: &models.ArticleBody{

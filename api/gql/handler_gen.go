@@ -61,6 +61,7 @@ type ComplexityRoot struct {
 
 	Diary struct {
 		Articles func(childComplexity int) int
+		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 	}
 
@@ -140,6 +141,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.Articles(childComplexity), true
 
+	case "Diary.id":
+		if e.complexity.Diary.ID == nil {
+			break
+		}
+
+		return e.complexity.Diary.ID(childComplexity), true
+
 	case "Diary.name":
 		if e.complexity.Diary.Name == nil {
 			break
@@ -215,6 +223,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 # type Mutation {}
 
 type Diary {
+  id: ID!
   name: String!
   articles: ArticleConnection!
 }
@@ -521,6 +530,43 @@ func (ec *executionContext) _ArticleConnection_nodes(ctx context.Context, field 
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Diary_id(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Diary",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Diary_name(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
@@ -1976,6 +2022,11 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Diary")
+		case "id":
+			out.Values[i] = ec._Diary_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "name":
 			out.Values[i] = ec._Diary_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
