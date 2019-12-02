@@ -21,6 +21,8 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      - name: dump deps
+        run: go list -m -json all 
       - name: install
         run: go get -v all
       - name: test
