@@ -18,9 +18,12 @@ type Article {
   id: ID!
   title: String
   body: ArticleBody!
+  publishedAt: Time!
 }
 
 type ArticleBody {
   markdown: String!
   html: String!
 }
+
+scalar Time

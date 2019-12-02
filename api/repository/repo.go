@@ -73,6 +73,7 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 				Markdown: dto.MarkdownBody,
 				HTML:     "", //TODO
 			},
+			PublishedAt: dto.PublishedAt,
 		})
 	}
 	return results, nil
