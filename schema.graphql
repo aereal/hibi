@@ -16,4 +16,10 @@ type ArticleConnection {
 type Article {
   id: ID!
   title: String
+  body: ArticleBody!
+}
+
+type ArticleBody {
+  markdown: String!
+  html: String!
 }

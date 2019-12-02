@@ -42,8 +42,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Article struct {
+		Body  func(childComplexity int) int
 		ID    func(childComplexity int) int
 		Title func(childComplexity int) int
+	}
+
+	ArticleBody struct {
+		HTML     func(childComplexity int) int
+		Markdown func(childComplexity int) int
 	}
 
 	ArticleConnection struct {
@@ -79,6 +85,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Article.body":
+		if e.complexity.Article.Body == nil {
+			break
+		}
+
+		return e.complexity.Article.Body(childComplexity), true
+
 	case "Article.id":
 		if e.complexity.Article.ID == nil {
 			break
@@ -92,6 +105,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Article.Title(childComplexity), true
+
+	case "ArticleBody.html":
+		if e.complexity.ArticleBody.HTML == nil {
+			break
+		}
+
+		return e.complexity.ArticleBody.HTML(childComplexity), true
+
+	case "ArticleBody.markdown":
+		if e.complexity.ArticleBody.Markdown == nil {
+			break
+		}
+
+		return e.complexity.ArticleBody.Markdown(childComplexity), true
 
 	case "ArticleConnection.nodes":
 		if e.complexity.ArticleConnection.Nodes == nil {
@@ -193,6 +220,12 @@ type ArticleConnection {
 type Article {
   id: ID!
   title: String
+  body: ArticleBody!
+}
+
+type ArticleBody {
+  markdown: String!
+  html: String!
 }
 `},
 )
@@ -334,6 +367,117 @@ func (ec *executionContext) _Article_title(ctx context.Context, field graphql.Co
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Article_body(ctx context.Context, field graphql.CollectedField, obj *dto.Article) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Article",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Body, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.ArticleBody)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ArticleBody_markdown(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleBody) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ArticleBody",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Markdown, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ArticleBody_html(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleBody) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "ArticleBody",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HTML, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ArticleConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleConnection) (ret graphql.Marshaler) {
@@ -1740,6 +1884,43 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "title":
 			out.Values[i] = ec._Article_title(ctx, field, obj)
+		case "body":
+			out.Values[i] = ec._Article_body(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var articleBodyImplementors = []string{"ArticleBody"}
+
+func (ec *executionContext) _ArticleBody(ctx context.Context, sel ast.SelectionSet, obj *dto.ArticleBody) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, articleBodyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ArticleBody")
+		case "markdown":
+			out.Values[i] = ec._ArticleBody_markdown(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "html":
+			out.Values[i] = ec._ArticleBody_html(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2145,6 +2326,20 @@ func (ec *executionContext) marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋap
 		return graphql.Null
 	}
 	return ec._Article(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNArticleBody2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v dto.ArticleBody) graphql.Marshaler {
+	return ec._ArticleBody(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v *dto.ArticleBody) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ArticleBody(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNArticleConnection2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleConnection(ctx context.Context, sel ast.SelectionSet, v dto.ArticleConnection) graphql.Marshaler {

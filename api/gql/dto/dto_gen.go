@@ -3,8 +3,14 @@
 package dto
 
 type Article struct {
-	ID    string  `json:"id"`
-	Title *string `json:"title"`
+	ID    string       `json:"id"`
+	Title *string      `json:"title"`
+	Body  *ArticleBody `json:"body"`
+}
+
+type ArticleBody struct {
+	Markdown string `json:"markdown"`
+	HTML     string `json:"html"`
 }
 
 type ArticleConnection struct {
