@@ -7,7 +7,7 @@ type Query {
 type Diary {
   id: ID!
   name: String!
-  articles: ArticleConnection!
+  articles(first: Int!): ArticleConnection!
 }
 
 type ArticleConnection {

@@ -60,7 +60,7 @@ type ComplexityRoot struct {
 	}
 
 	Diary struct {
-		Articles func(childComplexity int) int
+		Articles func(childComplexity int, first int) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 	}
@@ -71,7 +71,7 @@ type ComplexityRoot struct {
 }
 
 type DiaryResolver interface {
-	Articles(ctx context.Context, obj *models.Diary) (*dto.ArticleConnection, error)
+	Articles(ctx context.Context, obj *models.Diary, first int) (*dto.ArticleConnection, error)
 }
 type QueryResolver interface {
 	Diary(ctx context.Context, id string) (*models.Diary, error)
@@ -139,7 +139,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Diary.Articles(childComplexity), true
+		args, err := ec.field_Diary_articles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Diary.Articles(childComplexity, args["first"].(int)), true
 
 	case "Diary.id":
 		if e.complexity.Diary.ID == nil {
@@ -225,7 +230,7 @@ var parsedSchema = gqlparser.MustLoadSchema(
 type Diary {
   id: ID!
   name: String!
-  articles: ArticleConnection!
+  articles(first: Int!): ArticleConnection!
 }
 
 type ArticleConnection {
@@ -248,6 +253,20 @@ type ArticleBody {
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -622,10 +641,17 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Diary_articles_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Diary().Articles(rctx, obj)
+		return ec.resolvers.Diary().Articles(rctx, obj, args["first"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2442,6 +2468,20 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
