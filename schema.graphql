@@ -12,6 +12,8 @@ type Diary {
 
 type ArticleConnection {
   nodes: [Article!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type Article {
@@ -24,6 +26,13 @@ type Article {
 type ArticleBody {
   markdown: String!
   html: String!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
 }
 
 scalar Time

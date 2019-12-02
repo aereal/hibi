@@ -45,13 +45,21 @@ func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, er
 type diaryResolver struct{ *rootResolver }
 
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int) (*dto.ArticleConnection, error) {
-	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first)
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first+1)
 	if err != nil {
 		return nil, err
 	}
-	conn := &dto.ArticleConnection{}
+	conn := &dto.ArticleConnection{
+		PageInfo: &dto.PageInfo{},
+	}
 	for _, article := range articles {
 		conn.Nodes = append(conn.Nodes, article)
+	}
+	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
+	conn.PageInfo.HasNextPage = len(articles) > first
+	conn.TotalCount = len(articles)
+	if conn.TotalCount > first {
+		conn.TotalCount = first
 	}
 	return conn, nil
 }

@@ -7,5 +7,14 @@ import (
 )
 
 type ArticleConnection struct {
-	Nodes []*models.Article `json:"nodes"`
+	Nodes      []*models.Article `json:"nodes"`
+	PageInfo   *PageInfo         `json:"pageInfo"`
+	TotalCount int               `json:"totalCount"`
+}
+
+type PageInfo struct {
+	EndCursor       *string `json:"endCursor"`
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor"`
 }
