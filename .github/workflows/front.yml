@@ -39,11 +39,11 @@ jobs:
         uses: actions/gcloud/auth@master
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
-        if: github.ref == 'master'
+        if: github.ref == 'refs/heads/master'
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
           args: app deploy --quiet --project hibi-260613 ./front.app.yml
         env:
           CI: true
-        if: github.ref == 'master'
+        if: github.ref == 'refs/heads/master'
