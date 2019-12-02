@@ -40,15 +40,13 @@ func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, er
 type diaryResolver struct{ *rootResolver }
 
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary) (*dto.ArticleConnection, error) {
-	conn := &dto.ArticleConnection{}
-	r.repo.FindArticlesOf(ctx, obj)
-	article := &models.Article{
-		ID: "1",
-		Body: &models.ArticleBody{
-			Markdown: "# poppoe\n",
-			HTML:     "<h1>poppoe</h1>\n",
-		},
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, 15)
+	if err != nil {
+		return nil, err
 	}
-	conn.Nodes = append(conn.Nodes, article)
+	conn := &dto.ArticleConnection{}
+	for _, article := range articles {
+		conn.Nodes = append(conn.Nodes, article)
+	}
 	return conn, nil
 }
