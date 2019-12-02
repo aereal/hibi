@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint --ext .ts,.tsx **/*",
     "build": "next build",
-    "gcp-build": "run-p -l lint build",
+    "gcp-build": "run-p -l build",
     "start": "next start",
     "dev": "run-p -l dev:*",
     "dev:next": "next",

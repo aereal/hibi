@@ -6,7 +6,7 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
-    "start": "next start",
+    "start": "next start --port $PORT",
     "gcp-build": "yarn workspace front gcp-build && cp -R front/.next ."
   },
   "workspaces": [
