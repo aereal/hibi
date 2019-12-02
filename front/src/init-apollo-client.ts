@@ -22,7 +22,7 @@ const createApolloClient = (
     connectToDevTools: process.browser,
     ssrMode: !process.browser,
     link: new HttpLink({
-      uri: `http://localhost:8080/graphql`, // TODO
+      uri: `https://api-dot-hibi-260613.appspot.com/graphql`, // TODO
       credentials: "same-origin",
       fetchOptions: { mode: "cors" },
     }),
