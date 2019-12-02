@@ -1,5 +1,36 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    ":separateMultipleMajorReleases"
+  ],
+  "npm": {
+    "rangeStrategy": "bump"
+  },
+  "automerge": false,
+  "patch": {
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "packagePatterns": ["^@types/"],
+      "automerge": true,
+      "major": {
+        "automerge": false
+      }
+    },
+    {
+      "groupName": "linters",
+      "packagePatterns": [
+        "^eslint",
+        "^@typescript-eslint"
+      ],
+      "packageNames": [
+        "prettier"
+      ],
+      "automerge": true,
+      "major": {
+        "automerge": false
+      }
+    }
   ]
 }
