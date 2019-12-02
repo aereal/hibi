@@ -7,6 +7,7 @@ import (
 
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
+	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
 )
 
@@ -22,12 +23,28 @@ func (r *rootResolver) Query() gql.QueryResolver {
 	return &queryResolver{r}
 }
 
+func (r *rootResolver) Diary() gql.DiaryResolver {
+	return &diaryResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
-func (r *queryResolver) Diary(ctx context.Context, id string) (*dto.Diary, error) {
-	diary := &dto.Diary{
-		Articles: &dto.ArticleConnection{},
-	}
-	diary.Articles.Nodes = append(diary.Articles.Nodes, &dto.Article{ID: "1"})
+func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
+	diary := &models.Diary{}
 	return diary, nil
+}
+
+type diaryResolver struct{ *rootResolver }
+
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary) (*dto.ArticleConnection, error) {
+	conn := &dto.ArticleConnection{}
+	article := &models.Article{
+		ID: "1",
+		Body: &models.ArticleBody{
+			Markdown: "# poppoe\n",
+			HTML:     "<h1>poppoe</h1>\n",
+		},
+	}
+	conn.Nodes = append(conn.Nodes, article)
+	return conn, nil
 }

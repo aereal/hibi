@@ -2,22 +2,10 @@
 
 package dto
 
-type Article struct {
-	ID    string       `json:"id"`
-	Title *string      `json:"title"`
-	Body  *ArticleBody `json:"body"`
-}
-
-type ArticleBody struct {
-	Markdown string `json:"markdown"`
-	HTML     string `json:"html"`
-}
+import (
+	"github.com/aereal/hibi/api/models"
+)
 
 type ArticleConnection struct {
-	Nodes []*Article `json:"nodes"`
-}
-
-type Diary struct {
-	Name     string             `json:"name"`
-	Articles *ArticleConnection `json:"articles"`
+	Nodes []*models.Article `json:"nodes"`
 }

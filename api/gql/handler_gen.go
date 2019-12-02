@@ -8,10 +8,12 @@ import (
 	"errors"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/aereal/hibi/api/gql/dto"
+	"github.com/aereal/hibi/api/models"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -34,6 +36,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Diary() DiaryResolver
 	Query() QueryResolver
 }
 
@@ -66,8 +69,11 @@ type ComplexityRoot struct {
 	}
 }
 
+type DiaryResolver interface {
+	Articles(ctx context.Context, obj *models.Diary) (*dto.ArticleConnection, error)
+}
 type QueryResolver interface {
-	Diary(ctx context.Context, id string) (*dto.Diary, error)
+	Diary(ctx context.Context, id string) (*models.Diary, error)
 }
 
 type executableSchema struct {
@@ -298,7 +304,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Article_id(ctx context.Context, field graphql.CollectedField, obj *dto.Article) (ret graphql.Marshaler) {
+func (ec *executionContext) _Article_id(ctx context.Context, field graphql.CollectedField, obj *models.Article) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -335,7 +341,7 @@ func (ec *executionContext) _Article_id(ctx context.Context, field graphql.Colle
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Article_title(ctx context.Context, field graphql.CollectedField, obj *dto.Article) (ret graphql.Marshaler) {
+func (ec *executionContext) _Article_title(ctx context.Context, field graphql.CollectedField, obj *models.Article) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -369,7 +375,7 @@ func (ec *executionContext) _Article_title(ctx context.Context, field graphql.Co
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Article_body(ctx context.Context, field graphql.CollectedField, obj *dto.Article) (ret graphql.Marshaler) {
+func (ec *executionContext) _Article_body(ctx context.Context, field graphql.CollectedField, obj *models.Article) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -400,13 +406,13 @@ func (ec *executionContext) _Article_body(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*dto.ArticleBody)
+	res := resTmp.(*models.ArticleBody)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx, field.Selections, res)
+	return ec.marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleBody(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ArticleBody_markdown(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleBody) (ret graphql.Marshaler) {
+func (ec *executionContext) _ArticleBody_markdown(ctx context.Context, field graphql.CollectedField, obj *models.ArticleBody) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -443,7 +449,7 @@ func (ec *executionContext) _ArticleBody_markdown(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ArticleBody_html(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleBody) (ret graphql.Marshaler) {
+func (ec *executionContext) _ArticleBody_html(ctx context.Context, field graphql.CollectedField, obj *models.ArticleBody) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -511,13 +517,13 @@ func (ec *executionContext) _ArticleConnection_nodes(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*dto.Article)
+	res := resTmp.([]*models.Article)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleᚄ(ctx, field.Selections, res)
+	return ec.marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Diary_name(ctx context.Context, field graphql.CollectedField, obj *dto.Diary) (ret graphql.Marshaler) {
+func (ec *executionContext) _Diary_name(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -554,7 +560,7 @@ func (ec *executionContext) _Diary_name(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.CollectedField, obj *dto.Diary) (ret graphql.Marshaler) {
+func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -567,13 +573,13 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 		Object:   "Diary",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Articles, nil
+		return ec.resolvers.Diary().Articles(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -626,10 +632,10 @@ func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*dto.Diary)
+	res := resTmp.(*models.Diary)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiary(ctx, field.Selections, res)
+	return ec.marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1868,7 +1874,7 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 var articleImplementors = []string{"Article"}
 
-func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, obj *dto.Article) graphql.Marshaler {
+func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, obj *models.Article) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, articleImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -1902,7 +1908,7 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 
 var articleBodyImplementors = []string{"ArticleBody"}
 
-func (ec *executionContext) _ArticleBody(ctx context.Context, sel ast.SelectionSet, obj *dto.ArticleBody) graphql.Marshaler {
+func (ec *executionContext) _ArticleBody(ctx context.Context, sel ast.SelectionSet, obj *models.ArticleBody) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, articleBodyImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -1961,7 +1967,7 @@ func (ec *executionContext) _ArticleConnection(ctx context.Context, sel ast.Sele
 
 var diaryImplementors = []string{"Diary"}
 
-func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, obj *dto.Diary) graphql.Marshaler {
+func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, obj *models.Diary) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.RequestContext, sel, diaryImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -1973,13 +1979,22 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 		case "name":
 			out.Values[i] = ec._Diary_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "articles":
-			out.Values[i] = ec._Diary_articles(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Diary_articles(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2277,11 +2292,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticle(ctx context.Context, sel ast.SelectionSet, v dto.Article) graphql.Marshaler {
+func (ec *executionContext) marshalNArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx context.Context, sel ast.SelectionSet, v models.Article) graphql.Marshaler {
 	return ec._Article(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleᚄ(ctx context.Context, sel ast.SelectionSet, v []*dto.Article) graphql.Marshaler {
+func (ec *executionContext) marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Article) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2305,7 +2320,7 @@ func (ec *executionContext) marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibi�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticle(ctx, sel, v[i])
+			ret[i] = ec.marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2318,7 +2333,7 @@ func (ec *executionContext) marshalNArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibi�
 	return ret
 }
 
-func (ec *executionContext) marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticle(ctx context.Context, sel ast.SelectionSet, v *dto.Article) graphql.Marshaler {
+func (ec *executionContext) marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx context.Context, sel ast.SelectionSet, v *models.Article) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2328,11 +2343,11 @@ func (ec *executionContext) marshalNArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋap
 	return ec._Article(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNArticleBody2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v dto.ArticleBody) graphql.Marshaler {
+func (ec *executionContext) marshalNArticleBody2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v models.ArticleBody) graphql.Marshaler {
 	return ec._ArticleBody(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v *dto.ArticleBody) graphql.Marshaler {
+func (ec *executionContext) marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v *models.ArticleBody) graphql.Marshaler {
 	if v == nil {
 		if !ec.HasError(graphql.GetResolverContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2647,11 +2662,11 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
-func (ec *executionContext) marshalODiary2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiary(ctx context.Context, sel ast.SelectionSet, v dto.Diary) graphql.Marshaler {
+func (ec *executionContext) marshalODiary2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx context.Context, sel ast.SelectionSet, v models.Diary) graphql.Marshaler {
 	return ec._Diary(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiary(ctx context.Context, sel ast.SelectionSet, v *dto.Diary) graphql.Marshaler {
+func (ec *executionContext) marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx context.Context, sel ast.SelectionSet, v *models.Diary) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
