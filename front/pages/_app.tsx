@@ -3,6 +3,7 @@ import App from "next/app";
 import Head from "next/head";
 import { ApolloProvider } from "@apollo/react-common";
 import { ThemeProvider } from "styled-components";
+import { Normalize } from "styled-normalize";
 import { WithApolloProps } from "../src/types";
 import { withApollo } from "../src/with-apollo";
 import { defaultTheme } from "../src/styling";
@@ -16,6 +17,7 @@ class ApolloApp extends App<WithApolloProps<any>> {
           <title>hibi</title>
         </Head>
         <ApolloProvider client={apolloClient}>
+          <Normalize />
           <ThemeProvider theme={defaultTheme}>
             <Component {...pageProps} />
           </ThemeProvider>
