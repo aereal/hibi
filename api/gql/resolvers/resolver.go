@@ -30,7 +30,10 @@ func (r *rootResolver) Diary() gql.DiaryResolver {
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
-	diary := &models.Diary{}
+	diary, err := r.repo.FindDiary(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	return diary, nil
 }
 
