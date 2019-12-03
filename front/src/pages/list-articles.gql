@@ -1,9 +1,9 @@
 #import "../organisms/article.fragment.gql"
 
-query ListArticles($diaryID: ID!) {
+query ListArticles($diaryID: ID!, $articlesCount: Int!) {
   diary(id: $diaryID) {
     name
-    articles {
+    articles(first: $articlesCount) {
       nodes {
         ...ArticleFragment
       }
