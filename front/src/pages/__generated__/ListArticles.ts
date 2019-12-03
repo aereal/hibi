@@ -28,4 +28,5 @@ export interface ListArticles {
 
 export interface ListArticlesVariables {
   readonly diaryID: string;
+  readonly articlesCount: number;
 }

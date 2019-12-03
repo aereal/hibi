@@ -11,7 +11,7 @@ export const ArticlesPage: FC = () => {
   const { loading, data } = useQuery<ListArticles, ListArticlesVariables>(
     LIST_ARTICLES,
     {
-      variables: { diaryID: "126" },
+      variables: { diaryID: "gZJXFGCS7fONfpIKXWYn", articlesCount: 15 },
     }
   );
   if (loading) {
