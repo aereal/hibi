@@ -6,7 +6,14 @@
 // GraphQL fragment: ArticleFragment
 // ====================================================
 
+export interface ArticleFragment_body {
+  readonly __typename: "ArticleBody";
+  readonly html: string;
+}
+
 export interface ArticleFragment {
   readonly __typename: "Article";
   readonly title: string | null;
+  readonly publishedAt: any;
+  readonly body: ArticleFragment_body;
 }

@@ -6,9 +6,16 @@
 // GraphQL query operation: ListArticles
 // ====================================================
 
+export interface ListArticles_diary_articles_nodes_body {
+  readonly __typename: "ArticleBody";
+  readonly html: string;
+}
+
 export interface ListArticles_diary_articles_nodes {
   readonly __typename: "Article";
   readonly title: string | null;
+  readonly publishedAt: any;
+  readonly body: ListArticles_diary_articles_nodes_body;
 }
 
 export interface ListArticles_diary_articles {
