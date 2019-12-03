@@ -42,7 +42,7 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 type ArticleOrderField string
 
 const (
-	ArticleOrderFieldPublishedAt = "PUBLISHED_AT"
+	ArticleOrderFieldPublishedAt = ArticleOrderField("PUBLISHED_AT")
 )
 
 var (
