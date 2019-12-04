@@ -3,12 +3,19 @@ import { useQuery } from "@apollo/react-hooks";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
 import LIST_ARTICLES from "./list-articles.gql";
 import {
   ListArticles,
   ListArticlesVariables,
 } from "./__generated__/ListArticles";
 import { ArticleList } from "../organisms/article-list";
+
+const useStyles = makeStyles(theme => ({
+  pageTitle: {
+    margin: theme.spacing(3, 0),
+  },
+}));
 
 export const ArticlesPage: FC = () => {
   const { loading, data } = useQuery<ListArticles, ListArticlesVariables>(
@@ -17,6 +24,7 @@ export const ArticlesPage: FC = () => {
       variables: { diaryID: "gZJXFGCS7fONfpIKXWYn", articlesCount: 15 },
     }
   );
+  const classes = useStyles();
   if (loading) {
     return null;
   }
@@ -30,7 +38,9 @@ export const ArticlesPage: FC = () => {
     <>
       <CssBaseline />
       <Container maxWidth="sm">
-        <Typography variant="h3">{data.diary.name}</Typography>
+        <Typography className={classes.pageTitle} variant="h3">
+          {data.diary.name}
+        </Typography>
         <ArticleList articles={data.diary.articles.nodes} />
       </Container>
     </>

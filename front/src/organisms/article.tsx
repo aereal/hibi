@@ -10,6 +10,7 @@ export interface ArticleProps {
 
 const useStyles = makeStyles(theme => ({
   root: {
+    margin: theme.spacing(3, 0),
     padding: theme.spacing(3, 2),
   },
 }));
