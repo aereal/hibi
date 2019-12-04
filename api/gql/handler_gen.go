@@ -71,6 +71,12 @@ type ComplexityRoot struct {
 		Name     func(childComplexity int) int
 	}
 
+	DiaryConnecion struct {
+		Nodes      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -79,7 +85,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Diary func(childComplexity int, id string) int
+		Diaries func(childComplexity int, first int) int
+		Diary   func(childComplexity int, id string) int
 	}
 }
 
@@ -91,6 +98,7 @@ type DiaryResolver interface {
 }
 type QueryResolver interface {
 	Diary(ctx context.Context, id string) (*models.Diary, error)
+	Diaries(ctx context.Context, first int) (*dto.DiaryConnecion, error)
 }
 
 type executableSchema struct {
@@ -197,6 +205,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.Name(childComplexity), true
 
+	case "DiaryConnecion.nodes":
+		if e.complexity.DiaryConnecion.Nodes == nil {
+			break
+		}
+
+		return e.complexity.DiaryConnecion.Nodes(childComplexity), true
+
+	case "DiaryConnecion.pageInfo":
+		if e.complexity.DiaryConnecion.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.DiaryConnecion.PageInfo(childComplexity), true
+
+	case "DiaryConnecion.totalCount":
+		if e.complexity.DiaryConnecion.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.DiaryConnecion.TotalCount(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -224,6 +253,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.diaries":
+		if e.complexity.Query.Diaries == nil {
+			break
+		}
+
+		args, err := ec.field_Query_diaries_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Diaries(childComplexity, args["first"].(int)), true
 
 	case "Query.diary":
 		if e.complexity.Query.Diary == nil {
@@ -288,9 +329,16 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema.graphql", Input: `type Query {
   diary(id: ID!): Diary
+  diaries(first: Int!): DiaryConnecion!
 }
 
 # type Mutation {}
+
+type DiaryConnecion {
+  nodes: [Diary!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
 
 type Diary {
   id: ID!
@@ -378,6 +426,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_diaries_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg0
 	return args, nil
 }
 
@@ -879,6 +941,117 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	return ec.marshalNArticleConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DiaryConnecion_nodes(ctx context.Context, field graphql.CollectedField, obj *dto.DiaryConnecion) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DiaryConnecion",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Diary)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDiary2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiaryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DiaryConnecion_pageInfo(ctx context.Context, field graphql.CollectedField, obj *dto.DiaryConnecion) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DiaryConnecion",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.PageInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DiaryConnecion_totalCount(ctx context.Context, field graphql.CollectedField, obj *dto.DiaryConnecion) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DiaryConnecion",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1060,6 +1233,50 @@ func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_diaries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_diaries_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Diaries(rctx, args["first"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.DiaryConnecion)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDiaryConnecion2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiaryConnecion(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2483,6 +2700,43 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var diaryConnecionImplementors = []string{"DiaryConnecion"}
+
+func (ec *executionContext) _DiaryConnecion(ctx context.Context, sel ast.SelectionSet, obj *dto.DiaryConnecion) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, diaryConnecionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DiaryConnecion")
+		case "nodes":
+			out.Values[i] = ec._DiaryConnecion_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._DiaryConnecion_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._DiaryConnecion_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var pageInfoImplementors = []string{"PageInfo"}
 
 func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *dto.PageInfo) graphql.Marshaler {
@@ -2543,6 +2797,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_diary(ctx, field)
+				return res
+			})
+		case "diaries":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_diaries(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":
@@ -2911,6 +3179,71 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNDiary2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx context.Context, sel ast.SelectionSet, v models.Diary) graphql.Marshaler {
+	return ec._Diary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDiary2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiaryᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Diary) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDiary(ctx context.Context, sel ast.SelectionSet, v *models.Diary) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Diary(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDiaryConnecion2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiaryConnecion(ctx context.Context, sel ast.SelectionSet, v dto.DiaryConnecion) graphql.Marshaler {
+	return ec._DiaryConnecion(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDiaryConnecion2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDiaryConnecion(ctx context.Context, sel ast.SelectionSet, v *dto.DiaryConnecion) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DiaryConnecion(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {

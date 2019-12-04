@@ -20,8 +20,13 @@ type Repository struct {
 	client *firestore.Client
 }
 
+func (r *Repository) FindDiaries(ctx context.Context, limit int) ([]*models.Diary, error) {
+	iter := r.diaries().Limit(limit).Documents(ctx)
+	return r.populateDiaries(iter)
+}
+
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
-	snapshot, err := r.client.Collection("diaries").Doc(id).Get(ctx)
+	snapshot, err := r.diaries().Doc(id).Get(ctx)
 	if status.Code(err) == codes.NotFound {
 		return nil, nil
 	}
@@ -64,6 +69,10 @@ func (r *Repository) articles() *firestore.CollectionRef {
 	return r.client.Collection("articles")
 }
 
+func (r *Repository) diaries() *firestore.CollectionRef {
+	return r.client.Collection("diaries")
+}
+
 func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) ([]*models.Article, error) {
 	results := []*models.Article{}
 	for {
@@ -85,6 +94,28 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 				Markdown: dto.MarkdownBody,
 			},
 			PublishedAt: dto.PublishedAt,
+		})
+	}
+	return results, nil
+}
+
+func (r *Repository) populateDiaries(diariesIter *firestore.DocumentIterator) ([]*models.Diary, error) {
+	results := []*models.Diary{}
+	for {
+		snapshot, err := diariesIter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		var dto diaryDTO
+		if err := snapshot.DataTo(&dto); err != nil {
+			return nil, xerrors.Errorf("failed to article: %w", err)
+		}
+		results = append(results, &models.Diary{
+			ID:   snapshot.Ref.ID,
+			Name: dto.Name,
 		})
 	}
 	return results, nil

@@ -1,8 +1,15 @@
 type Query {
   diary(id: ID!): Diary
+  diaries(first: Int!): DiaryConnecion!
 }
 
 # type Mutation {}
+
+type DiaryConnecion {
+  nodes: [Diary!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
 
 type Diary {
   id: ID!

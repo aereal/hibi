@@ -42,6 +42,24 @@ func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, er
 	return diary, nil
 }
 
+func (r *queryResolver) Diaries(ctx context.Context, first int) (*dto.DiaryConnecion, error) {
+	diaries, err := r.repo.FindDiaries(ctx, first+1)
+	if err != nil {
+		return nil, err
+	}
+	conn := &dto.DiaryConnecion{PageInfo: &dto.PageInfo{}}
+	for _, diary := range diaries {
+		conn.Nodes = append(conn.Nodes, diary)
+	}
+	conn.PageInfo.EndCursor = &diaries[len(diaries)-1].ID
+	conn.PageInfo.HasNextPage = len(diaries) > first
+	conn.TotalCount = len(diaries)
+	if conn.TotalCount > first {
+		conn.TotalCount = first
+	}
+	return conn, nil
+}
+
 type diaryResolver struct{ *rootResolver }
 
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
