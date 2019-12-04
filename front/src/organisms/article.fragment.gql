@@ -1,3 +1,7 @@
 fragment ArticleFragment on Article {
   title
+  publishedAt
+  body {
+    html
+  }
 }

@@ -1,11 +1,22 @@
 import React, { FC } from "react";
 import { useQuery } from "@apollo/react-hooks";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
 import LIST_ARTICLES from "./list-articles.gql";
 import {
   ListArticles,
   ListArticlesVariables,
 } from "./__generated__/ListArticles";
-import { Article } from "../organisms/article";
+import { ArticleList } from "../organisms/article-list";
+import { BidirectionalPager } from "../organisms/bidirectional-pager";
+
+const useStyles = makeStyles(theme => ({
+  pageTitle: {
+    margin: theme.spacing(3, 0),
+  },
+}));
 
 export const ArticlesPage: FC = () => {
   const { loading, data } = useQuery<ListArticles, ListArticlesVariables>(
@@ -14,6 +25,7 @@ export const ArticlesPage: FC = () => {
       variables: { diaryID: "gZJXFGCS7fONfpIKXWYn", articlesCount: 15 },
     }
   );
+  const classes = useStyles();
   if (loading) {
     return null;
   }
@@ -25,13 +37,17 @@ export const ArticlesPage: FC = () => {
   }
   return (
     <>
-      <h1>
-        Diary: {JSON.stringify(data.diary.name)}{" "}
-        {data.diary.articles.nodes.length} articles
-      </h1>
-      {data.diary.articles.nodes.map((article, i) => (
-        <Article article={article} key={i} />
-      ))}
+      <CssBaseline />
+      <Container maxWidth="sm">
+        <Typography className={classes.pageTitle} variant="h3">
+          {data.diary.name}
+        </Typography>
+        <ArticleList articles={data.diary.articles.nodes} />
+        <BidirectionalPager
+          baseURL="/"
+          pageInfo={data.diary.articles.pageInfo}
+        />
+      </Container>
     </>
   );
 };

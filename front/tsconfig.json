@@ -23,6 +23,7 @@
   "include": [
     "next-env.d.ts",
     "graphql.d.ts",
+    "src/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "pages/**/*.ts",

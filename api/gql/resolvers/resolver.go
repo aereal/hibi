@@ -62,6 +62,9 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 	}
 	for _, article := range articles {
 		conn.Nodes = append(conn.Nodes, article)
+		if len(conn.Nodes) == first {
+			break
+		}
 	}
 	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
 	conn.PageInfo.HasNextPage = len(articles) > first
