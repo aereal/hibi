@@ -1,4 +1,5 @@
 #import "../organisms/article.fragment.gql"
+#import "../organisms/bidirectional-page-info.gql"
 
 query ListArticles($diaryID: ID!, $articlesCount: Int!) {
   diary(id: $diaryID) {
@@ -6,6 +7,9 @@ query ListArticles($diaryID: ID!, $articlesCount: Int!) {
     articles(first: $articlesCount, orderBy: { direction: DESC, field: PUBLISHED_AT }) {
       nodes {
         ...ArticleFragment
+      }
+      pageInfo {
+        ...BidirectionalPageInfo
       }
     }
   }

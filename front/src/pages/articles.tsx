@@ -10,6 +10,7 @@ import {
   ListArticlesVariables,
 } from "./__generated__/ListArticles";
 import { ArticleList } from "../organisms/article-list";
+import { BidirectionalPager } from "../organisms/bidirectional-pager";
 
 const useStyles = makeStyles(theme => ({
   pageTitle: {
@@ -42,6 +43,10 @@ export const ArticlesPage: FC = () => {
           {data.diary.name}
         </Typography>
         <ArticleList articles={data.diary.articles.nodes} />
+        <BidirectionalPager
+          baseURL="/"
+          pageInfo={data.diary.articles.pageInfo}
+        />
       </Container>
     </>
   );
