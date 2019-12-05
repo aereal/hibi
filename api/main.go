@@ -17,6 +17,7 @@ import (
 	"github.com/aereal/hibi/api/gql/resolvers"
 	"github.com/aereal/hibi/api/repository"
 	"github.com/aereal/hibi/api/web"
+	clog "github.com/yfuruyama/stackdriver-request-context-log"
 	"go.opencensus.io/trace"
 	"golang.org/x/xerrors"
 )
@@ -70,11 +71,16 @@ func run() error {
 		Resolvers: resolvers.New(repo),
 	})
 
+	cfg := clog.NewConfig(projectID)
+	cfg.RequestLogOut = os.Stderr
+	cfg.ContextLogOut = os.Stdout
+	cfg.Severity = clog.SeverityInfo
+
 	w, err := web.New(onGAE, schema)
 	if err != nil {
 		return xerrors.Errorf("failed to build web: %w", err)
 	}
-	server := w.Server(port)
+	server := w.Server(port, clog.RequestLogging(cfg))
 	go graceful(ctx, server, 5*time.Second)
 
 	log.Printf("starting server; accepting request on %s", server.Addr)

@@ -10,6 +10,7 @@ import (
 	gqlgenhandler "github.com/99designs/gqlgen/handler"
 	"github.com/dimfeld/httptreemux"
 	"github.com/rs/cors"
+	log "github.com/yfuruyama/stackdriver-request-context-log"
 	"go.opencensus.io/plugin/ochttp"
 )
 
@@ -22,7 +23,7 @@ type Web struct {
 	executableSchema graphql.ExecutableSchema
 }
 
-func (w *Web) Server(port string) *http.Server {
+func (w *Web) Server(port string, middleware ...func(prev http.Handler) http.Handler) *http.Server {
 	var (
 		host                 = "localhost"
 		handler http.Handler = w.handler()
@@ -36,6 +37,10 @@ func (w *Web) Server(port string) *http.Server {
 		}
 	}
 
+	for _, mw := range middleware {
+		handler = mw(handler)
+	}
+
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", host, port),
 		Handler: handler,
@@ -45,6 +50,8 @@ func (w *Web) Server(port string) *http.Server {
 func (w *Web) handler() http.Handler {
 	router := httptreemux.New()
 	router.UsingContext().GET("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := log.RequestContextLogger(r)
+		logger.Info("OK")
 		fmt.Fprintln(w, "OK")
 	}))
 	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
