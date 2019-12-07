@@ -38,6 +38,10 @@ func (r *rootResolver) ArticleBody() gql.ArticleBodyResolver {
 	return &articleBodyResolver{r}
 }
 
+func (r *rootResolver) Article() gql.ArticleResolver {
+	return &articleResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
@@ -109,4 +113,18 @@ func (r *mutationResolver) PostArticle(ctx context.Context, newArticle repositor
 		return "", err
 	}
 	return articleID, nil
+}
+
+type articleResolver struct{ *rootResolver }
+
+func (r *articleResolver) Author(ctx context.Context, article *models.Article) (*models.User, error) {
+	record, err := r.authClient.GetUser(ctx, article.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	user := &models.User{
+		ID:   record.UID,
+		Name: record.DisplayName,
+	}
+	return user, nil
 }

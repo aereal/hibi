@@ -34,6 +34,7 @@ func (r *Repository) CreateArticle(ctx context.Context, newDiary NewArticle) (st
 		Title:        newDiary.Title,
 		MarkdownBody: newDiary.MarkdownBody,
 		PublishedAt:  publishedAt,
+		AuthorID:     "TODO",
 	})
 	if err != nil {
 		return "", xerrors.Errorf("cannot create article: %w", err)
@@ -107,6 +108,7 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 				Markdown: dto.MarkdownBody,
 			},
 			PublishedAt: dto.PublishedAt,
+			AuthorID:    dto.AuthorID,
 		})
 	}
 	return results, nil
@@ -122,6 +124,7 @@ type articleDTO struct {
 	Title        string
 	MarkdownBody string
 	PublishedAt  time.Time
+	AuthorID     string
 }
 
 type OrderDirection string

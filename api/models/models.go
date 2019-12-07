@@ -13,6 +13,7 @@ type Article struct {
 	Title       *string
 	Body        *ArticleBody
 	PublishedAt time.Time
+	AuthorID    string
 }
 
 type ArticleBody struct {

@@ -51,6 +51,7 @@ type Article {
   title: String
   body: ArticleBody!
   publishedAt: Time!
+  author: User!
 }
 
 type ArticleBody {

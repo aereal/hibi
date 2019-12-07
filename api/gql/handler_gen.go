@@ -39,6 +39,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Article() ArticleResolver
 	ArticleBody() ArticleBodyResolver
 	Diary() DiaryResolver
 	Mutation() MutationResolver
@@ -51,6 +52,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Article struct {
+		Author      func(childComplexity int) int
 		Body        func(childComplexity int) int
 		ID          func(childComplexity int) int
 		PublishedAt func(childComplexity int) int
@@ -96,6 +98,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type ArticleResolver interface {
+	Author(ctx context.Context, obj *models.Article) (*models.User, error)
+}
 type ArticleBodyResolver interface {
 	HTML(ctx context.Context, obj *models.ArticleBody) (string, error)
 }
@@ -124,6 +129,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Article.author":
+		if e.complexity.Article.Author == nil {
+			break
+		}
+
+		return e.complexity.Article.Author(childComplexity), true
 
 	case "Article.body":
 		if e.complexity.Article.Body == nil {
@@ -402,6 +414,7 @@ type Article {
   title: String
   body: ArticleBody!
   publishedAt: Time!
+  author: User!
 }
 
 type ArticleBody {
@@ -686,6 +699,43 @@ func (ec *executionContext) _Article_publishedAt(ctx context.Context, field grap
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Article_author(ctx context.Context, field graphql.CollectedField, obj *models.Article) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Article",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Article().Author(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ArticleBody_markdown(ctx context.Context, field graphql.CollectedField, obj *models.ArticleBody) (ret graphql.Marshaler) {
@@ -2631,20 +2681,34 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Article_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "title":
 			out.Values[i] = ec._Article_title(ctx, field, obj)
 		case "body":
 			out.Values[i] = ec._Article_body(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "publishedAt":
 			out.Values[i] = ec._Article_publishedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "author":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Article_author(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
