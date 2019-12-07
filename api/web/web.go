@@ -8,9 +8,9 @@ import (
 	"github.com/99designs/gqlgen-contrib/gqlopencensus"
 	"github.com/99designs/gqlgen/graphql"
 	gqlgenhandler "github.com/99designs/gqlgen/handler"
+	"github.com/aereal/hibi/api/logging"
 	"github.com/dimfeld/httptreemux"
 	"github.com/rs/cors"
-	log "github.com/yfuruyama/stackdriver-request-context-log"
 	"go.opencensus.io/plugin/ochttp"
 )
 
@@ -49,19 +49,19 @@ func (w *Web) Server(port string, middleware ...func(prev http.Handler) http.Han
 
 func (w *Web) handler() http.Handler {
 	router := httptreemux.New()
-	router.UsingContext().GET("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger := log.RequestContextLogger(r)
+	router.UsingContext().GET("/", logging.InjectLogger(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := logging.FromRequest(r)
 		logger.Info("OK")
 		fmt.Fprintln(w, "OK")
-	}))
+	})).ServeHTTP)
 	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
 	allow := cors.New(cors.Options{
 		Debug:            true,
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
-	router.UsingContext().Handler(http.MethodOptions, "/graphql", allow.Handler(graphqlHandler))
-	router.UsingContext().Handler(http.MethodPost, "/graphql", allow.Handler(graphqlHandler))
+	router.UsingContext().Handler(http.MethodOptions, "/graphql", logging.InjectLogger(allow.Handler(graphqlHandler)))
+	router.UsingContext().Handler(http.MethodPost, "/graphql", logging.InjectLogger(allow.Handler(graphqlHandler)))
 	return router
 }
 
