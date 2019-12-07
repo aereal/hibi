@@ -56,8 +56,10 @@ func (w *Web) handler() http.Handler {
 	})).ServeHTTP)
 	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
 	allow := cors.New(cors.Options{
-		Debug:            true,
-		AllowedOrigins:   []string{"*"},
+		Debug: true,
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
 		AllowCredentials: true,
 	})
 	router.UsingContext().Handler(http.MethodOptions, "/graphql", logging.InjectLogger(allow.Handler(graphqlHandler)))
