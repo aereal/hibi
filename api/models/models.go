@@ -30,8 +30,15 @@ type User struct {
 	Name string
 }
 
+func (u *User) Role() Role {
+	if u.ID == guestID {
+		return RoleGuest
+	}
+	return RoleAdmin
+}
+
 func (u *User) IsGuest() bool {
-	return u.ID == guestID
+	return u.Role() == RoleGuest
 }
 
 var (

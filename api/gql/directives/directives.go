@@ -22,7 +22,7 @@ func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, role *
 
 	assumedRole := models.RoleGuest
 	if user := auth.ForContext(ctx); user != nil {
-		assumedRole = models.RoleAdmin
+		assumedRole = user.Role()
 	}
 
 	hasPrivilege := assumedRole.HasPrivilegeOf(requiredRole)
