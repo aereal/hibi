@@ -49,7 +49,7 @@ export const useAuthentication = (): AuthenticationStatus => {
   });
 
   useEffect(() => {
-    return auth.onAuthStateChanged(async user => {
+    return auth().onAuthStateChanged(async user => {
       if (user === null) {
         setStatus({ status: "unauthenticated" });
         return;
