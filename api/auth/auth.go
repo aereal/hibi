@@ -60,6 +60,10 @@ const (
 	RoleAdmin
 )
 
+func (r Role) HasPrivilegeOf(other Role) bool {
+	return r >= other
+}
+
 func (r Role) IsValid() bool {
 	switch r {
 	case RoleAdmin, RoleGuest:
