@@ -65,7 +65,7 @@ func (w *Web) handler() http.Handler {
 			return true
 		},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"authorization"},
+		AllowedHeaders:   []string{"authorization", "content-type"},
 	})
 	handle := func(next http.Handler) http.Handler {
 		return logging.InjectLogger(allow.Handler(auth.WithAuthentication(w.authClient)(next)))

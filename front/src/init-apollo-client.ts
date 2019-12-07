@@ -23,8 +23,8 @@ const createApolloClient = (
     ssrMode: !process.browser,
     link: new HttpLink({
       uri: `https://api-dot-hibi-260613.appspot.com/graphql`, // TODO
-      credentials: "same-origin",
-      fetchOptions: { mode: "cors" },
+      credentials: "include",
+      fetchOptions: { mode: "cors", credentials: "include" },
     }),
     cache: new InMemoryCache().restore(initialState),
   });
