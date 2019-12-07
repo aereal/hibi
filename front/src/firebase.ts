@@ -14,10 +14,11 @@ const getApp = (): firebase.app.App => {
   }
 
   cachedApp = firebase.initializeApp({
-    apiKey: "TODO",
-    authDomain: "TODO",
-    projectId: "TODO",
-    appId: "TODO",
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId:
+      process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT,
+    appId: process.env.FIREBASE_APP_ID,
   });
   return cachedApp;
 };
