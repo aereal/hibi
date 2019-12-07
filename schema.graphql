@@ -9,12 +9,21 @@ type Query {
   diary(id: ID!): Diary
 }
 
-# type Mutation {}
+type Mutation {
+  postArticle(article: NewArticle!): ID!
+}
+
+input NewArticle {
+  diaryID: ID!
+  title: String!
+  markdownBody: String!
+}
 
 type Diary {
   id: ID!
   name: String!
   articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+  owner: User!
 }
 
 input ArticleOrder {
@@ -42,11 +51,17 @@ type Article {
   title: String
   body: ArticleBody!
   publishedAt: Time!
+  author: User!
 }
 
 type ArticleBody {
   markdown: String!
   html: String!
+}
+
+type User {
+  id: ID!
+  name: String!
 }
 
 type PageInfo {

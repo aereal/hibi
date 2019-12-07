@@ -20,6 +20,28 @@ type Repository struct {
 	client *firestore.Client
 }
 
+type NewArticle struct {
+	DiaryID      string
+	Title        string
+	MarkdownBody string
+}
+
+func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newDiary NewArticle) (string, error) {
+	ref := r.articles().NewDoc()
+	publishedAt := time.Now()
+	_, err := ref.Create(ctx, articleDTO{
+		DiaryID:      newDiary.DiaryID,
+		Title:        newDiary.Title,
+		MarkdownBody: newDiary.MarkdownBody,
+		PublishedAt:  publishedAt,
+		AuthorID:     author.ID,
+	})
+	if err != nil {
+		return "", xerrors.Errorf("cannot create article: %w", err)
+	}
+	return ref.ID, nil
+}
+
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
 	snapshot, err := r.client.Collection("diaries").Doc(id).Get(ctx)
 	if status.Code(err) == codes.NotFound {
@@ -33,8 +55,9 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 		return nil, xerrors.Errorf("failed to populate snapshot as diary: %w", err)
 	}
 	diary := &models.Diary{
-		Name: dto.Name,
-		ID:   snapshot.Ref.ID,
+		Name:    dto.Name,
+		ID:      snapshot.Ref.ID,
+		OwnerID: dto.OwnerID,
 	}
 	return diary, nil
 }
@@ -85,13 +108,15 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 				Markdown: dto.MarkdownBody,
 			},
 			PublishedAt: dto.PublishedAt,
+			AuthorID:    dto.AuthorID,
 		})
 	}
 	return results, nil
 }
 
 type diaryDTO struct {
-	Name string
+	Name    string
+	OwnerID string
 }
 
 type articleDTO struct {
@@ -99,6 +124,7 @@ type articleDTO struct {
 	Title        string
 	MarkdownBody string
 	PublishedAt  time.Time
+	AuthorID     string
 }
 
 type OrderDirection string
