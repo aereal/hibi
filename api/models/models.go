@@ -24,3 +24,12 @@ type User struct {
 	ID   string
 	Name string
 }
+
+func (u *User) IsGuest() bool {
+	return u.ID == guestID
+}
+
+var (
+	guestID = "**guest**"
+	GUEST   = &User{ID: guestID, Name: "GUEST"}
+)
