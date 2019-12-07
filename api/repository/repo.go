@@ -20,6 +20,27 @@ type Repository struct {
 	client *firestore.Client
 }
 
+type NewArticle struct {
+	DiaryID      string
+	Title        string
+	MarkdownBody string
+}
+
+func (r *Repository) CreateArticle(ctx context.Context, newDiary NewArticle) (string, error) {
+	ref := r.articles().NewDoc()
+	publishedAt := time.Now()
+	_, err := ref.Create(ctx, articleDTO{
+		DiaryID:      newDiary.DiaryID,
+		Title:        newDiary.Title,
+		MarkdownBody: newDiary.MarkdownBody,
+		PublishedAt:  publishedAt,
+	})
+	if err != nil {
+		return "", xerrors.Errorf("cannot create article: %w", err)
+	}
+	return ref.ID, nil
+}
+
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
 	snapshot, err := r.client.Collection("diaries").Doc(id).Get(ctx)
 	if status.Code(err) == codes.NotFound {

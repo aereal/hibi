@@ -41,6 +41,7 @@ type Config struct {
 type ResolverRoot interface {
 	ArticleBody() ArticleBodyResolver
 	Diary() DiaryResolver
+	Mutation() MutationResolver
 	Query() QueryResolver
 }
 
@@ -73,6 +74,10 @@ type ComplexityRoot struct {
 		Name     func(childComplexity int) int
 	}
 
+	Mutation struct {
+		PostArticle func(childComplexity int, article repository.NewArticle) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -90,6 +95,9 @@ type ArticleBodyResolver interface {
 }
 type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
+}
+type MutationResolver interface {
+	PostArticle(ctx context.Context, article repository.NewArticle) (string, error)
 }
 type QueryResolver interface {
 	Diary(ctx context.Context, id string) (*models.Diary, error)
@@ -199,6 +207,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.Name(childComplexity), true
 
+	case "Mutation.postArticle":
+		if e.complexity.Mutation.PostArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_postArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.PostArticle(childComplexity, args["article"].(repository.NewArticle)), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -261,7 +281,20 @@ func (e *executableSchema) Query(ctx context.Context, op *ast.OperationDefinitio
 }
 
 func (e *executableSchema) Mutation(ctx context.Context, op *ast.OperationDefinition) *graphql.Response {
-	return graphql.ErrorResponse(ctx, "mutations are not supported")
+	ec := executionContext{graphql.GetRequestContext(ctx), e}
+
+	buf := ec.RequestMiddleware(ctx, func(ctx context.Context) []byte {
+		data := ec._Mutation(ctx, op.SelectionSet)
+		var buf bytes.Buffer
+		data.MarshalGQL(&buf)
+		return buf.Bytes()
+	})
+
+	return &graphql.Response{
+		Data:       buf,
+		Errors:     ec.Errors,
+		Extensions: ec.Extensions,
+	}
 }
 
 func (e *executableSchema) Subscription(ctx context.Context, op *ast.OperationDefinition) func() *graphql.Response {
@@ -299,7 +332,15 @@ type Query {
   diary(id: ID!): Diary
 }
 
-# type Mutation {}
+type Mutation {
+  postArticle(article: NewArticle!): ID!
+}
+
+input NewArticle {
+  diaryID: ID!
+  title: String!
+  markdownBody: String!
+}
 
 type Diary {
   id: ID!
@@ -387,6 +428,20 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 		}
 	}
 	args["orderBy"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_postArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 repository.NewArticle
+	if tmp, ok := rawArgs["article"]; ok {
+		arg0, err = ec.unmarshalNNewArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐNewArticle(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["article"] = arg0
 	return args, nil
 }
 
@@ -900,6 +955,50 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNArticleConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_postArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_postArticle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().PostArticle(rctx, args["article"].(repository.NewArticle))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
@@ -2335,6 +2434,36 @@ func (ec *executionContext) unmarshalInputArticleOrder(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj interface{}) (repository.NewArticle, error) {
+	var it repository.NewArticle
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "diaryID":
+			var err error
+			it.DiaryID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "markdownBody":
+			var err error
+			it.MarkdownBody, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2495,6 +2624,37 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mutationImplementors = []string{"Mutation"}
+
+func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, mutationImplementors)
+
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Object: "Mutation",
+	})
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Mutation")
+		case "postArticle":
+			out.Values[i] = ec._Mutation_postArticle(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2962,6 +3122,10 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNNewArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐNewArticle(ctx context.Context, v interface{}) (repository.NewArticle, error) {
+	return ec.unmarshalInputNewArticle(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐOrderDirection(ctx context.Context, v interface{}) (repository.OrderDirection, error) {

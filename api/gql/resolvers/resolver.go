@@ -24,6 +24,10 @@ func (r *rootResolver) Query() gql.QueryResolver {
 	return &queryResolver{r}
 }
 
+func (r *rootResolver) Mutation() gql.MutationResolver {
+	return &mutationResolver{r}
+}
+
 func (r *rootResolver) Diary() gql.DiaryResolver {
 	return &diaryResolver{r}
 }
@@ -80,4 +84,15 @@ type articleBodyResolver struct{ *rootResolver }
 func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody) (string, error) {
 	rendered := blackfriday.Run([]byte(body.Markdown))
 	return string(rendered), nil
+}
+
+type mutationResolver struct{ *rootResolver }
+
+func (r *mutationResolver) PostArticle(ctx context.Context, newArticle repository.NewArticle) (string, error) {
+	// TODO: check user
+	articleID, err := r.repo.CreateArticle(ctx, newArticle)
+	if err != nil {
+		return "", err
+	}
+	return articleID, nil
 }
