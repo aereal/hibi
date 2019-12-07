@@ -13,7 +13,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/gql/dto"
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
@@ -47,7 +46,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
-	HasRole func(ctx context.Context, obj interface{}, next graphql.Resolver, role *auth.Role) (res interface{}, err error)
+	HasRole func(ctx context.Context, obj interface{}, next graphql.Resolver, role *models.Role) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -445,9 +444,9 @@ scalar Time
 func (ec *executionContext) dir_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *auth.Role
+	var arg0 *models.Role
 	if tmp, ok := rawArgs["role"]; ok {
-		arg0, err = ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx, tmp)
+		arg0, err = ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3726,24 +3725,24 @@ func (ec *executionContext) marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapi�
 	return ec._Diary(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx context.Context, v interface{}) (auth.Role, error) {
-	var res auth.Role
+func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, v interface{}) (models.Role, error) {
+	var res models.Role
 	return res, res.UnmarshalGQL(v)
 }
 
-func (ec *executionContext) marshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx context.Context, sel ast.SelectionSet, v auth.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, sel ast.SelectionSet, v models.Role) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx context.Context, v interface{}) (*auth.Role, error) {
+func (ec *executionContext) unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, v interface{}) (*models.Role, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx, v)
+	res, err := ec.unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx, v)
 	return &res, err
 }
 
-func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx context.Context, sel ast.SelectionSet, v *auth.Role) graphql.Marshaler {
+func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, sel ast.SelectionSet, v *models.Role) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

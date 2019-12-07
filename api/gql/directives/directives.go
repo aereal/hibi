@@ -7,21 +7,22 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/gql"
+	"github.com/aereal/hibi/api/models"
 )
 
 func New() gql.DirectiveRoot {
 	return gql.DirectiveRoot{HasRole: hasRole}
 }
 
-func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, role *auth.Role) (interface{}, error) {
-	requiredRole := auth.RoleGuest
+func hasRole(ctx context.Context, obj interface{}, next graphql.Resolver, role *models.Role) (interface{}, error) {
+	requiredRole := models.RoleGuest
 	if role != nil {
 		requiredRole = *role
 	}
 
-	assumedRole := auth.RoleGuest
+	assumedRole := models.RoleGuest
 	if user := auth.ForContext(ctx); user != nil {
-		assumedRole = auth.RoleAdmin
+		assumedRole = models.RoleAdmin
 	}
 
 	hasPrivilege := assumedRole.HasPrivilegeOf(requiredRole)

@@ -26,7 +26,7 @@ models:
   ArticleOrderField:
     model: github.com/aereal/hibi/api/repository.ArticleOrderField
   Role:
-    model: github.com/aereal/hibi/api/auth.Role
+    model: github.com/aereal/hibi/api/models.Role
   NewArticle:
     model: github.com/aereal/hibi/api/repository.NewArticle
   User:
