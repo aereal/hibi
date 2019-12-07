@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -44,6 +45,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	HasRole func(ctx context.Context, obj interface{}, next graphql.Resolver, role *dto.Role) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -286,8 +288,15 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var parsedSchema = gqlparser.MustLoadSchema(
-	&ast.Source{Name: "schema.graphql", Input: `type Query {
-  diary(id: ID!): Diary
+	&ast.Source{Name: "schema.graphql", Input: `directive @hasRole(role: Role) on FIELD_DEFINITION
+
+enum Role {
+  ADMIN
+  GUEST
+}
+
+type Query {
+  diary(id: ID!): Diary @hasRole(role: ADMIN)
 }
 
 # type Mutation {}
@@ -344,6 +353,20 @@ scalar Time
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_hasRole_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *dto.Role
+	if tmp, ok := rawArgs["role"]; ok {
+		arg0, err = ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["role"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1046,8 +1069,32 @@ func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.Coll
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Diary(rctx, args["id"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Diary(rctx, args["id"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx, "ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasRole == nil {
+				return nil, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, role)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*models.Diary); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/aereal/hibi/api/models.Diary`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3268,6 +3315,30 @@ func (ec *executionContext) marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapi�
 		return graphql.Null
 	}
 	return ec._Diary(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx context.Context, v interface{}) (dto.Role, error) {
+	var res dto.Role
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx context.Context, sel ast.SelectionSet, v dto.Role) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx context.Context, v interface{}) (*dto.Role, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐRole(ctx context.Context, sel ast.SelectionSet, v *dto.Role) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

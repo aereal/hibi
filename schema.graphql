@@ -1,5 +1,12 @@
+directive @hasRole(role: Role) on FIELD_DEFINITION
+
+enum Role {
+  ADMIN
+  GUEST
+}
+
 type Query {
-  diary(id: ID!): Diary
+  diary(id: ID!): Diary @hasRole(role: ADMIN)
 }
 
 # type Mutation {}

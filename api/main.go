@@ -15,6 +15,7 @@ import (
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/resolvers"
+	"github.com/aereal/hibi/api/gql/directives"
 	"github.com/aereal/hibi/api/repository"
 	"github.com/aereal/hibi/api/web"
 	clog "github.com/yfuruyama/stackdriver-request-context-log"
@@ -69,6 +70,7 @@ func run() error {
 
 	schema := gql.NewExecutableSchema(gql.Config{
 		Resolvers: resolvers.New(repo),
+		Directives: directives.New(),
 	})
 
 	cfg := clog.NewConfig(projectID)
