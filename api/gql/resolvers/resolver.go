@@ -4,8 +4,10 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
-	"firebase.google.com/go/auth"
+	firebaseauth "firebase.google.com/go/auth"
+	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
 	"github.com/aereal/hibi/api/models"
@@ -13,13 +15,13 @@ import (
 	"gopkg.in/russross/blackfriday.v2"
 )
 
-func New(repo *repository.Repository, authClient *auth.Client) gql.ResolverRoot {
+func New(repo *repository.Repository, authClient *firebaseauth.Client) gql.ResolverRoot {
 	return &rootResolver{repo: repo, authClient: authClient}
 }
 
 type rootResolver struct {
 	repo       *repository.Repository
-	authClient *auth.Client
+	authClient *firebaseauth.Client
 }
 
 func (r *rootResolver) Query() gql.QueryResolver {
@@ -107,8 +109,21 @@ func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody
 type mutationResolver struct{ *rootResolver }
 
 func (r *mutationResolver) PostArticle(ctx context.Context, newArticle repository.NewArticle) (string, error) {
-	// TODO: check user
-	articleID, err := r.repo.CreateArticle(ctx, newArticle)
+	visitor := auth.ForContext(ctx)
+	if visitor == nil {
+		return "", fmt.Errorf("[BUG] authentication failed")
+	}
+
+	diary, err := r.repo.FindDiary(ctx, newArticle.DiaryID)
+	if err != nil {
+		return "", err
+	}
+
+	if !diary.CanPostArticle(visitor) {
+		return "", fmt.Errorf("cannot post article due to lack of permission")
+	}
+
+	articleID, err := r.repo.CreateArticle(ctx, visitor, newArticle)
 	if err != nil {
 		return "", err
 	}

@@ -13,6 +13,10 @@ type Diary struct {
 	OwnerID string
 }
 
+func (d *Diary) CanPostArticle(user *User) bool {
+	return user.ID == d.OwnerID
+}
+
 type Article struct {
 	ID          string
 	Title       *string

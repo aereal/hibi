@@ -26,7 +26,7 @@ type NewArticle struct {
 	MarkdownBody string
 }
 
-func (r *Repository) CreateArticle(ctx context.Context, newDiary NewArticle) (string, error) {
+func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newDiary NewArticle) (string, error) {
 	ref := r.articles().NewDoc()
 	publishedAt := time.Now()
 	_, err := ref.Create(ctx, articleDTO{
@@ -34,7 +34,7 @@ func (r *Repository) CreateArticle(ctx context.Context, newDiary NewArticle) (st
 		Title:        newDiary.Title,
 		MarkdownBody: newDiary.MarkdownBody,
 		PublishedAt:  publishedAt,
-		AuthorID:     "TODO",
+		AuthorID:     author.ID,
 	})
 	if err != nil {
 		return "", xerrors.Errorf("cannot create article: %w", err)
