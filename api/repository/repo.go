@@ -54,8 +54,9 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 		return nil, xerrors.Errorf("failed to populate snapshot as diary: %w", err)
 	}
 	diary := &models.Diary{
-		Name: dto.Name,
-		ID:   snapshot.Ref.ID,
+		Name:    dto.Name,
+		ID:      snapshot.Ref.ID,
+		OwnerID: dto.OwnerID,
 	}
 	return diary, nil
 }
@@ -112,7 +113,8 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 }
 
 type diaryDTO struct {
-	Name string
+	Name    string
+	OwnerID string
 }
 
 type articleDTO struct {

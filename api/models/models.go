@@ -3,8 +3,9 @@ package models
 import "time"
 
 type Diary struct {
-	ID   string
-	Name string
+	ID      string
+	Name    string
+	OwnerID string
 }
 
 type Article struct {
@@ -16,4 +17,9 @@ type Article struct {
 
 type ArticleBody struct {
 	Markdown string
+}
+
+type User struct {
+	ID   string
+	Name string
 }

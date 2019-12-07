@@ -23,6 +23,7 @@ type Diary {
   id: ID!
   name: String!
   articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+  owner: User!
 }
 
 input ArticleOrder {
@@ -55,6 +56,11 @@ type Article {
 type ArticleBody {
   markdown: String!
   html: String!
+}
+
+type User {
+  id: ID!
+  name: String!
 }
 
 type PageInfo {

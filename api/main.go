@@ -80,7 +80,7 @@ func run() error {
 	}
 
 	schema := gql.NewExecutableSchema(gql.Config{
-		Resolvers:  resolvers.New(repo),
+		Resolvers:  resolvers.New(repo, authClient),
 		Directives: directives.New(),
 	})
 

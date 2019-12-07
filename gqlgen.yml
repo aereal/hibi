@@ -29,3 +29,5 @@ models:
     model: github.com/aereal/hibi/api/auth.Role
   NewArticle:
     model: github.com/aereal/hibi/api/repository.NewArticle
+  User:
+    model: github.com/aereal/hibi/api/models.User

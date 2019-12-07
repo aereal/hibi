@@ -5,6 +5,7 @@ package resolvers
 import (
 	"context"
 
+	"firebase.google.com/go/auth"
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
 	"github.com/aereal/hibi/api/models"
@@ -12,12 +13,13 @@ import (
 	"gopkg.in/russross/blackfriday.v2"
 )
 
-func New(repo *repository.Repository) gql.ResolverRoot {
-	return &rootResolver{repo: repo}
+func New(repo *repository.Repository, authClient *auth.Client) gql.ResolverRoot {
+	return &rootResolver{repo: repo, authClient: authClient}
 }
 
 type rootResolver struct {
-	repo *repository.Repository
+	repo       *repository.Repository
+	authClient *auth.Client
 }
 
 func (r *rootResolver) Query() gql.QueryResolver {
@@ -77,6 +79,18 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 		conn.TotalCount = first
 	}
 	return conn, nil
+}
+
+func (r *diaryResolver) Owner(ctx context.Context, diary *models.Diary) (*models.User, error) {
+	record, err := r.authClient.GetUser(ctx, diary.OwnerID)
+	if err != nil {
+		return nil, err
+	}
+	user := &models.User{
+		ID:   record.UID,
+		Name: record.DisplayName,
+	}
+	return user, nil
 }
 
 type articleBodyResolver struct{ *rootResolver }
