@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -297,7 +296,7 @@ enum Role {
 }
 
 type Query {
-  diary(id: ID!): Diary @hasRole(role: ADMIN)
+  diary(id: ID!): Diary
 }
 
 # type Mutation {}
@@ -1070,32 +1069,8 @@ func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.Coll
 	rctx.Args = args
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Diary(rctx, args["id"].(string))
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			role, err := ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋauthᚐRole(ctx, "ADMIN")
-			if err != nil {
-				return nil, err
-			}
-			if ec.directives.HasRole == nil {
-				return nil, errors.New("directive hasRole is not implemented")
-			}
-			return ec.directives.HasRole(ctx, nil, directive0, role)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*models.Diary); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/aereal/hibi/api/models.Diary`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Diary(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

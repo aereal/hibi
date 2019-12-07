@@ -6,7 +6,7 @@ enum Role {
 }
 
 type Query {
-  diary(id: ID!): Diary @hasRole(role: ADMIN)
+  diary(id: ID!): Diary
 }
 
 # type Mutation {}
