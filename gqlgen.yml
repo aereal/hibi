@@ -25,3 +25,5 @@ models:
     model: github.com/aereal/hibi/api/repository.OrderDirection
   ArticleOrderField:
     model: github.com/aereal/hibi/api/repository.ArticleOrderField
+  Role:
+    model: github.com/aereal/hibi/api/auth.Role

@@ -3,10 +3,6 @@
 package dto
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
 )
@@ -27,45 +23,4 @@ type PageInfo struct {
 	HasNextPage     bool    `json:"hasNextPage"`
 	HasPreviousPage bool    `json:"hasPreviousPage"`
 	StartCursor     *string `json:"startCursor"`
-}
-
-type Role string
-
-const (
-	RoleAdmin Role = "ADMIN"
-	RoleGuest Role = "GUEST"
-)
-
-var AllRole = []Role{
-	RoleAdmin,
-	RoleGuest,
-}
-
-func (e Role) IsValid() bool {
-	switch e {
-	case RoleAdmin, RoleGuest:
-		return true
-	}
-	return false
-}
-
-func (e Role) String() string {
-	return string(e)
-}
-
-func (e *Role) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = Role(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Role", str)
-	}
-	return nil
-}
-
-func (e Role) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
 }
