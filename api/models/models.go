@@ -25,6 +25,13 @@ type Article struct {
 	AuthorID    string
 }
 
+type Draft struct {
+	ID       string
+	Title    *string
+	Body     *ArticleBody
+	AuthorID string
+}
+
 type ArticleBody struct {
 	Markdown string
 }
