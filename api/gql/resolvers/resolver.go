@@ -44,6 +44,10 @@ func (r *rootResolver) Article() gql.ArticleResolver {
 	return &articleResolver{r}
 }
 
+func (r *rootResolver) Draft() gql.DraftResolver {
+	return &draftResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
@@ -81,6 +85,29 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
 	conn.PageInfo.HasNextPage = len(articles) > first
 	conn.TotalCount = len(articles)
+	if conn.TotalCount > first {
+		conn.TotalCount = first
+	}
+	return conn, nil
+}
+
+func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, first int) (*dto.DraftConnection, error) {
+	drafts, err := r.repo.FindDraftsOf(ctx, diary.ID, first+1)
+	if err != nil {
+		return nil, err
+	}
+	conn := &dto.DraftConnection{
+		PageInfo: &dto.PageInfo{},
+	}
+	for _, draft := range drafts {
+		conn.Nodes = append(conn.Nodes, draft)
+		if len(conn.Nodes) == first {
+			break
+		}
+	}
+	conn.PageInfo.EndCursor = &drafts[len(drafts)-1].ID
+	conn.PageInfo.HasNextPage = len(drafts) > first
+	conn.TotalCount = len(drafts)
 	if conn.TotalCount > first {
 		conn.TotalCount = first
 	}
@@ -134,6 +161,20 @@ type articleResolver struct{ *rootResolver }
 
 func (r *articleResolver) Author(ctx context.Context, article *models.Article) (*models.User, error) {
 	record, err := r.authClient.GetUser(ctx, article.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	user := &models.User{
+		ID:   record.UID,
+		Name: record.DisplayName,
+	}
+	return user, nil
+}
+
+type draftResolver struct{ *rootResolver }
+
+func (r *draftResolver) Author(ctx context.Context, draft *models.Draft) (*models.User, error) {
+	record, err := r.authClient.GetUser(ctx, draft.AuthorID)
 	if err != nil {
 		return nil, err
 	}

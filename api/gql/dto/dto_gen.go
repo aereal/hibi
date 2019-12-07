@@ -18,6 +18,12 @@ type ArticleOrder struct {
 	Direction repository.OrderDirection    `json:"direction"`
 }
 
+type DraftConnection struct {
+	Nodes      []*models.Draft `json:"nodes"`
+	PageInfo   *PageInfo       `json:"pageInfo"`
+	TotalCount int             `json:"totalCount"`
+}
+
 type PageInfo struct {
 	EndCursor       *string `json:"endCursor"`
 	HasNextPage     bool    `json:"hasNextPage"`

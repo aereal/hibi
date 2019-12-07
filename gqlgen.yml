@@ -31,3 +31,5 @@ models:
     model: github.com/aereal/hibi/api/repository.NewArticle
   User:
     model: github.com/aereal/hibi/api/models.User
+  Draft:
+    model: github.com/aereal/hibi/api/models.Draft

@@ -41,6 +41,7 @@ type ResolverRoot interface {
 	Article() ArticleResolver
 	ArticleBody() ArticleBodyResolver
 	Diary() DiaryResolver
+	Draft() DraftResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -71,9 +72,23 @@ type ComplexityRoot struct {
 
 	Diary struct {
 		Articles func(childComplexity int, first int, orderBy *dto.ArticleOrder) int
+		Drafts   func(childComplexity int, first int) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Owner    func(childComplexity int) int
+	}
+
+	Draft struct {
+		Author func(childComplexity int) int
+		Body   func(childComplexity int) int
+		ID     func(childComplexity int) int
+		Title  func(childComplexity int) int
+	}
+
+	DraftConnection struct {
+		Nodes      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -105,7 +120,11 @@ type ArticleBodyResolver interface {
 }
 type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
+	Drafts(ctx context.Context, obj *models.Diary, first int) (*dto.DraftConnection, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
+}
+type DraftResolver interface {
+	Author(ctx context.Context, obj *models.Draft) (*models.User, error)
 }
 type MutationResolver interface {
 	PostArticle(ctx context.Context, article repository.NewArticle) (string, error)
@@ -211,6 +230,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.Articles(childComplexity, args["first"].(int), args["orderBy"].(*dto.ArticleOrder)), true
 
+	case "Diary.drafts":
+		if e.complexity.Diary.Drafts == nil {
+			break
+		}
+
+		args, err := ec.field_Diary_drafts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Diary.Drafts(childComplexity, args["first"].(int)), true
+
 	case "Diary.id":
 		if e.complexity.Diary.ID == nil {
 			break
@@ -231,6 +262,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Diary.Owner(childComplexity), true
+
+	case "Draft.author":
+		if e.complexity.Draft.Author == nil {
+			break
+		}
+
+		return e.complexity.Draft.Author(childComplexity), true
+
+	case "Draft.body":
+		if e.complexity.Draft.Body == nil {
+			break
+		}
+
+		return e.complexity.Draft.Body(childComplexity), true
+
+	case "Draft.id":
+		if e.complexity.Draft.ID == nil {
+			break
+		}
+
+		return e.complexity.Draft.ID(childComplexity), true
+
+	case "Draft.title":
+		if e.complexity.Draft.Title == nil {
+			break
+		}
+
+		return e.complexity.Draft.Title(childComplexity), true
+
+	case "DraftConnection.nodes":
+		if e.complexity.DraftConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.DraftConnection.Nodes(childComplexity), true
+
+	case "DraftConnection.pageInfo":
+		if e.complexity.DraftConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.DraftConnection.PageInfo(childComplexity), true
+
+	case "DraftConnection.totalCount":
+		if e.complexity.DraftConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.DraftConnection.TotalCount(childComplexity), true
 
 	case "Mutation.postArticle":
 		if e.complexity.Mutation.PostArticle == nil {
@@ -385,6 +465,7 @@ type Diary {
   id: ID!
   name: String!
   articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+  drafts(first: Int!): DraftConnection!
   owner: User!
 }
 
@@ -402,6 +483,12 @@ enum OrderDirection {
   DESC
 }
 
+type DraftConnection {
+  nodes: [Draft!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
 type ArticleConnection {
   nodes: [Article!]!
   pageInfo: PageInfo!
@@ -413,6 +500,13 @@ type Article {
   title: String
   body: ArticleBody!
   publishedAt: Time!
+  author: User!
+}
+
+type Draft {
+  id: ID!
+  title: String
+  body: ArticleBody!
   author: User!
 }
 
@@ -474,6 +568,20 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 		}
 	}
 	args["orderBy"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Diary_drafts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["first"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg0
 	return args, nil
 }
 
@@ -1040,6 +1148,50 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	return ec.marshalNArticleConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Diary_drafts(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Diary",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Diary_drafts_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Diary().Drafts(rctx, obj, args["first"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.DraftConnection)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDraftConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDraftConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Diary_owner(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
@@ -1075,6 +1227,262 @@ func (ec *executionContext) _Diary_owner(ctx context.Context, field graphql.Coll
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNUser2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Draft_id(ctx context.Context, field graphql.CollectedField, obj *models.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Draft_title(ctx context.Context, field graphql.CollectedField, obj *models.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Draft_body(ctx context.Context, field graphql.CollectedField, obj *models.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Body, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.ArticleBody)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNArticleBody2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleBody(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Draft_author(ctx context.Context, field graphql.CollectedField, obj *models.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Draft().Author(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DraftConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *dto.DraftConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DraftConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Draft)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNDraft2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDraftᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DraftConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *dto.DraftConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DraftConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.PageInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DraftConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *dto.DraftConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "DraftConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_postArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2832,6 +3240,20 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		case "drafts":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Diary_drafts(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "owner":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2846,6 +3268,91 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var draftImplementors = []string{"Draft"}
+
+func (ec *executionContext) _Draft(ctx context.Context, sel ast.SelectionSet, obj *models.Draft) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, draftImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Draft")
+		case "id":
+			out.Values[i] = ec._Draft_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "title":
+			out.Values[i] = ec._Draft_title(ctx, field, obj)
+		case "body":
+			out.Values[i] = ec._Draft_body(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "author":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Draft_author(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var draftConnectionImplementors = []string{"DraftConnection"}
+
+func (ec *executionContext) _DraftConnection(ctx context.Context, sel ast.SelectionSet, obj *dto.DraftConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, draftConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DraftConnection")
+		case "nodes":
+			out.Values[i] = ec._DraftConnection_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._DraftConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._DraftConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3348,6 +3855,71 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNDraft2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDraft(ctx context.Context, sel ast.SelectionSet, v models.Draft) graphql.Marshaler {
+	return ec._Draft(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDraft2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDraftᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Draft) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		rctx := &graphql.ResolverContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithResolverContext(ctx, rctx)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDraft2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDraft(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDraft2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐDraft(ctx context.Context, sel ast.SelectionSet, v *models.Draft) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Draft(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDraftConnection2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDraftConnection(ctx context.Context, sel ast.SelectionSet, v dto.DraftConnection) graphql.Marshaler {
+	return ec._DraftConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDraftConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐDraftConnection(ctx context.Context, sel ast.SelectionSet, v *dto.DraftConnection) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DraftConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
