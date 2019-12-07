@@ -11,9 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	firebase "firebase.google.com/go"
 	"github.com/aereal/hibi/api/gql"
+	"github.com/aereal/hibi/api/gql/directives"
 	"github.com/aereal/hibi/api/gql/resolvers"
 	"github.com/aereal/hibi/api/repository"
 	"github.com/aereal/hibi/api/web"
@@ -57,7 +58,18 @@ func run() error {
 	if projectID == "" {
 		return errors.New("GOOGLE_CLOUD_PROJECT must be defined")
 	}
-	client, err := firestore.NewClient(ctx, projectID)
+
+	app, err := firebase.NewApp(ctx, nil)
+	if err != nil {
+		return xerrors.Errorf("failed to initialize firebase admin SDK: %w", err)
+	}
+
+	authClient, err := app.Auth(ctx)
+	if err != nil {
+		return xerrors.Errorf("failed to initialize Firebase Authentication client: %w", err)
+	}
+
+	client, err := app.Firestore(ctx)
 	if err != nil {
 		return xerrors.Errorf("failed to build firestore client: %w", err)
 	}
@@ -68,7 +80,8 @@ func run() error {
 	}
 
 	schema := gql.NewExecutableSchema(gql.Config{
-		Resolvers: resolvers.New(repo),
+		Resolvers:  resolvers.New(repo),
+		Directives: directives.New(),
 	})
 
 	cfg := clog.NewConfig(projectID)
@@ -76,7 +89,7 @@ func run() error {
 	cfg.ContextLogOut = os.Stdout
 	cfg.Severity = clog.SeverityInfo
 
-	w, err := web.New(onGAE, schema)
+	w, err := web.New(onGAE, schema, authClient)
 	if err != nil {
 		return xerrors.Errorf("failed to build web: %w", err)
 	}
