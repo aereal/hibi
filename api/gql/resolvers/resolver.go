@@ -82,7 +82,9 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 			break
 		}
 	}
-	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
+	if len(articles) > 0 {
+		conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
+	}
 	conn.PageInfo.HasNextPage = len(articles) > first
 	conn.TotalCount = len(articles)
 	if conn.TotalCount > first {
@@ -105,7 +107,9 @@ func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, first i
 			break
 		}
 	}
-	conn.PageInfo.EndCursor = &drafts[len(drafts)-1].ID
+	if len(drafts) > 0 {
+		conn.PageInfo.EndCursor = &drafts[len(drafts)-1].ID
+	}
 	conn.PageInfo.HasNextPage = len(drafts) > first
 	conn.TotalCount = len(drafts)
 	if conn.TotalCount > first {
