@@ -15,4 +15,7 @@ module.exports = {
       process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT,
     FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
   },
+  typescript: {
+    ignoreDevErrors: true,
+  },
 };
