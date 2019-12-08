@@ -35,15 +35,22 @@ jobs:
           eslint_flags: '--ext .ts front/src/**/*'
       - name: build
         run: yarn workspace front build
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
       - name: setup google cloud
         uses: actions/gcloud/auth@master
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
-        if: github.ref == 'refs/heads/master'
+      - run: |
+          echo '{}' | jq --arg apiKey '${{ secrets.FIREBASE_API_KEY }}' --arg authDomain '${{ secrets.FIREBASE_AUTH_DOMAIN }}' --arg appId '${{ secrets.FIREBASE_APP_ID }}' '{FIREBASE_API_KEY: $apiKey, FIREBASE_AUTH_DOMAIN: $authDomain, FIREBASE_APP_ID: $appId}' > front/firebase-config.json
+          cat front/firebase-config.json | jq --arg apiEndpoint 'https://api-dot-hibi-260613.appspot.com/graphql' '.API_ENDPOINT = $apiEndpoint' | tee front/firebase-config.json
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
           args: app deploy --quiet --project hibi-260613 ./front.app.yml
         env:
           CI: true
-        if: github.ref == 'refs/heads/master'
