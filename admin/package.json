@@ -140,5 +140,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "firebase-tools": "^7.9.0"
   }
 }
