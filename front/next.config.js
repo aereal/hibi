@@ -12,21 +12,14 @@ const readConfigFile = () => {
 };
 
 module.exports = () => {
-  let firebaseConfig = readConfigFile();
-  if (firebaseConfig === undefined) {
-    firebaseConfig = {
-      FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
-      FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
-      FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
-      FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
-    };
-  }
-  if (
-    firebaseConfig !== undefined &&
-    firebaseConfig.FIREBASE_PROJECT_ID === undefined
-  ) {
-    firebaseConfig.FIREBASE_PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT;
-  }
+  const firebaseConfig = {
+    FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
+    FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
+    FIREBASE_PROJECT_ID:
+      process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT,
+    FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
+    ...readConfigFile(),
+  };
 
   return {
     webpack(config) {
