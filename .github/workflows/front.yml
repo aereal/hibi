@@ -45,6 +45,8 @@ jobs:
         uses: actions/gcloud/auth@master
         env:
           GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+      - run: |
+          echo '{}' | jq --arg apiKey '${{ secrets.FIREBASE_API_KEY }}' --arg authDomain '${{ secrets.FIREBASE_AUTH_DOMAIN }}' --arg appId '${{ secrets.FIREBASE_APP_ID }}' '{FIREBASE_API_KEY: $apiKey, FIREBASE_AUTH_DOMAIN: $authDomain, FIREBASE_APP_ID: $appId}' > front/firebase-config.json
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
