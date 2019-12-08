@@ -104,3 +104,5 @@ jobs:
         run: yarn workspace admin test
         env:
           CI: true
+      - name: deploy
+        run: yarn workspace admin deploy --token "${{ secrets.FIREBASE_TOKEN }}"
