@@ -10,7 +10,8 @@
     "gcp-build": "yarn workspace front gcp-build && cp -R front/.next ."
   },
   "workspaces": [
-    "front"
+    "front",
+    "admin"
   ],
   "resolutions": {
     "merge-anything": "2.4.2"
