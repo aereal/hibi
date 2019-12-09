@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, FormEventHandler } from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -6,6 +6,12 @@ import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
+import {
+  signIn,
+  useAuthentication,
+  isSignedIn,
+} from "../effects/authentication";
+import { getCurrentRoute, routes, isWellKnownRouteName } from "../routes";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -27,8 +33,35 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const redirectToPreviousPage = (): void => {
+  const current = getCurrentRoute();
+  if (current.name !== "signIn") {
+    return;
+  }
+  const nextRouteName =
+    current.params.callbackRoute !== undefined
+      ? current.params.callbackRoute
+      : routes.root.name;
+  if (!isWellKnownRouteName(nextRouteName)) {
+    return;
+  }
+  const nextRoute = routes[nextRouteName];
+  nextRoute.push();
+};
+
 export const SignInPage: FC = () => {
   const classes = useStyles();
+  const status = useAuthentication();
+
+  if (isSignedIn(status)) {
+    redirectToPreviousPage();
+    return null;
+  }
+
+  const onSubmit: FormEventHandler = event => {
+    event.preventDefault();
+    signIn();
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -40,7 +73,7 @@ export const SignInPage: FC = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={onSubmit}>
           <Button
             type="submit"
             fullWidth
