@@ -3,7 +3,8 @@
   "editor.formatOnSave": false,
   "editor.formatOnType": false,
   "eslint.workingDirectories": [
-    { "changeProcessCWD": true, "directory": "./front" }
+    { "changeProcessCWD": true, "directory": "./front" },
+    { "changeProcessCWD": true, "directory": "./admin" }
   ],
   "eslint.autoFixOnSave": true,
   "eslint.validate": [
