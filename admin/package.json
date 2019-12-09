@@ -60,6 +60,7 @@
     "style-loader": "1.0.0",
     "terser-webpack-plugin": "2.2.1",
     "ts-pnp": "1.1.5",
+    "type-route": "^0.3.4",
     "typescript": "~3.7.2",
     "url-loader": "2.3.0",
     "webpack": "4.41.2",
