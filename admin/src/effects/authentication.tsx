@@ -4,6 +4,7 @@ import React, {
   useState,
   PropsWithChildren,
 } from "react";
+import firebase from "firebase";
 import { auth } from "../firebase";
 
 export interface User {
@@ -76,3 +77,11 @@ export const DefaultAuthenticationProvider = (props: PropsWithChildren<{}>) => (
     {props.children}
   </AuthenticationContext.Provider>
 );
+
+const authProvider = new firebase.auth.GoogleAuthProvider();
+
+export const signIn = async (): Promise<void> => {
+  await auth().signInWithPopup(authProvider);
+};
+
+export const signOut = (): Promise<void> => auth().signOut();
