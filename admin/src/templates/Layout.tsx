@@ -58,7 +58,7 @@ const useStyles = makeStyles<Theme, { drawerWidth: number }>(theme => ({
 export const Layout: FC = ({ children }) => {
   const drawerWidth = 240;
   const classes = useStyles({ drawerWidth });
-  const [openDrawer, setOpenDrawer] = useState(true);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const handleDrawerOpen = (): void => setOpenDrawer(true);
 
   return (
