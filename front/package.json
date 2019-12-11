@@ -88,7 +88,7 @@
     "@types/react-dom": "16.9.4",
     "@typescript-eslint/eslint-plugin": "2.11.0",
     "@typescript-eslint/parser": "2.11.0",
-    "apollo": "2.21.1",
+    "apollo": "2.21.2",
     "eslint": "6.7.2",
     "eslint-config-prettier": "6.7.0",
     "eslint-plugin-prettier": "3.1.1",
