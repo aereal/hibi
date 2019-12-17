@@ -5,6 +5,7 @@ import { RootPage } from "./pages/RootPage";
 import { SignInPage } from "./pages/SignInPage";
 import { NewArticlePage } from "./pages/NewArticlePage";
 import { DefaultAuthenticationProvider } from "./effects/authentication";
+import { AuthenApolloClientProvider } from "./effects/authen-apollo-client";
 
 const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
   switch (route.name) {
@@ -25,7 +26,9 @@ const App: FC = () => {
 
   return (
     <DefaultAuthenticationProvider>
-      <Routing route={route} />
+      <AuthenApolloClientProvider>
+        <Routing route={route} />
+      </AuthenApolloClientProvider>
     </DefaultAuthenticationProvider>
   );
 };
