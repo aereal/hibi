@@ -10,6 +10,7 @@ import {
   PostNewArticleMutation,
   PostNewArticleMutationVariables,
 } from "./__generated__/PostNewArticleMutation";
+import { PostCompletedNotification } from "../organisms/PostCompletedNotification";
 
 const NewArticlePageContent: FC = () => {
   const [doMutation, { error, loading }] = useMutation<
@@ -18,6 +19,7 @@ const NewArticlePageContent: FC = () => {
   >(mutation);
   const [title, setTitle] = useState("");
   const [markdownBody, setMarkdownBody] = useState("");
+  const [completed, setCompleted] = useState(false);
 
   if (error !== undefined) {
     return (
@@ -41,6 +43,7 @@ const NewArticlePageContent: FC = () => {
     });
     setTitle("");
     setMarkdownBody("");
+    setCompleted(true);
   };
 
   const onChange = (item: ChangeItem) => {
@@ -54,14 +57,25 @@ const NewArticlePageContent: FC = () => {
     }
   };
 
+  const onCloseNotification = () => {
+    setCompleted(false);
+  };
+
   return (
-    <ArticleEditor
-      onSubmit={onSubmit}
-      loading={loading}
-      title={title}
-      markdownBody={markdownBody}
-      onChange={onChange}
-    />
+    <>
+      <ArticleEditor
+        onSubmit={onSubmit}
+        loading={loading}
+        title={title}
+        markdownBody={markdownBody}
+        onChange={onChange}
+      />
+      <PostCompletedNotification
+        open={completed}
+        onClose={onCloseNotification}
+      />
+      {loading ? <LinearProgress /> : null}
+    </>
   );
 };
 
