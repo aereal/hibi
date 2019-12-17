@@ -86,7 +86,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "deploy": "firebase deploy",
-    "predeploy": "node scripts/build.js"
+    "predeploy": "node scripts/build.js",
+    "dev:codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql --watch",
+    "codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql"
   },
   "eslintConfig": {
     "extends": [
