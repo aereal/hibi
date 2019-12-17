@@ -108,3 +108,7 @@ jobs:
         run: yarn workspace admin deploy --token "${{ secrets.FIREBASE_TOKEN }}" --project "${{ secrets.GCLOUD_PROJECT }}"
         env:
           REACT_APP_API_ENDPOINT: https://api-dot-hibi-260613.appspot.com/graphql
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          REACT_APP_FIREBASE_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
