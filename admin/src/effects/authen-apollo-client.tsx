@@ -25,7 +25,10 @@ export const useAuthenApolloClient = () => {
   return { apolloClient, authenticationStatus };
 };
 
-export const ProvideAuthenApolloClientOrRedirect: FC = ({ children }) => {
+export const ProvideAuthenApolloClientOrRedirect: FC<{ onLoading: FC }> = ({
+  children,
+  onLoading: OnLoading,
+}) => {
   const { apolloClient, authenticationStatus } = useAuthenApolloClient();
 
   if (isUnauthenticated(authenticationStatus)) {
@@ -37,7 +40,7 @@ export const ProvideAuthenApolloClientOrRedirect: FC = ({ children }) => {
   }
 
   if (apolloClient === undefined) {
-    return null;
+    return <OnLoading />;
   }
 
   return <ApolloProvider client={apolloClient}>{children}</ApolloProvider>;

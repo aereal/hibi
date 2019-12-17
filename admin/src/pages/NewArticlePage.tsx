@@ -1,5 +1,6 @@
 import React, { FC, FormEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
+import LinearProgress from "@material-ui/core/LinearProgress";
 import { useQuery } from "@apollo/react-hooks";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
@@ -26,7 +27,7 @@ const NewArticlePageContent: FC = () => {
   }
 
   if (loading) {
-    return <>Loading ...</>;
+    return <LinearProgress />;
   }
 
   if (data === undefined) {
@@ -43,7 +44,7 @@ const NewArticlePageContent: FC = () => {
 export const NewArticlePage: FC = () => (
   <Layout>
     <Grid item xs={12} spacing={0}>
-      <ProvideAuthenApolloClientOrRedirect>
+      <ProvideAuthenApolloClientOrRedirect onLoading={() => <LinearProgress />}>
         <NewArticlePageContent />
       </ProvideAuthenApolloClientOrRedirect>
     </Grid>
