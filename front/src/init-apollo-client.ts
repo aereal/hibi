@@ -24,7 +24,7 @@ const createApolloClient = (
     link: new HttpLink({
       uri:
         process.env.API_ENDPOINT !== undefined
-          ? process.env.API_ENDPOINTI
+          ? process.env.API_ENDPOINT
           : `http://localhost:8080/graphql`,
       credentials: "include",
       fetchOptions: { mode: "cors", credentials: "include" },
