@@ -1,27 +1,44 @@
 import React, { useState, useEffect, FC } from "react";
 import { ApolloProvider } from "@apollo/react-common";
-import { useAuthentication, isSignedIn } from "./authentication";
+import {
+  useAuthentication,
+  isSignedIn,
+  isUnauthenticated,
+} from "./authentication";
 import { createApolloClient } from "../create-apollo-client";
+import { getCurrentRoute, routes } from "../routes";
 
-const useAuthenApolloClient = () => {
+export const useAuthenApolloClient = () => {
   const [apolloClient, setApolloClient] = useState<
     ReturnType<typeof createApolloClient>
   >();
-  const status = useAuthentication();
+  const authenticationStatus = useAuthentication();
 
   useEffect(() => {
-    if (isSignedIn(status)) {
-      setApolloClient(createApolloClient(status.currentUser.idToken));
+    if (isSignedIn(authenticationStatus)) {
+      setApolloClient(
+        createApolloClient(authenticationStatus.currentUser.idToken)
+      );
     }
-  }, [isSignedIn(status)]);
+  }, [isSignedIn(authenticationStatus)]);
 
-  return apolloClient;
+  return { apolloClient, authenticationStatus };
 };
 
-export const AuthenApolloClientProvider: FC = ({ children }) => {
-  const client = useAuthenApolloClient();
-  if (client === undefined) {
+export const ProvideAuthenApolloClientOrRedirect: FC = ({ children }) => {
+  const { apolloClient, authenticationStatus } = useAuthenApolloClient();
+
+  if (isUnauthenticated(authenticationStatus)) {
+    const { name } = getCurrentRoute();
+    routes.signIn.push({
+      callbackRoute: name === false ? undefined : name,
+    });
     return null;
   }
-  return <ApolloProvider client={client}>{children}</ApolloProvider>;
+
+  if (apolloClient === undefined) {
+    return null;
+  }
+
+  return <ApolloProvider client={apolloClient}>{children}</ApolloProvider>;
 };

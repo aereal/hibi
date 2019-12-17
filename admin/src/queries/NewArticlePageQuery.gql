@@ -1,0 +1,5 @@
+query NewArticlePageQuery($diaryID: ID!) {
+  diary(id: $diaryID) {
+    name
+  }
+}
