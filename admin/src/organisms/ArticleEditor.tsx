@@ -1,9 +1,8 @@
-import React, { FC } from "react";
+import React, { FC, FormEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { FormEventHandler } from "react";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -14,15 +13,34 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-interface ArticleEditorProps {
-  readonly onSubmit: FormEventHandler;
+export interface ChangeItem {
+  readonly name: "title" | "markdownBody";
+  readonly value: string;
 }
 
-export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
+interface ArticleEditorProps {
+  readonly onSubmit: FormEventHandler;
+  readonly loading: boolean;
+  readonly title: string;
+  readonly markdownBody: string;
+  readonly onChange: (item: ChangeItem) => void;
+}
+
+export const ArticleEditor: FC<ArticleEditorProps> = ({
+  onSubmit,
+  loading,
+  title,
+  markdownBody,
+  onChange,
+}) => {
   const classes = useStyles();
 
   return (
-    <form noValidate className={classes.form} onSubmit={onSubmit}>
+    <form
+      noValidate
+      className={classes.form}
+      onSubmit={event => onSubmit(event)}
+    >
       <Grid container spacing={0}>
         <Grid item sm={12} spacing={0}>
           <TextField
@@ -33,6 +51,11 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
             id="title"
             label="題"
             placeholder="今日の日記"
+            value={title}
+            disabled={loading}
+            onChange={event =>
+              onChange({ name: "title", value: event.target.value })
+            }
           />
         </Grid>
         <Grid item sm={12} spacing={0}>
@@ -45,6 +68,11 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
             placeholder="…"
             multiline
             rows={12}
+            value={markdownBody}
+            disabled={loading}
+            onChange={event =>
+              onChange({ name: "markdownBody", value: event.target.value })
+            }
           />
         </Grid>
         <Grid container justify="flex-start" spacing={0}>
@@ -55,6 +83,7 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
               variant="contained"
               color="primary"
               className={classes.submit}
+              disabled={loading}
             >
               公開する
             </Button>

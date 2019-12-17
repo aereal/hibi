@@ -6,6 +6,12 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface NewArticle {
+  readonly diaryID: string;
+  readonly title: string;
+  readonly markdownBody: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

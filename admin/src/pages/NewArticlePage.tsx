@@ -1,21 +1,23 @@
-import React, { FC, FormEventHandler } from "react";
+import React, { FC, useState, FormEvent } from "react";
 import Grid from "@material-ui/core/Grid";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
-import { ArticleEditor } from "../organisms/ArticleEditor";
-import query from "../queries/NewArticlePageQuery.gql";
+import { ArticleEditor, ChangeItem } from "../organisms/ArticleEditor";
+import mutation from "./PostNewArticleMutation.gql";
 import {
-  NewArticlePageQuery,
-  NewArticlePageQueryVariables,
-} from "../queries/__generated__/NewArticlePageQuery";
+  PostNewArticleMutation,
+  PostNewArticleMutationVariables,
+} from "./__generated__/PostNewArticleMutation";
 
 const NewArticlePageContent: FC = () => {
-  const { data, loading, error } = useQuery<
-    NewArticlePageQuery,
-    NewArticlePageQueryVariables
-  >(query, { variables: { diaryID: "gZJXFGCS7fONfpIKXWYn" } });
+  const [doMutation, { error, loading }] = useMutation<
+    PostNewArticleMutation,
+    PostNewArticleMutationVariables
+  >(mutation);
+  const [title, setTitle] = useState("");
+  const [markdownBody, setMarkdownBody] = useState("");
 
   if (error !== undefined) {
     return (
@@ -26,19 +28,41 @@ const NewArticlePageContent: FC = () => {
     );
   }
 
-  if (loading) {
-    return <LinearProgress />;
-  }
-
-  if (data === undefined) {
-    return null;
-  }
-
-  const onSubmit: FormEventHandler = event => {
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    await doMutation({
+      variables: {
+        newArticle: {
+          diaryID: "gZJXFGCS7fONfpIKXWYn",
+          title,
+          markdownBody,
+        },
+      },
+    });
+    setTitle("");
+    setMarkdownBody("");
   };
 
-  return <ArticleEditor onSubmit={onSubmit} />;
+  const onChange = (item: ChangeItem) => {
+    switch (item.name) {
+      case "title":
+        setTitle(item.value);
+        break;
+      case "markdownBody":
+        setMarkdownBody(item.value);
+        break;
+    }
+  };
+
+  return (
+    <ArticleEditor
+      onSubmit={onSubmit}
+      loading={loading}
+      title={title}
+      markdownBody={markdownBody}
+      onChange={onChange}
+    />
+  );
 };
 
 export const NewArticlePage: FC = () => (
