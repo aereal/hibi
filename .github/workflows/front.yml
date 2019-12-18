@@ -105,6 +105,7 @@ jobs:
         env:
           CI: true
       - name: deploy
+        if: github.ref == 'refs/heads/master'
         run: yarn workspace admin deploy --token "${{ secrets.FIREBASE_TOKEN }}" --project "${{ secrets.GCLOUD_PROJECT }}"
         env:
           REACT_APP_API_ENDPOINT: https://api-dot-hibi-260613.appspot.com/graphql
