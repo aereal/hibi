@@ -74,11 +74,12 @@ var (
 	}
 )
 
-func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Article, error) {
+func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Article, error) {
 	iter := r.articles().
 		OrderBy(articleFieldMapping[orderField], firestoreOrderDirectionMapping[dir]).
 		Where("DiaryID", "==", diaryID).
 		Limit(limit).
+		Offset(offset).
 		Documents(ctx)
 	return r.populateArticles(iter)
 }

@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 	}
 
 	Diary struct {
-		Articles func(childComplexity int, first int, orderBy *dto.ArticleOrder) int
+		Articles func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Owner    func(childComplexity int) int
@@ -80,11 +80,9 @@ type ComplexityRoot struct {
 		PostArticle func(childComplexity int, article repository.NewArticle) int
 	}
 
-	PageInfo struct {
-		EndCursor       func(childComplexity int) int
-		HasNextPage     func(childComplexity int) int
-		HasPreviousPage func(childComplexity int) int
-		StartCursor     func(childComplexity int) int
+	OffsetBasePageInfo struct {
+		HasNextPage func(childComplexity int) int
+		NextPage    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -104,7 +102,7 @@ type ArticleBodyResolver interface {
 	HTML(ctx context.Context, obj *models.ArticleBody) (string, error)
 }
 type DiaryResolver interface {
-	Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
+	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
 }
 type MutationResolver interface {
@@ -209,7 +207,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Diary.Articles(childComplexity, args["first"].(int), args["orderBy"].(*dto.ArticleOrder)), true
+		return e.complexity.Diary.Articles(childComplexity, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder)), true
 
 	case "Diary.id":
 		if e.complexity.Diary.ID == nil {
@@ -244,33 +242,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.PostArticle(childComplexity, args["article"].(repository.NewArticle)), true
 
-	case "PageInfo.endCursor":
-		if e.complexity.PageInfo.EndCursor == nil {
+	case "OffsetBasePageInfo.hasNextPage":
+		if e.complexity.OffsetBasePageInfo.HasNextPage == nil {
 			break
 		}
 
-		return e.complexity.PageInfo.EndCursor(childComplexity), true
+		return e.complexity.OffsetBasePageInfo.HasNextPage(childComplexity), true
 
-	case "PageInfo.hasNextPage":
-		if e.complexity.PageInfo.HasNextPage == nil {
+	case "OffsetBasePageInfo.nextPage":
+		if e.complexity.OffsetBasePageInfo.NextPage == nil {
 			break
 		}
 
-		return e.complexity.PageInfo.HasNextPage(childComplexity), true
-
-	case "PageInfo.hasPreviousPage":
-		if e.complexity.PageInfo.HasPreviousPage == nil {
-			break
-		}
-
-		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
-
-	case "PageInfo.startCursor":
-		if e.complexity.PageInfo.StartCursor == nil {
-			break
-		}
-
-		return e.complexity.PageInfo.StartCursor(childComplexity), true
+		return e.complexity.OffsetBasePageInfo.NextPage(childComplexity), true
 
 	case "Query.diary":
 		if e.complexity.Query.Diary == nil {
@@ -384,7 +368,7 @@ input NewArticle {
 type Diary {
   id: ID!
   name: String!
-  articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
   owner: User!
 }
 
@@ -404,7 +388,7 @@ enum OrderDirection {
 
 type ArticleConnection {
   nodes: [Article!]!
-  pageInfo: PageInfo!
+  pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }
 
@@ -426,11 +410,9 @@ type User {
   name: String!
 }
 
-type PageInfo {
-  endCursor: String
+type OffsetBasePageInfo {
   hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
+  nextPage: Int
 }
 
 scalar Time
@@ -459,21 +441,29 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["first"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["first"] = arg0
-	var arg1 *dto.ArticleOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		arg1, err = ec.unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, tmp)
+	args["page"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["perPage"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["orderBy"] = arg1
+	args["perPage"] = arg1
+	var arg2 *dto.ArticleOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		arg2, err = ec.unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg2
 	return args, nil
 }
 
@@ -879,10 +869,10 @@ func (ec *executionContext) _ArticleConnection_pageInfo(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*dto.PageInfo)
+	res := resTmp.(*dto.OffsetBasePageInfo)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPageInfo(ctx, field.Selections, res)
+	return ec.marshalNOffsetBasePageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐOffsetBasePageInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ArticleConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleConnection) (ret graphql.Marshaler) {
@@ -1022,7 +1012,7 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Diary().Articles(rctx, obj, args["first"].(int), args["orderBy"].(*dto.ArticleOrder))
+		return ec.resolvers.Diary().Articles(rctx, obj, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1121,7 +1111,7 @@ func (ec *executionContext) _Mutation_postArticle(ctx context.Context, field gra
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
+func (ec *executionContext) _OffsetBasePageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *dto.OffsetBasePageInfo) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1131,41 +1121,7 @@ func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graph
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "PageInfo",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EndCursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "PageInfo",
+		Object:   "OffsetBasePageInfo",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -1192,7 +1148,7 @@ func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
+func (ec *executionContext) _OffsetBasePageInfo_nextPage(ctx context.Context, field graphql.CollectedField, obj *dto.OffsetBasePageInfo) (ret graphql.Marshaler) {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer func() {
 		if r := recover(); r != nil {
@@ -1202,7 +1158,7 @@ func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field
 		ec.Tracer.EndFieldExecution(ctx)
 	}()
 	rctx := &graphql.ResolverContext{
-		Object:   "PageInfo",
+		Object:   "OffsetBasePageInfo",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -1211,44 +1167,7 @@ func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.HasPreviousPage, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *dto.PageInfo) (ret graphql.Marshaler) {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-		ec.Tracer.EndFieldExecution(ctx)
-	}()
-	rctx := &graphql.ResolverContext{
-		Object:   "PageInfo",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.StartCursor, nil
+		return obj.NextPage, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1257,10 +1176,10 @@ func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2888,31 +2807,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var pageInfoImplementors = []string{"PageInfo"}
+var offsetBasePageInfoImplementors = []string{"OffsetBasePageInfo"}
 
-func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *dto.PageInfo) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.RequestContext, sel, pageInfoImplementors)
+func (ec *executionContext) _OffsetBasePageInfo(ctx context.Context, sel ast.SelectionSet, obj *dto.OffsetBasePageInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, offsetBasePageInfoImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("PageInfo")
-		case "endCursor":
-			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("OffsetBasePageInfo")
 		case "hasNextPage":
-			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
+			out.Values[i] = ec._OffsetBasePageInfo_hasNextPage(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "hasPreviousPage":
-			out.Values[i] = ec._PageInfo_hasPreviousPage(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "startCursor":
-			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+		case "nextPage":
+			out.Values[i] = ec._OffsetBasePageInfo_nextPage(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3382,6 +3294,20 @@ func (ec *executionContext) unmarshalNNewArticle2githubᚗcomᚋaerealᚋhibiᚋ
 	return ec.unmarshalInputNewArticle(ctx, v)
 }
 
+func (ec *executionContext) marshalNOffsetBasePageInfo2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐOffsetBasePageInfo(ctx context.Context, sel ast.SelectionSet, v dto.OffsetBasePageInfo) graphql.Marshaler {
+	return ec._OffsetBasePageInfo(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOffsetBasePageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐOffsetBasePageInfo(ctx context.Context, sel ast.SelectionSet, v *dto.OffsetBasePageInfo) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._OffsetBasePageInfo(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNOrderDirection2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐOrderDirection(ctx context.Context, v interface{}) (repository.OrderDirection, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	return repository.OrderDirection(tmp), err
@@ -3395,20 +3321,6 @@ func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋaerealᚋhibi�
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNPageInfo2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v dto.PageInfo) graphql.Marshaler {
-	return ec._PageInfo(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNPageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v *dto.PageInfo) graphql.Marshaler {
-	if v == nil {
-		if !ec.HasError(graphql.GetResolverContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._PageInfo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3723,6 +3635,29 @@ func (ec *executionContext) marshalODiary2ᚖgithubᚗcomᚋaerealᚋhibiᚋapi�
 		return graphql.Null
 	}
 	return ec._Diary(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalInt(v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOInt2int(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOInt2int(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, v interface{}) (models.Role, error) {

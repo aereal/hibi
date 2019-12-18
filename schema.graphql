@@ -22,7 +22,7 @@ input NewArticle {
 type Diary {
   id: ID!
   name: String!
-  articles(first: Int!, orderBy: ArticleOrder): ArticleConnection!
+  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
   owner: User!
 }
 
@@ -42,7 +42,7 @@ enum OrderDirection {
 
 type ArticleConnection {
   nodes: [Article!]!
-  pageInfo: PageInfo!
+  pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }
 
@@ -64,11 +64,9 @@ type User {
   name: String!
 }
 
-type PageInfo {
-  endCursor: String
+type OffsetBasePageInfo {
   hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
+  nextPage: Int
 }
 
 scalar Time
