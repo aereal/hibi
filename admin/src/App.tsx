@@ -3,6 +3,7 @@ import { Route } from "type-route";
 import { routes, getCurrentRoute, listen } from "./routes";
 import { RootPage } from "./pages/RootPage";
 import { SignInPage } from "./pages/SignInPage";
+import { NewArticlePage } from "./pages/NewArticlePage";
 import { DefaultAuthenticationProvider } from "./effects/authentication";
 
 const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
@@ -11,6 +12,8 @@ const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
       return <RootPage />;
     case routes.signIn.name:
       return <SignInPage />;
+    case routes.newArticle.name:
+      return <NewArticlePage />;
     default:
       return <>Not Found</>;
   }

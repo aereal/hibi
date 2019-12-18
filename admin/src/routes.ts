@@ -8,6 +8,7 @@ export const { routes, listen, getCurrentRoute } = createRouter({
     },
     () => "/sign-in"
   ),
+  newArticle: defineRoute("/new"),
 });
 
 export const isWellKnownRouteName = (

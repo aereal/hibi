@@ -7,6 +7,7 @@ import Divider from "@material-ui/core/Divider";
 import CloseIcon from "@material-ui/icons/Close";
 import CreateIcon from "@material-ui/icons/Create";
 import { signOut } from "../effects/authentication";
+import { routes } from "../routes";
 
 const signOutWithConfirmation = () => {
   if (window.confirm("ログアウトしますか?")) {
@@ -18,7 +19,7 @@ export const DrawerMenuList: FC = () => (
   <>
     <Divider />
     <List>
-      <ListItem button>
+      <ListItem button {...routes.newArticle.link()}>
         <ListItemIcon>
           <CreateIcon />
         </ListItemIcon>
