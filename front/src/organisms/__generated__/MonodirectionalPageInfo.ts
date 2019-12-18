@@ -3,13 +3,11 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: BidirectionalPageInfo
+// GraphQL fragment: MonodirectionalPageInfo
 // ====================================================
 
-export interface BidirectionalPageInfo {
-  readonly __typename: "PageInfo";
+export interface MonodirectionalPageInfo {
+  readonly __typename: "OffsetBasePageInfo";
   readonly hasNextPage: boolean;
-  readonly hasPreviousPage: boolean;
-  readonly startCursor: string | null;
-  readonly endCursor: string | null;
+  readonly nextPage: number | null;
 }

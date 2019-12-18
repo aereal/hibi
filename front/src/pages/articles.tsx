@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { useRouter } from "next/router";
 import { useQuery } from "@apollo/react-hooks";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Container from "@material-ui/core/Container";
@@ -10,7 +11,9 @@ import {
   ListArticlesVariables,
 } from "./__generated__/ListArticles";
 import { ArticleList } from "../organisms/article-list";
-import { BidirectionalPager } from "../organisms/bidirectional-pager";
+import { MonodirectionalPager } from "../organisms/monodirectional-pager";
+import { toSearchParams } from "../parsed-url-query";
+import { tryParseInt } from "../try-parse-int";
 
 const useStyles = makeStyles(theme => ({
   pageTitle: {
@@ -19,10 +22,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const ArticlesPage: FC = () => {
+  const router = useRouter() ?? { query: {} };
+  const params = toSearchParams(router.query);
+  const currentPage = tryParseInt(params.get("page") ?? "1") ?? 1;
   const { loading, data } = useQuery<ListArticles, ListArticlesVariables>(
     LIST_ARTICLES,
     {
-      variables: { diaryID: "gZJXFGCS7fONfpIKXWYn", articlesCount: 15 },
+      variables: {
+        diaryID: "gZJXFGCS7fONfpIKXWYn",
+        articlesCount: 5,
+        currentPage,
+      },
     }
   );
   const classes = useStyles();
@@ -43,7 +53,7 @@ export const ArticlesPage: FC = () => {
           {data.diary.name}
         </Typography>
         <ArticleList articles={data.diary.articles.nodes} />
-        <BidirectionalPager
+        <MonodirectionalPager
           baseURL="/"
           pageInfo={data.diary.articles.pageInfo}
         />

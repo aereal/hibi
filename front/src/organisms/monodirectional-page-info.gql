@@ -1,0 +1,4 @@
+fragment MonodirectionalPageInfo on OffsetBasePageInfo {
+  hasNextPage
+  nextPage
+}

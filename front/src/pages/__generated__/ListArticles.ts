@@ -19,11 +19,9 @@ export interface ListArticles_diary_articles_nodes {
 }
 
 export interface ListArticles_diary_articles_pageInfo {
-  readonly __typename: "PageInfo";
+  readonly __typename: "OffsetBasePageInfo";
   readonly hasNextPage: boolean;
-  readonly hasPreviousPage: boolean;
-  readonly startCursor: string | null;
-  readonly endCursor: string | null;
+  readonly nextPage: number | null;
 }
 
 export interface ListArticles_diary_articles {
@@ -45,4 +43,5 @@ export interface ListArticles {
 export interface ListArticlesVariables {
   readonly diaryID: string;
   readonly articlesCount: number;
+  readonly currentPage: number;
 }

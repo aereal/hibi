@@ -56,7 +56,19 @@ func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, er
 
 type diaryResolver struct{ *rootResolver }
 
-func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+const maxPerPage = 50
+
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+	if perPage > maxPerPage {
+		return nil, fmt.Errorf("perPage parameter too large")
+	}
+
+	pageOffset := page - 1
+	if pageOffset < 0 {
+		pageOffset = 0
+	}
+	offset := pageOffset * perPage
+
 	var (
 		field     = repository.ArticleOrderFieldPublishedAt
 		direction = repository.OrderDirectionAsc
@@ -65,24 +77,27 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, first i
 		field = orderBy.Field
 		direction = orderBy.Direction
 	}
-	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, first+1, field, direction)
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, perPage+1, offset, field, direction)
 	if err != nil {
 		return nil, err
 	}
 	conn := &dto.ArticleConnection{
-		PageInfo: &dto.PageInfo{},
+		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, article := range articles {
 		conn.Nodes = append(conn.Nodes, article)
-		if len(conn.Nodes) == first {
+		if len(conn.Nodes) == perPage {
 			break
 		}
 	}
-	conn.PageInfo.EndCursor = &articles[len(articles)-1].ID
-	conn.PageInfo.HasNextPage = len(articles) > first
+	conn.PageInfo.HasNextPage = len(articles) > perPage
+	if conn.PageInfo.HasNextPage {
+		nextPage := page + 1
+		conn.PageInfo.NextPage = &nextPage
+	}
 	conn.TotalCount = len(articles)
-	if conn.TotalCount > first {
-		conn.TotalCount = first
+	if conn.TotalCount > perPage {
+		conn.TotalCount = perPage
 	}
 	return conn, nil
 }
