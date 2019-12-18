@@ -1,6 +1,0 @@
-fragment BidirectionalPageInfo on PageInfo {
-  hasNextPage
-  hasPreviousPage
-  startCursor
-  endCursor
-}
