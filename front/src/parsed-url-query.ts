@@ -1,12 +1,13 @@
-/// <reference lib="esnext.array" />
 /// <reference lib="dom" />
 
 import { ParsedUrlQuery } from "querystring";
-import "core-js/es/array/flat-map";
+
+const flatMap = <T, U>(array: T[], f: (t: T) => U[]): U[] =>
+  array.reduce<U[]>((accum, e) => accum.concat(f(e)), []);
 
 export const toSearchParams = (q: ParsedUrlQuery): URLSearchParams =>
   new URLSearchParams(
-    Object.entries(q).flatMap(([k, vs]) => {
+    flatMap(Object.entries(q), ([k, vs]) => {
       const values = ([] as string[]).concat(vs);
       return values.map(v => [k, v]);
     })
