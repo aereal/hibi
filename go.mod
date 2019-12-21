@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/pubsub v1.1.0 // indirect
 	cloud.google.com/go/storage v1.4.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.8
-	firebase.google.com/go v3.10.0+incompatible
+	firebase.google.com/go v3.11.0+incompatible
 	github.com/99designs/gqlgen v0.10.2
 	github.com/99designs/gqlgen-contrib v0.0.0-20191030030013-7aa27db3321a
 	github.com/agnivade/levenshtein v1.0.3 // indirect
