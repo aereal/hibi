@@ -14,6 +14,8 @@ export const DateTime: FC<DateTimeProps> = ({
   return (
     <Typography
       ref={el =>
+        el !== undefined &&
+        el !== null &&
         ((el as TimeHTMLAttributes<HTMLElement>).dateTime = dt.toISOString())
       }
       component="time"
