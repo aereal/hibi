@@ -23,6 +23,7 @@ type Diary {
   id: ID!
   name: String!
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
+  article(id: ID!): Article
   owner: User!
 }
 

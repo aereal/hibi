@@ -58,6 +58,10 @@ type diaryResolver struct{ *rootResolver }
 
 const maxPerPage = 50
 
+func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articleID string) (*models.Article, error) {
+	return r.repo.FindArticle(ctx, diary.ID, articleID)
+}
+
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
 	if perPage > maxPerPage {
 		return nil, fmt.Errorf("perPage parameter too large")

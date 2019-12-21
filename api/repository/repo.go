@@ -62,6 +62,32 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 	return diary, nil
 }
 
+func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID string) (*models.Article, error) {
+	snapshot, err := r.articles().Doc(articleID).Get(ctx)
+	if status.Code(err) == codes.NotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var dto articleDTO
+	if err := snapshot.DataTo(&dto); err != nil {
+		return nil, xerrors.Errorf("failed to populate snapshot as article: %w", err)
+	}
+	if dto.DiaryID != diaryID {
+		return nil, nil
+	}
+	return &models.Article{
+		ID:    snapshot.Ref.ID,
+		Title: &dto.Title,
+		Body: &models.ArticleBody{
+			Markdown: dto.MarkdownBody,
+		},
+		PublishedAt: dto.PublishedAt,
+		AuthorID:    dto.AuthorID,
+	}, nil
+}
+
 type ArticleOrderField string
 
 const (
