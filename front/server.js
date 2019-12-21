@@ -12,6 +12,9 @@ const start = async () => {
 
   const server = express();
   server.get("/", (req, res) => app.render(req, res, "/", req.query));
+  server.get("/articles/:slug", (req, res) =>
+    app.render(req, res, "/permalink", { slug: req.params.slug })
+  );
   server.all("*", (req, res) => handle(req, res));
 
   await new Promise((ok, ng) => {

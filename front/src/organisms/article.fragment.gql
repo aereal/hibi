@@ -1,4 +1,5 @@
 fragment ArticleFragment on Article {
+  id
   title
   publishedAt
   body {

@@ -1,0 +1,10 @@
+#import "../organisms/article.fragment.gql"
+
+query PermalinkQuery($diaryID: ID!, $articleID: ID!) {
+  diary(id: $diaryID) {
+    name
+    article(id: $articleID) {
+      ...ArticleFragment
+    }
+  }
+}
