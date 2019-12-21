@@ -6,9 +6,9 @@
     "lint": "eslint --ext .ts,.tsx **/*",
     "build": "next build",
     "gcp-build": "run-p -l build",
-    "start": "next start",
+    "start": "env NODE_ENV=production node server.js",
     "dev": "run-p -l dev:*",
-    "dev:next": "next",
+    "dev:next": "node server.js",
     "dev:codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql --watch",
     "codegen": "apollo client:codegen --addTypename --localSchemaFile=../schema.graphql --target=typescript --useReadOnlyTypes --includes=./**/*.gql"
   },
