@@ -31,6 +31,8 @@ firebase.google.com/go v3.10.0+incompatible h1:GVdqx1+ZmPg9qd2S+8K9NHgkUUmZsGJxD
 firebase.google.com/go v3.10.0+incompatible/go.mod h1:xlah6XbEyW6tbfSklcfe5FHJIwjt8toICdV5Wh9ptHs=
 firebase.google.com/go v3.11.0+incompatible h1:sRdTTYeJBfZF4Bq16af2/5syFNkKbgoz5yYPOe+05fs=
 firebase.google.com/go v3.11.0+incompatible/go.mod h1:xlah6XbEyW6tbfSklcfe5FHJIwjt8toICdV5Wh9ptHs=
+firebase.google.com/go v3.11.1+incompatible h1:Eakw25N2BmDw5j93iR4DWpozEY9VwbNgYmuc0jRUhuo=
+firebase.google.com/go v3.11.1+incompatible/go.mod h1:xlah6XbEyW6tbfSklcfe5FHJIwjt8toICdV5Wh9ptHs=
 github.com/99designs/gqlgen v0.9.3/go.mod h1:HrrG7ic9EgLPsULxsZh/Ti+p0HNWgR3XRuvnD0pb5KY=
 github.com/99designs/gqlgen v0.10.2 h1:FfjCqIWejHDJeLpQTI0neoZo5vDO3sdo5oNCucet3A0=
 github.com/99designs/gqlgen v0.10.2/go.mod h1:aDB7oabSAyZ4kUHLEySsLxnWrBy3lA0A2gWKU+qoHwI=
