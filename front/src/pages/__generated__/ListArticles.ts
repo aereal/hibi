@@ -13,6 +13,7 @@ export interface ListArticles_diary_articles_nodes_body {
 
 export interface ListArticles_diary_articles_nodes {
   readonly __typename: "Article";
+  readonly id: string;
   readonly title: string | null;
   readonly publishedAt: any;
   readonly body: ListArticles_diary_articles_nodes_body;

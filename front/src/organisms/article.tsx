@@ -4,6 +4,7 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { ArticleFragment } from "./__generated__/ArticleFragment";
 import { DateTime } from "../atoms/date-time";
+import { ArticleLink } from "../atoms/article-link";
 
 export interface ArticleProps {
   article: ArticleFragment;
@@ -30,7 +31,9 @@ export const Article: FC<ArticleProps> = ({ article }) => {
   const { root } = useStyles();
   return (
     <Paper square elevation={0} className={root}>
-      <Typography variant="h5">{article.title}</Typography>
+      <Typography variant="h5">
+        <ArticleLink slug={article.id}>{article.title}</ArticleLink>
+      </Typography>
       <DateTime formatter={dateTimeFormatter} datetime={article.publishedAt} />
       <div dangerouslySetInnerHTML={{ __html: article.body.html }} />
     </Paper>

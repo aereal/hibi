@@ -13,6 +13,7 @@ export interface ArticleFragment_body {
 
 export interface ArticleFragment {
   readonly __typename: "Article";
+  readonly id: string;
   readonly title: string | null;
   readonly publishedAt: any;
   readonly body: ArticleFragment_body;
