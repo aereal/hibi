@@ -35,7 +35,7 @@ jobs:
       - name: deploy
         uses: actions/gcloud/cli@master
         with:
-          args: app deploy --quiet --project hibi-260613 ./api.app.yml
+          args: app deploy --quiet --project hibi-260613 --stop-previous-version ./api.app.yml
         env:
           CI: true
         if: github.ref == 'refs/heads/master'
