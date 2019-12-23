@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@apollo/react-hooks";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -44,6 +45,11 @@ export const ArticlePermalinkPage: FC = () => {
   }
   return (
     <>
+      <Head>
+        <title>
+          {data.diary.article.title} - {data.diary.name}
+        </title>
+      </Head>
       <CssBaseline />
       <Container maxWidth="sm">
         <Typography className={classes.pageTitle} variant="h3">
