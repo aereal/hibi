@@ -49,6 +49,17 @@ export const ArticlePermalinkPage: FC = () => {
         <title>
           {data.diary.article.title} - {data.diary.name}
         </title>
+        <meta key="og-type" property="og:type" content="article" />
+        <meta
+          key="og-title"
+          property="og:title"
+          content={`${data.diary.article.title} - ${data.diary.name}`}
+        />
+        <meta
+          key="og-site-name"
+          property="og:site_name"
+          content={data.diary.name}
+        />
       </Head>
       <CssBaseline />
       <Container maxWidth="sm">

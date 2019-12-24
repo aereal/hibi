@@ -50,6 +50,13 @@ export const ArticlesPage: FC = () => {
     <>
       <Head>
         <title>{data.diary.name}</title>
+        <meta key="og-type" property="og:type" content="blog" />
+        <meta key="og-title" property="og:title" content={data.diary.name} />
+        <meta
+          key="og-site-name"
+          property="og:site_name"
+          content={data.diary.name}
+        />
       </Head>
       <CssBaseline />
       <Container maxWidth="sm">
