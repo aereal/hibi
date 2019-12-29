@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useQuery } from "@apollo/react-hooks";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -47,6 +48,16 @@ export const ArticlesPage: FC = () => {
   }
   return (
     <>
+      <Head>
+        <title>{data.diary.name}</title>
+        <meta key="og-type" property="og:type" content="blog" />
+        <meta key="og-title" property="og:title" content={data.diary.name} />
+        <meta
+          key="og-site-name"
+          property="og:site_name"
+          content={data.diary.name}
+        />
+      </Head>
       <CssBaseline />
       <Container maxWidth="sm">
         <Typography className={classes.pageTitle} variant="h3">
