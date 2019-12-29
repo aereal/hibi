@@ -4,6 +4,7 @@ import { routes, getCurrentRoute, listen } from "./routes";
 import { RootPage } from "./pages/RootPage";
 import { SignInPage } from "./pages/SignInPage";
 import { NewArticlePage } from "./pages/NewArticlePage";
+import { DiarySettingsPage } from "./pages/DiarySettingsPage";
 import { DefaultAuthenticationProvider } from "./effects/authentication";
 
 const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
@@ -14,6 +15,8 @@ const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
       return <SignInPage />;
     case routes.newArticle.name:
       return <NewArticlePage />;
+    case routes.diarySettings.name:
+      return <DiarySettingsPage />;
     default:
       return <>Not Found</>;
   }

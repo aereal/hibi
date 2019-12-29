@@ -6,6 +6,7 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
+    "dev": "wsrun dev",
     "start": "next start --port $PORT",
     "gcp-build": "yarn workspace front gcp-build && cp -R front/.next ."
   },
@@ -15,5 +16,8 @@
   ],
   "resolutions": {
     "merge-anything": "2.4.2"
+  },
+  "devDependencies": {
+    "wsrun": "^5.2.0"
   }
 }

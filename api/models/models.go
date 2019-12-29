@@ -17,6 +17,10 @@ func (d *Diary) CanPostArticle(user *User) bool {
 	return user.ID == d.OwnerID
 }
 
+func (d *Diary) CanUpdateSettings(user *User) bool {
+	return user.ID == d.OwnerID
+}
+
 type Article struct {
 	ID          string
 	Title       *string

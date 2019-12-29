@@ -1,0 +1,3 @@
+mutation UpdateDiarySettingsMutation($diaryID: ID!, $settings: DiarySettings!) {
+  updateDiarySettings(diaryID: $diaryID, settings: $settings)
+}
