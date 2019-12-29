@@ -26,6 +26,10 @@ type NewArticle struct {
 	MarkdownBody string
 }
 
+func (r *Repository) diaries() *firestore.CollectionRef {
+	return r.client.Collection("diaries")
+}
+
 func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newDiary NewArticle) (string, error) {
 	ref := r.articles().NewDoc()
 	publishedAt := time.Now()
@@ -43,7 +47,7 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 }
 
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
-	snapshot, err := r.client.Collection("diaries").Doc(id).Get(ctx)
+	snapshot, err := r.diaries().Doc(id).Get(ctx)
 	if status.Code(err) == codes.NotFound {
 		return nil, nil
 	}
@@ -60,6 +64,20 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 		OwnerID: dto.OwnerID,
 	}
 	return diary, nil
+}
+
+type DiarySettings struct {
+	Name string
+}
+
+func (r *Repository) UpdateDiarySettings(ctx context.Context, diaryID string, settings DiarySettings) error {
+	_, err := r.diaries().Doc(diaryID).Update(ctx, []firestore.Update{
+		firestore.Update{Path: "Name", Value: settings.Name},
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID string) (*models.Article, error) {

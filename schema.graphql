@@ -10,13 +10,18 @@ type Query {
 }
 
 type Mutation {
-  postArticle(article: NewArticle!): ID!
+  postArticle(article: NewArticle!): ID! @hasRole(role: ADMIN)
+  updateDiarySettings(diaryID: ID!, settings: DiarySettings!): Boolean! @hasRole(role: ADMIN)
 }
 
 input NewArticle {
   diaryID: ID!
   title: String!
   markdownBody: String!
+}
+
+input DiarySettings {
+  name: String!
 }
 
 type Diary {

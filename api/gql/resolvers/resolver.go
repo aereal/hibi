@@ -10,8 +10,10 @@ import (
 	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/gql"
 	"github.com/aereal/hibi/api/gql/dto"
+	"github.com/aereal/hibi/api/logging"
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
+	"golang.org/x/xerrors"
 	"gopkg.in/russross/blackfriday.v2"
 )
 
@@ -147,6 +149,30 @@ func (r *mutationResolver) PostArticle(ctx context.Context, newArticle repositor
 		return "", err
 	}
 	return articleID, nil
+}
+
+func (r *mutationResolver) UpdateDiarySettings(ctx context.Context, diaryID string, settings repository.DiarySettings) (bool, error) {
+	logger := logging.FromContext(ctx)
+	logger.Infof("diaryID=%v settings=%#v", diaryID, settings)
+
+	visitor := auth.ForContext(ctx)
+	if visitor == nil {
+		return false, fmt.Errorf("[BUG] authentication failed")
+	}
+
+	diary, err := r.repo.FindDiary(ctx, diaryID)
+	if err != nil {
+		return false, err
+	}
+
+	if !diary.CanUpdateSettings(visitor) {
+		return false, fmt.Errorf("cannot update diary settings due to lack of permission")
+	}
+
+	if err := r.repo.UpdateDiarySettings(ctx, diary.ID, settings); err != nil {
+		return false, xerrors.Errorf("failed to update diary settings: %w", err)
+	}
+	return true, nil
 }
 
 type articleResolver struct{ *rootResolver }
