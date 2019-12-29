@@ -5,9 +5,10 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import green from "@material-ui/core/colors/green";
 
-interface PostCompletedNotificationProps {
+interface CompletedNotificationProps {
   readonly open: boolean;
   readonly onClose: () => void;
+  readonly message: string;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -25,9 +26,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export const PostCompletedNotification: FC<PostCompletedNotificationProps> = ({
+export const CompletedNotification: FC<CompletedNotificationProps> = ({
   open,
   onClose,
+  message,
 }) => {
   const classes = useStyles();
   return (
@@ -41,7 +43,7 @@ export const PostCompletedNotification: FC<PostCompletedNotificationProps> = ({
         className={classes.success}
         message={
           <span className={classes.message}>
-            <CheckCircleIcon className={classes.icon} /> 投稿しました
+            <CheckCircleIcon className={classes.icon} /> {message}
           </span>
         }
       />

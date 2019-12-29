@@ -10,7 +10,7 @@ import {
   PostNewArticleMutation,
   PostNewArticleMutationVariables,
 } from "./__generated__/PostNewArticleMutation";
-import { PostCompletedNotification } from "../organisms/PostCompletedNotification";
+import { CompletedNotification } from "../organisms/CompletedNotification";
 
 const NewArticlePageContent: FC = () => {
   const [doMutation, { error, loading }] = useMutation<
@@ -70,9 +70,10 @@ const NewArticlePageContent: FC = () => {
         markdownBody={markdownBody}
         onChange={onChange}
       />
-      <PostCompletedNotification
+      <CompletedNotification
         open={completed}
         onClose={onCloseNotification}
+        message="公開しました"
       />
       {loading ? <LinearProgress /> : null}
     </>
