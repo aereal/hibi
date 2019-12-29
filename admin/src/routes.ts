@@ -9,6 +9,7 @@ export const { routes, listen, getCurrentRoute } = createRouter({
     () => "/sign-in"
   ),
   newArticle: defineRoute("/new"),
+  diarySettings: defineRoute("/settings"),
 });
 
 export const isWellKnownRouteName = (

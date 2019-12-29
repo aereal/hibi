@@ -1,0 +1,5 @@
+query DiarySettingsQuery($diaryID: ID!) {
+  diary(id: $diaryID) {
+    name
+  }
+}

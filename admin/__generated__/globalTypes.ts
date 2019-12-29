@@ -6,6 +6,10 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface DiarySettings {
+  readonly name: string;
+}
+
 export interface NewArticle {
   readonly diaryID: string;
   readonly title: string;

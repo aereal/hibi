@@ -2,6 +2,9 @@ import React, { FC } from "react";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 import clsx from "clsx";
 import { Layout } from "../templates/Layout";
 import {
@@ -40,7 +43,11 @@ export const RootPage: FC = () => {
       <Grid item xs={12} sm={6}>
         {isSignedIn(status) ? (
           <Paper className={clsx(classes.paper, classes.fixedHeight)}>
-            Root
+            <List component="nav">
+              <ListItem button {...routes.diarySettings.link()}>
+                <ListItemText primary="設定" />
+              </ListItem>
+            </List>
           </Paper>
         ) : null}
       </Grid>
