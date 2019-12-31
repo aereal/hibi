@@ -27,7 +27,7 @@ export const withApollo = (App: typeof NextApp) =>
 
       if (!process.browser) {
         try {
-          getMarkupFromTree({
+          await getMarkupFromTree({
             renderFunction: renderToString,
             tree: (
               <App
