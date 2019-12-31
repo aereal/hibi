@@ -7,8 +7,8 @@
   "private": true,
   "scripts": {
     "dev": "wsrun dev",
-    "start": "NODE_ENV=production node ./server.js",
-    "gcp-build": "yarn workspace front gcp-build && cp -R front/* ./ && cp -R front/.next ."
+    "start": "yarn workspace front start",
+    "gcp-build": "yarn workspace front gcp-build"
   },
   "workspaces": [
     "front",
