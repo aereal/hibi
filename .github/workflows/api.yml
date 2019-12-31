@@ -27,15 +27,20 @@ jobs:
         run: go get -v all
       - name: test
         run: go test -cover -v ./...
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    steps:
+      - uses: actions/checkout@v1
       - name: setup gcloud
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@8958ac65db5da419b56f4ffbefc673774ba1434e
         with:
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
           version: '272.0.0'
-        # if: github.ref == 'refs/heads/master'
       - name: deploy
         run: |
           gcloud app deploy --quiet --project hibi-260613 --stop-previous-version ./api.app.yml
         env:
           CI: true
-        # if: github.ref == 'refs/heads/master'

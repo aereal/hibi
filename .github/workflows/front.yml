@@ -56,7 +56,7 @@ jobs:
       - name: build
         run: yarn workspace front build
   front-deploy:
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     needs: front-build
     runs-on: ubuntu-latest
     steps:
