@@ -64,6 +64,13 @@ export const withApollo = (App: typeof NextApp) =>
     render() {
       return <App {...this.props} apolloClient={this.apolloClient} />;
     }
+
+    componentDidMount() {
+      const jssStyles = document.getElementById("jss-server-side");
+      if (jssStyles) {
+        jssStyles.parentElement?.removeChild(jssStyles);
+      }
+    }
   };
 
 const getDisplayName = (component: ComponentType<any>): string =>
