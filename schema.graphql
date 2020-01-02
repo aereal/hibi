@@ -17,7 +17,7 @@ type Mutation {
 input NewArticle {
   diaryID: ID!
   title: String!
-  markdownBody: String!
+  bodyHTML: String!
 }
 
 input DiarySettings {

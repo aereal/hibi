@@ -40,7 +40,6 @@ type Config struct {
 
 type ResolverRoot interface {
 	Article() ArticleResolver
-	ArticleBody() ArticleBodyResolver
 	Diary() DiaryResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
@@ -100,9 +99,6 @@ type ComplexityRoot struct {
 
 type ArticleResolver interface {
 	Author(ctx context.Context, obj *models.Article) (*models.User, error)
-}
-type ArticleBodyResolver interface {
-	HTML(ctx context.Context, obj *models.ArticleBody) (string, error)
 }
 type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
@@ -392,7 +388,7 @@ type Mutation {
 input NewArticle {
   diaryID: ID!
   title: String!
-  markdownBody: String!
+  bodyHTML: String!
 }
 
 input DiarySettings {
@@ -854,7 +850,7 @@ func (ec *executionContext) _ArticleBody_html(ctx context.Context, field graphql
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ArticleBody().HTML(rctx, obj)
+		return obj.HTML(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2787,9 +2783,9 @@ func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
-		case "markdownBody":
+		case "bodyHTML":
 			var err error
-			it.MarkdownBody, err = ec.unmarshalNString2string(ctx, v)
+			it.BodyHTML, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2874,22 +2870,13 @@ func (ec *executionContext) _ArticleBody(ctx context.Context, sel ast.SelectionS
 		case "markdown":
 			out.Values[i] = ec._ArticleBody_markdown(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "html":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ArticleBody_html(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._ArticleBody_html(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
