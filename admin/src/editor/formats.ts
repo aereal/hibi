@@ -8,6 +8,19 @@ export const Mark = {
 } as const;
 export type MarkFormat = ValueType<typeof Mark>;
 
-// TODO: block format
+export const Block = {
+  H1: "heading1",
+  H2: "heading2",
+  H3: "heading3",
+  Quote: "quote",
+  NumberedList: "numbered-list",
+  BulletedList: "bulleted-list",
+  ListItem: "list-item",
+  Paragraph: "paragraph",
+} as const;
+export type BlockFormat = ValueType<typeof Block>;
 
-export type Format = MarkFormat;
+export const isList = (block: BlockFormat): boolean =>
+  block === Block.NumberedList || block === Block.BulletedList;
+
+export type Format = MarkFormat | BlockFormat;

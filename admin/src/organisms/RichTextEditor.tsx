@@ -17,7 +17,7 @@ import {
 import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
-import { Mark } from "../editor/formats";
+import { Mark, Block, BlockFormat } from "../editor/formats";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -58,19 +58,25 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
 };
 
 const Element: FC<RenderElementProps> = ({ element, attributes, children }) => {
-  switch (element["type"]) {
-    case "block-quote":
+  switch (element["type"] as BlockFormat) {
+    case Block.Quote:
       return <blockquote {...attributes}>{children}</blockquote>;
-    case "bulleted-list":
+    case Block.BulletedList:
       return <ul {...attributes}>{children}</ul>;
-    case "numbered-list":
+    case Block.NumberedList:
       return <ol {...attributes}>{children}</ol>;
-    case "heading-one":
+    case Block.ListItem:
+      return <li {...attributes}>{children}</li>;
+    case Block.H1:
       return <h1 {...attributes}>{children}</h1>;
-    case "heading-two":
+    case Block.H2:
       return <h2 {...attributes}>{children}</h2>;
-    default:
+    case Block.H3:
+      return <h3 {...attributes}>{children}</h3>;
+    case Block.Paragraph:
       return <p {...attributes}>{children}</p>;
+    default:
+      return null;
   }
 };
 
@@ -97,10 +103,10 @@ const serializeAsHTML = (node: SlateNode): string => {
 
   const children = node.children.map(n => serializeAsHTML(n)).join("");
 
-  switch (node["type"]) {
-    case "block-quote":
+  switch (node["type"] as BlockFormat) {
+    case Block.Quote:
       return renderToStaticMarkup(<blockquote>{children}</blockquote>);
-    case "paragraph":
+    case Block.Paragraph:
       return renderToStaticMarkup(<p>{children}</p>);
     default:
       return children;
@@ -130,9 +136,9 @@ const deserialize = (el: Node): any => {
       case "BR":
         return "\n";
       case "BLOCKQUOTE":
-        return jsx("element", { type: "quote" }, children);
+        return jsx("element", { type: Block.Quote }, children);
       case "P":
-        return jsx("element", { type: "paragraph" }, children);
+        return jsx("element", { type: Block.Paragraph }, children);
       case "A":
         return jsx(
           "element",
