@@ -15,6 +15,7 @@ import {
   RenderLeafProps,
 } from "slate-react";
 import { jsx } from "slate-hyperscript";
+import { Mark } from "../editor/formats";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -69,16 +70,16 @@ const Element: FC<RenderElementProps> = ({ element, attributes, children }) => {
 };
 
 const Leaf: FC<RenderLeafProps> = ({ attributes, children, leaf }) => {
-  if (leaf["bold"]) {
+  if (leaf[Mark.Bold]) {
     children = <strong>{children}</strong>;
   }
-  if (leaf["code"]) {
+  if (leaf[Mark.Code]) {
     children = <code>{children}</code>;
   }
-  if (leaf["italic"]) {
+  if (leaf[Mark.Italic]) {
     children = <em>{children}</em>;
   }
-  if (leaf["underline"]) {
+  if (leaf[Mark.Underlined]) {
     children = <u>{children}</u>;
   }
   return <span {...attributes}>{children}</span>;
