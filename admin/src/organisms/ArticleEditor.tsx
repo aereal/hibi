@@ -1,7 +1,6 @@
 import React, { FC, FormEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { RichTextEditor } from "./RichTextEditor";
@@ -64,13 +63,11 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
           />
         </Grid>
         <Grid item sm={12} spacing={0}>
-          <Paper>
-            <RichTextEditor
-              defaultValue={bodyHTML}
-              onChangeBody={handleChange}
-              style={{ minHeight: "50vh" }}
-            />
-          </Paper>
+          <RichTextEditor
+            defaultValue={bodyHTML}
+            onChangeBody={handleChange}
+            style={{ minHeight: "50vh" }}
+          />
         </Grid>
         <Grid container justify="flex-start" spacing={0}>
           <Grid item spacing={0}>

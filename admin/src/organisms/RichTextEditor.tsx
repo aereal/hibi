@@ -15,6 +15,8 @@ import {
   RenderLeafProps,
 } from "slate-react";
 import { jsx } from "slate-hyperscript";
+import Paper from "@material-ui/core/Paper";
+import { EditorActionToolbar } from "./EditorActionToolbar";
 import { Mark } from "../editor/formats";
 
 interface RichTextEditorProps {
@@ -42,12 +44,15 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
 
   return (
     <Slate value={value} editor={editor} onChange={handleChange}>
-      <Editable
-        style={style}
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        readOnly={false}
-      />
+      <EditorActionToolbar />
+      <Paper>
+        <Editable
+          style={style}
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          readOnly={false}
+        />
+      </Paper>
     </Slate>
   );
 };
