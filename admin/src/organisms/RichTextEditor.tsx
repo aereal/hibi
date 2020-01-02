@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useState,
   CSSProperties,
+  ReactChild,
 } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createEditor, Node as SlateNode, Text as SlateText } from "slate";
@@ -17,7 +18,8 @@ import {
 import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
-import { Mark, Block, BlockFormat } from "../editor/formats";
+import { Block, BlockFormat } from "../editor/formats";
+import { SerializedMark } from "../editor/conversion";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -80,41 +82,31 @@ const Element: FC<RenderElementProps> = ({ element, attributes, children }) => {
   }
 };
 
-const Leaf: FC<RenderLeafProps> = ({ attributes, children, leaf }) => {
-  if (leaf[Mark.Bold]) {
-    children = <strong>{children}</strong>;
-  }
-  if (leaf[Mark.Code]) {
-    children = <code>{children}</code>;
-  }
-  if (leaf[Mark.Italic]) {
-    children = <em>{children}</em>;
-  }
-  if (leaf[Mark.Underlined]) {
-    children = <u>{children}</u>;
-  }
-  return <span {...attributes}>{children}</span>;
-};
+const Leaf: FC<RenderLeafProps> = ({ attributes, children, leaf }) => (
+  <span {...attributes}>
+    <SerializedMark leaf={leaf}>{children}</SerializedMark>
+  </span>
+);
 
-const serializeAsHTML = (node: SlateNode): string => {
+const serializeAsHTML = (node: SlateNode): ReactChild => {
   if (SlateText.isText(node)) {
-    return node.text; // TODO: escape
+    return <SerializedMark leaf={node}>{node.text}</SerializedMark>;
   }
 
-  const children = node.children.map(n => serializeAsHTML(n)).join("");
+  const children = node.children.map(n => serializeAsHTML(n));
 
   switch (node["type"] as BlockFormat) {
     case Block.Quote:
-      return renderToStaticMarkup(<blockquote>{children}</blockquote>);
+      return <blockquote>{children}</blockquote>;
     case Block.Paragraph:
-      return renderToStaticMarkup(<p>{children}</p>);
+      return <p>{children}</p>;
     default:
-      return children;
+      return <>{children}</>;
   }
 };
 
 const serialize = (nodes: SlateNode[]): string =>
-  nodes.map(n => serializeAsHTML(n)).join("");
+  renderToStaticMarkup(<>{nodes.map(n => serializeAsHTML(n))}</>);
 
 const isTextNode = (node: Node): node is Text =>
   node.nodeType === Node.TEXT_NODE;
