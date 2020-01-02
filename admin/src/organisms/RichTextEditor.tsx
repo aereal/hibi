@@ -19,7 +19,7 @@ import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
 import { Block, BlockFormat } from "../editor/formats";
-import { SerializedMark } from "../editor/conversion";
+import { SerializedMark, blockSerializers } from "../editor/conversion";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -55,31 +55,17 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
           readOnly={false}
         />
       </Paper>
+      <pre>{serialize(value)}</pre>
     </Slate>
   );
 };
 
 const Element: FC<RenderElementProps> = ({ element, attributes, children }) => {
-  switch (element["type"] as BlockFormat) {
-    case Block.Quote:
-      return <blockquote {...attributes}>{children}</blockquote>;
-    case Block.BulletedList:
-      return <ul {...attributes}>{children}</ul>;
-    case Block.NumberedList:
-      return <ol {...attributes}>{children}</ol>;
-    case Block.ListItem:
-      return <li {...attributes}>{children}</li>;
-    case Block.H1:
-      return <h1 {...attributes}>{children}</h1>;
-    case Block.H2:
-      return <h2 {...attributes}>{children}</h2>;
-    case Block.H3:
-      return <h3 {...attributes}>{children}</h3>;
-    case Block.Paragraph:
-      return <p {...attributes}>{children}</p>;
-    default:
-      return null;
+  const blockSerializer = blockSerializers[element["type"] as BlockFormat];
+  if (blockSerializer) {
+    return blockSerializer({ children, attributes });
   }
+  return null;
 };
 
 const Leaf: FC<RenderLeafProps> = ({ attributes, children, leaf }) => (
@@ -88,21 +74,19 @@ const Leaf: FC<RenderLeafProps> = ({ attributes, children, leaf }) => (
   </span>
 );
 
-const serializeAsHTML = (node: SlateNode): ReactChild => {
+const serializeAsHTML = (node: SlateNode): ReactChild | null => {
   if (SlateText.isText(node)) {
     return <SerializedMark leaf={node}>{node.text}</SerializedMark>;
   }
 
   const children = node.children.map(n => serializeAsHTML(n));
 
-  switch (node["type"] as BlockFormat) {
-    case Block.Quote:
-      return <blockquote>{children}</blockquote>;
-    case Block.Paragraph:
-      return <p>{children}</p>;
-    default:
-      return <>{children}</>;
+  const blockSerializer = blockSerializers[node["type"] as BlockFormat];
+  if (blockSerializer) {
+    return blockSerializer({ children });
   }
+
+  return <>{children}</>;
 };
 
 const serialize = (nodes: SlateNode[]): string =>
