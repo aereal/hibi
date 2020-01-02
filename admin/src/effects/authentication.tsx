@@ -57,6 +57,7 @@ export const useAuthentication = (): AuthenticationStatus => {
       }
 
       const idToken = await user.getIdToken();
+      console.log({ idToken });
       setStatus({
         status: "signed-in",
         currentUser: {

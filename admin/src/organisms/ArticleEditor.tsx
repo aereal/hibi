@@ -1,8 +1,10 @@
 import React, { FC, FormEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import { RichTextEditor } from "./RichTextEditor";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -14,7 +16,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export interface ChangeItem {
-  readonly name: "title" | "markdownBody";
+  readonly name: "title" | "body";
   readonly value: string;
 }
 
@@ -22,7 +24,7 @@ interface ArticleEditorProps {
   readonly onSubmit: FormEventHandler;
   readonly loading: boolean;
   readonly title: string;
-  readonly markdownBody: string;
+  readonly bodyHTML: string;
   readonly onChange: (item: ChangeItem) => void;
 }
 
@@ -30,10 +32,13 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
   onSubmit,
   loading,
   title,
-  markdownBody,
+  bodyHTML,
   onChange,
 }) => {
   const classes = useStyles();
+
+  const handleChange = (body: string): void =>
+    onChange({ name: "body", value: body });
 
   return (
     <form
@@ -59,21 +64,13 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
           />
         </Grid>
         <Grid item sm={12} spacing={0}>
-          <TextField
-            variant="outlined"
-            name="body"
-            required
-            fullWidth
-            id="body"
-            placeholder="…"
-            multiline
-            rows={12}
-            value={markdownBody}
-            disabled={loading}
-            onChange={event =>
-              onChange({ name: "markdownBody", value: event.target.value })
-            }
-          />
+          <Paper>
+            <RichTextEditor
+              defaultValue={bodyHTML}
+              onChangeBody={handleChange}
+              style={{ minHeight: "50vh" }}
+            />
+          </Paper>
         </Grid>
         <Grid container justify="flex-start" spacing={0}>
           <Grid item spacing={0}>
