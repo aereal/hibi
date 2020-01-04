@@ -1,4 +1,11 @@
+import { Element, Node } from "slate";
+
 type ValueType<T extends {}> = T[keyof T];
+
+export interface LinkElement extends Element {
+  readonly type: "link";
+  readonly url: string;
+}
 
 export const Mark = {
   Bold: "bold",
@@ -17,10 +24,14 @@ export const Block = {
   BulletedList: "bulleted-list",
   ListItem: "list-item",
   Paragraph: "paragraph",
+  Link: "link",
 } as const;
 export type BlockFormat = ValueType<typeof Block>;
 
 export const isList = (block: BlockFormat): boolean =>
   block === Block.NumberedList || block === Block.BulletedList;
+
+export const isLinkElement = (node: Node): node is LinkElement =>
+  node["type"] === Block.Link;
 
 export type Format = MarkFormat | BlockFormat;

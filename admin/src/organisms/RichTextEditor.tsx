@@ -18,8 +18,9 @@ import {
 import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
-import { Block, BlockFormat } from "../editor/formats";
+import { Block, BlockFormat, isLinkElement } from "../editor/formats";
 import { SerializedMark, blockSerializers } from "../editor/conversion";
+import { withLink } from "../editor/link";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -34,7 +35,7 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
 }) => {
   const renderElement = useCallback(props => <Element {...props} />, []);
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
-  const editor = useMemo(() => withReact(createEditor()), []);
+  const editor = useMemo(() => withLink(withReact(createEditor())), []);
   const [value, setValue] = useState<SlateNode[]>(
     deserializeHTML(defaultValue)
   );
@@ -61,9 +62,16 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
 };
 
 const Element: FC<RenderElementProps> = ({ element, attributes, children }) => {
+  if (isLinkElement(element)) {
+    return (
+      <a href={element.url} {...attributes}>
+        {children}
+      </a>
+    );
+  }
   const blockSerializer = blockSerializers[element["type"] as BlockFormat];
   if (blockSerializer) {
-    return blockSerializer({ children, attributes });
+    return blockSerializer({ children, attributes, element });
   }
   return null;
 };
@@ -81,9 +89,13 @@ const serializeAsHTML = (node: SlateNode): ReactChild | null => {
 
   const children = node.children.map(n => serializeAsHTML(n));
 
+  if (isLinkElement(node)) {
+    return <a href={node.url}>{children}</a>;
+  }
+
   const blockSerializer = blockSerializers[node["type"] as BlockFormat];
   if (blockSerializer) {
-    return blockSerializer({ children });
+    return blockSerializer({ children, element: node });
   }
 
   return <>{children}</>;

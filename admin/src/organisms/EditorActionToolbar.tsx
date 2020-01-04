@@ -13,6 +13,7 @@ import Looks3Icon from "@material-ui/icons/Looks3";
 import { MarkButton } from "./MarkButton";
 import { BlockButton } from "./BlockButton";
 import { Mark, Block } from "../editor/formats";
+import { LinkActionButton } from "./LinkActionButton";
 
 export const EditorActionToolbar: FC = () => {
   return (
@@ -34,6 +35,7 @@ export const EditorActionToolbar: FC = () => {
           icon={<FormatUnderlinedIcon />}
         />
         <MarkButton format={Mark.Code} aria-label="code" icon={<CodeIcon />} />
+        <LinkActionButton />
       </ButtonGroup>
       <ButtonGroup size="large" disableRipple>
         <BlockButton format={Block.H1} icon={<Looks1Icon />} />

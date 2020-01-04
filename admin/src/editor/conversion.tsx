@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 
 import React, { FC, ReactNode } from "react";
-import { Text } from "slate";
+import { Text, Element } from "slate";
 import { Mark, Block, BlockFormat } from "./formats";
 
 export const SerializedMark: FC<{ readonly leaf: Text }> = ({
@@ -26,6 +26,7 @@ export const SerializedMark: FC<{ readonly leaf: Text }> = ({
 
 interface BlockSerializerProps {
   readonly attributes?: Record<string, any>;
+  readonly element: Element;
 }
 
 export const blockSerializers: Record<BlockFormat, FC<BlockSerializerProps>> = {
@@ -46,5 +47,10 @@ export const blockSerializers: Record<BlockFormat, FC<BlockSerializerProps>> = {
   ),
   [Block.Quote]: ({ children, attributes }) => (
     <blockquote {...attributes}>{children}</blockquote>
+  ),
+  [Block.Link]: ({ children, attributes, element }) => (
+    <a href={element.url} {...attributes}>
+      {children}
+    </a>
   ),
 };
