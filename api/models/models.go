@@ -5,6 +5,8 @@ import (
 	"io"
 	"strconv"
 	"time"
+
+	"gopkg.in/russross/blackfriday.v2"
 )
 
 type Diary struct {
@@ -31,6 +33,19 @@ type Article struct {
 
 type ArticleBody struct {
 	Markdown string
+	html     string
+}
+
+func (b *ArticleBody) SetHTML(html string) {
+	b.html = html
+}
+
+func (b *ArticleBody) HTML() string {
+	if b.Markdown != "" {
+		rendered := blackfriday.Run([]byte(b.Markdown))
+		return string(rendered)
+	}
+	return b.html
 }
 
 type User struct {

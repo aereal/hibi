@@ -14,7 +14,6 @@ import (
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
 	"golang.org/x/xerrors"
-	"gopkg.in/russross/blackfriday.v2"
 )
 
 func New(repo *repository.Repository, authClient *firebaseauth.Client) gql.ResolverRoot {
@@ -36,10 +35,6 @@ func (r *rootResolver) Mutation() gql.MutationResolver {
 
 func (r *rootResolver) Diary() gql.DiaryResolver {
 	return &diaryResolver{r}
-}
-
-func (r *rootResolver) ArticleBody() gql.ArticleBodyResolver {
-	return &articleBodyResolver{r}
 }
 
 func (r *rootResolver) Article() gql.ArticleResolver {
@@ -118,13 +113,6 @@ func (r *diaryResolver) Owner(ctx context.Context, diary *models.Diary) (*models
 		Name: record.DisplayName,
 	}
 	return user, nil
-}
-
-type articleBodyResolver struct{ *rootResolver }
-
-func (r *articleBodyResolver) HTML(ctx context.Context, body *models.ArticleBody) (string, error) {
-	rendered := blackfriday.Run([]byte(body.Markdown))
-	return string(rendered), nil
 }
 
 type mutationResolver struct{ *rootResolver }

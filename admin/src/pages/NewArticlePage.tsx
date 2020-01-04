@@ -18,7 +18,7 @@ const NewArticlePageContent: FC = () => {
     PostNewArticleMutationVariables
   >(mutation);
   const [title, setTitle] = useState("");
-  const [markdownBody, setMarkdownBody] = useState("");
+  const [bodyHTML, setBodyHTML] = useState(`<p> </p>\n`);
   const [completed, setCompleted] = useState(false);
 
   if (error !== undefined) {
@@ -37,12 +37,12 @@ const NewArticlePageContent: FC = () => {
         newArticle: {
           diaryID: "gZJXFGCS7fONfpIKXWYn",
           title,
-          markdownBody,
+          bodyHTML,
         },
       },
     });
     setTitle("");
-    setMarkdownBody("");
+    setBodyHTML("");
     setCompleted(true);
   };
 
@@ -51,8 +51,8 @@ const NewArticlePageContent: FC = () => {
       case "title":
         setTitle(item.value);
         break;
-      case "markdownBody":
-        setMarkdownBody(item.value);
+      case "body":
+        setBodyHTML(item.value);
         break;
     }
   };
@@ -67,7 +67,7 @@ const NewArticlePageContent: FC = () => {
         onSubmit={onSubmit}
         loading={loading}
         title={title}
-        markdownBody={markdownBody}
+        bodyHTML={bodyHTML}
         onChange={onChange}
       />
       <CompletedNotification

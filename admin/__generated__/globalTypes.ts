@@ -13,7 +13,7 @@ export interface DiarySettings {
 export interface NewArticle {
   readonly diaryID: string;
   readonly title: string;
-  readonly markdownBody: string;
+  readonly bodyHTML: string;
 }
 
 //==============================================================

@@ -21,9 +21,9 @@ type Repository struct {
 }
 
 type NewArticle struct {
-	DiaryID      string
-	Title        string
-	MarkdownBody string
+	DiaryID  string
+	Title    string
+	BodyHTML string
 }
 
 func (r *Repository) diaries() *firestore.CollectionRef {
@@ -34,11 +34,11 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 	ref := r.articles().NewDoc()
 	publishedAt := time.Now()
 	_, err := ref.Create(ctx, articleDTO{
-		DiaryID:      newDiary.DiaryID,
-		Title:        newDiary.Title,
-		MarkdownBody: newDiary.MarkdownBody,
-		PublishedAt:  publishedAt,
-		AuthorID:     author.ID,
+		DiaryID:     newDiary.DiaryID,
+		Title:       newDiary.Title,
+		BodyHTML:    newDiary.BodyHTML,
+		PublishedAt: publishedAt,
+		AuthorID:    author.ID,
 	})
 	if err != nil {
 		return "", xerrors.Errorf("cannot create article: %w", err)
@@ -146,12 +146,16 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 		if err := snapshot.DataTo(&dto); err != nil {
 			return nil, xerrors.Errorf("failed to article: %w", err)
 		}
+		body := &models.ArticleBody{
+			Markdown: dto.MarkdownBody,
+		}
+		if dto.BodyHTML != "" {
+			body.SetHTML(dto.BodyHTML)
+		}
 		results = append(results, &models.Article{
-			ID:    snapshot.Ref.ID,
-			Title: &dto.Title,
-			Body: &models.ArticleBody{
-				Markdown: dto.MarkdownBody,
-			},
+			ID:          snapshot.Ref.ID,
+			Title:       &dto.Title,
+			Body:        body,
 			PublishedAt: dto.PublishedAt,
 			AuthorID:    dto.AuthorID,
 		})
@@ -168,6 +172,7 @@ type articleDTO struct {
 	DiaryID      string
 	Title        string
 	MarkdownBody string
+	BodyHTML     string
 	PublishedAt  time.Time
 	AuthorID     string
 }
