@@ -1,11 +1,16 @@
-import React, { FC, MouseEventHandler } from "react";
+import React, { FC, MouseEventHandler, useState } from "react";
 import LinkIcon from "@material-ui/icons/Link";
 import { useSlate } from "slate-react";
+import { Range, Transforms } from "slate";
 import { ActionButton } from "../atoms/ActionButton";
 import { insertLink, isLinkActive, unwrapLink } from "../editor/link";
+import { InputURLDialog } from "./InputURLDialog";
 
 export const LinkActionButton: FC = () => {
   const editor = useSlate();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [url, setURL] = useState<string>();
+  const [currentSelection, setCurrentSelection] = useState<Range>();
   const isActive = isLinkActive(editor);
   const handleClick: MouseEventHandler<HTMLElement> = event => {
     event.preventDefault();
@@ -13,18 +18,39 @@ export const LinkActionButton: FC = () => {
       unwrapLink(editor);
       return;
     }
-    const url = window.prompt("URL"); // TODO
-    if (url === null) {
+    if (url === undefined) {
+      setOpenDialog(true);
+      setCurrentSelection(editor.selection ?? undefined);
       return;
     }
-    insertLink(editor, url);
+  };
+  const doClose = (): void => {
+    setOpenDialog(false);
+    setURL(undefined);
+  };
+  const doSubmit = (): void => {
+    setOpenDialog(false);
+    if (url !== undefined && currentSelection !== undefined) {
+      Transforms.select(editor, currentSelection);
+      insertLink(editor, url);
+    }
+    setURL(undefined);
+    setCurrentSelection(undefined);
   };
   return (
-    <ActionButton
-      color={isActive ? "primary" : "default"}
-      onClick={handleClick}
-    >
-      <LinkIcon />
-    </ActionButton>
+    <>
+      <ActionButton
+        color={isActive ? "primary" : "default"}
+        onClick={handleClick}
+      >
+        <LinkIcon />
+      </ActionButton>
+      <InputURLDialog
+        open={openDialog}
+        close={doClose}
+        submit={doSubmit}
+        setURL={setURL}
+      />
+    </>
   );
 };

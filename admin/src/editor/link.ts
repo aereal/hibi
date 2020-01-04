@@ -34,9 +34,6 @@ const wrapLink = (editor: ReactEditor, url: string): void => {
 };
 
 export const insertLink = (editor: ReactEditor, url: string): void => {
-  if (editor.selection === null) {
-    return;
-  }
   wrapLink(editor, url);
 };
 
