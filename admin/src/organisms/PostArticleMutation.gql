@@ -1,0 +1,3 @@
+mutation PostArticleMutation($newArticle: NewArticle!) {
+  postArticle(article: $newArticle)
+}

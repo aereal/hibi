@@ -1,9 +1,15 @@
-import React, { FC, FormEventHandler } from "react";
+import React, { FC, FormEvent, useState, ChangeEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import { useMutation } from "@apollo/react-hooks";
 import { RichTextEditor } from "./RichTextEditor";
+import {
+  PostArticleMutation,
+  PostArticleMutationVariables,
+} from "./__generated__/PostArticleMutation";
+import mutation from "./PostArticleMutation.gql";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -14,37 +20,51 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export interface ChangeItem {
-  readonly name: "title" | "body";
-  readonly value: string;
-}
-
 interface ArticleEditorProps {
-  readonly onSubmit: FormEventHandler;
-  readonly loading: boolean;
-  readonly title: string;
-  readonly bodyHTML: string;
-  readonly onChange: (item: ChangeItem) => void;
+  readonly onSubmit: () => void;
 }
 
-export const ArticleEditor: FC<ArticleEditorProps> = ({
-  onSubmit,
-  loading,
-  title,
-  bodyHTML,
-  onChange,
-}) => {
+export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
   const classes = useStyles();
+  const [doMutation, { error, loading }] = useMutation<
+    PostArticleMutation,
+    PostArticleMutationVariables
+  >(mutation);
+  const [title, setTitle] = useState("");
+  const [bodyHTML, setBodyHTML] = useState("<p> </p>\n");
 
-  const handleChange = (body: string): void =>
-    onChange({ name: "body", value: body });
+  const handleChangeBody = (body: string): void => setBodyHTML(body);
+
+  const handleChangeTitle: ChangeEventHandler<HTMLInputElement> = event =>
+    setTitle(event.target.value);
+
+  const handleSubmit = async (event: FormEvent): Promise<void> => {
+    event.preventDefault();
+    await doMutation({
+      variables: {
+        newArticle: {
+          diaryID: "gZJXFGCS7fONfpIKXWYn",
+          title,
+          bodyHTML,
+        },
+      },
+    });
+    setTitle("");
+    setBodyHTML("");
+    onSubmit();
+  };
+
+  if (error !== undefined) {
+    return (
+      <>
+        <div>! Error</div>
+        <pre>{JSON.stringify(error)}</pre>
+      </>
+    );
+  }
 
   return (
-    <form
-      noValidate
-      className={classes.form}
-      onSubmit={event => onSubmit(event)}
-    >
+    <form noValidate className={classes.form} onSubmit={handleSubmit}>
       <Grid container spacing={0}>
         <Grid item sm={12} spacing={0}>
           <TextField
@@ -57,15 +77,13 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
             placeholder="今日の日記"
             value={title}
             disabled={loading}
-            onChange={event =>
-              onChange({ name: "title", value: event.target.value })
-            }
+            onChange={handleChangeTitle}
           />
         </Grid>
         <Grid item sm={12} spacing={0}>
           <RichTextEditor
             defaultValue={bodyHTML}
-            onChangeBody={handleChange}
+            onChangeBody={handleChangeBody}
             style={{ minHeight: "50vh" }}
           />
         </Grid>
