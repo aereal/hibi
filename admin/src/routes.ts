@@ -5,6 +5,7 @@ export const router = createRouter({
   signIn: defineRoute(
     {
       callbackRoute: "query.param.string.optional",
+      callbackParamsJSON: "query.param.string.optional",
     },
     () => "/sign-in"
   ),
@@ -30,6 +31,14 @@ export const redirectToPreviousPage = async (): Promise<void> => {
   if (!isWellKnownRouteName(nextRouteName)) {
     return;
   }
+  let nextRouteParams: { [key: string]: any } | undefined;
+  if (current.params.callbackParamsJSON) {
+    try {
+      nextRouteParams = JSON.parse(current.params.callbackParamsJSON);
+    } catch (_) {
+      // no-op
+    }
+  }
   const nextRoute = routes[nextRouteName];
-  await nextRoute.push();
+  await nextRoute.push(nextRouteParams);
 };
