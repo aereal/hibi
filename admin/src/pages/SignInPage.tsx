@@ -11,7 +11,7 @@ import {
   useAuthentication,
   isSignedIn,
 } from "../effects/authentication";
-import { getCurrentRoute, routes, isWellKnownRouteName } from "../routes";
+import { redirectToPreviousPage } from "../routes";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,22 +32,6 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
   },
 }));
-
-const redirectToPreviousPage = (): void => {
-  const current = getCurrentRoute();
-  if (current.name !== "signIn") {
-    return;
-  }
-  const nextRouteName =
-    current.params.callbackRoute !== undefined
-      ? current.params.callbackRoute
-      : routes.root.name;
-  if (!isWellKnownRouteName(nextRouteName)) {
-    return;
-  }
-  const nextRoute = routes[nextRouteName];
-  nextRoute.push();
-};
 
 export const SignInPage: FC = () => {
   const classes = useStyles();
