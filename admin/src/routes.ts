@@ -1,4 +1,4 @@
-import { createRouter, defineRoute } from "type-route";
+import { createRouter, defineRoute, Route } from "type-route";
 
 export const router = createRouter({
   root: defineRoute("/"),
@@ -10,6 +10,10 @@ export const router = createRouter({
     () => "/sign-in"
   ),
   newArticle: defineRoute("/new"),
+  editArticle: defineRoute(
+    { articleID: "path.param.string" },
+    p => `/article/${p.articleID}`
+  ),
   diarySettings: defineRoute("/settings"),
 });
 
@@ -40,5 +44,21 @@ export const redirectToPreviousPage = async (): Promise<void> => {
     }
   }
   const nextRoute = routes[nextRouteName];
+
+  if (nextRoute.name === "editArticle") {
+    if (nextRouteParams !== undefined && isEditArticleParams(nextRouteParams)) {
+      await nextRoute.push(nextRouteParams);
+      return;
+    } else {
+      throw new Error("required parameters not given");
+    }
+  }
+
   await nextRoute.push(nextRouteParams);
 };
+
+type EditArticleParams = Route<typeof routes.editArticle>["params"];
+
+const isEditArticleParams = (params: {
+  [key: string]: any;
+}): params is EditArticleParams => "articleID" in params;
