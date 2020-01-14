@@ -19,8 +19,14 @@ import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
 import { Block, BlockFormat, isLinkElement } from "../editor/formats";
-import { SerializedMark, blockSerializers } from "../editor/conversion";
+import {
+  SerializedMark,
+  blockSerializers,
+  isDeserializable,
+  blockDeserializers,
+} from "../editor/conversion";
 import { withLink } from "../editor/link";
+import { flatMap } from "../flat-map";
 
 interface RichTextEditorProps {
   readonly onChangeBody: (body: string) => void;
@@ -110,35 +116,34 @@ const isTextNode = (node: Node): node is Text =>
 const isElementNode = (node: Node): node is Element =>
   node.nodeType === Node.ELEMENT_NODE;
 
-const deserialize = (el: Node): any => {
+const textElement = (node: Node): SlateText => ({
+  text: node.textContent ?? "",
+});
+
+const deserialize = (el: Node): Array<ReturnType<typeof jsx>> => {
   if (isTextNode(el)) {
-    return el.textContent;
+    return [textElement(el)];
   }
 
   if (isElementNode(el)) {
-    const children = Array.from(el.childNodes).map(deserialize);
+    const children = flatMap(Array.from(el.childNodes), deserialize);
+
+    const { nodeName } = el;
+    if (isDeserializable(nodeName)) {
+      return [blockDeserializers[nodeName]({ children, element: el })];
+    }
 
     switch (el.nodeName) {
       case "BODY":
         return jsx("fragment", {}, children);
       case "BR":
-        return "\n";
-      case "BLOCKQUOTE":
-        return jsx("element", { type: Block.Quote }, children);
-      case "P":
-        return jsx("element", { type: Block.Paragraph }, children);
-      case "A":
-        return jsx(
-          "element",
-          { type: "link", url: el.getAttribute("href") },
-          children
-        );
+        return [{ text: "\n" }];
       default:
-        return el.textContent;
+        return [textElement(el)];
     }
   }
 
-  return null;
+  return [];
 };
 
 const deserializeHTML = (input: string): any =>

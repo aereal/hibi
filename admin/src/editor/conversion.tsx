@@ -1,8 +1,9 @@
 /* eslint-disable react/display-name */
 
 import React, { FC, ReactNode } from "react";
-import { Text, Element } from "slate";
-import { Mark, Block, BlockFormat } from "./formats";
+import { Text, Element as SlateElement } from "slate";
+import { jsx } from "slate-hyperscript";
+import { Mark, Block, BlockFormat, TagType, BlockTagType } from "./formats";
 
 export const SerializedMark: FC<{ readonly leaf: Text }> = ({
   children,
@@ -26,7 +27,7 @@ export const SerializedMark: FC<{ readonly leaf: Text }> = ({
 
 interface BlockSerializerProps {
   readonly attributes?: Record<string, any>;
-  readonly element: Element;
+  readonly element: SlateElement;
 }
 
 export const blockSerializers: Record<BlockFormat, FC<BlockSerializerProps>> = {
@@ -54,3 +55,39 @@ export const blockSerializers: Record<BlockFormat, FC<BlockSerializerProps>> = {
     </a>
   ),
 };
+
+interface DeserializerProps {
+  readonly element: Element;
+  readonly children: any;
+}
+
+type Deserialzier = (props: DeserializerProps) => ReturnType<typeof jsx>;
+
+export const blockDeserializers: Record<BlockTagType, Deserialzier> = {
+  A: ({ element, children }) =>
+    jsx(
+      "element",
+      { type: Block.Link, url: element.getAttribute("href") },
+      children
+    ),
+  BLOCKQUOTE: ({ children }) => jsx("element", { type: Block.Quote }, children),
+  H1: ({ children }) => jsx("element", { type: Block.H1 }, children),
+  H2: ({ children }) => jsx("element", { type: Block.H2 }, children),
+  H3: ({ children }) => jsx("element", { type: Block.H3 }, children),
+  LI: ({ children }) => jsx("element", { type: Block.ListItem }, children),
+  OL: ({ children }) => jsx("element", { type: Block.NumberedList }, children),
+  UL: ({ children }) => jsx("element", { type: Block.BulletedList }, children),
+  P: ({ children }) =>
+    jsx(
+      "element",
+      { type: Block.Paragraph },
+      children.length === 0
+        ? [
+            { text: " \n" },
+          ] /* XXX: if empty children returned, SlateJS raises `Cannot get the start point` error ... */
+        : children
+    ),
+};
+
+export const isDeserializable = (x: string): x is BlockTagType =>
+  x in blockDeserializers;
