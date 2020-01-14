@@ -12,7 +12,7 @@ export const router = createRouter({
   newArticle: defineRoute("/new"),
   editArticle: defineRoute(
     { articleID: "path.param.string" },
-    p => `/article/${p.articleID}`
+    p => `/articles/${p.articleID}`
   ),
   diarySettings: defineRoute("/settings"),
 });

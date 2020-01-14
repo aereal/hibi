@@ -19,7 +19,11 @@ const NewArticlePageContent: FC = () => {
 
   return (
     <>
-      <ArticleEditor onSubmit={onSubmit} />
+      <ArticleEditor
+        onSubmit={onSubmit}
+        defaultTitle=""
+        defaultBodyHTML="<p> </p>\n"
+      />
       <CompletedNotification
         open={completed}
         onClose={onCloseNotification}

@@ -22,16 +22,22 @@ const useStyles = makeStyles(theme => ({
 
 interface ArticleEditorProps {
   readonly onSubmit: () => void;
+  readonly defaultTitle: string;
+  readonly defaultBodyHTML: string;
 }
 
-export const ArticleEditor: FC<ArticleEditorProps> = ({ onSubmit }) => {
+export const ArticleEditor: FC<ArticleEditorProps> = ({
+  onSubmit,
+  defaultTitle,
+  defaultBodyHTML,
+}) => {
   const classes = useStyles();
   const [doMutation, { error, loading }] = useMutation<
     PostArticleMutation,
     PostArticleMutationVariables
   >(mutation);
-  const [title, setTitle] = useState("");
-  const [bodyHTML, setBodyHTML] = useState("<p> </p>\n");
+  const [title, setTitle] = useState(defaultTitle);
+  const [bodyHTML, setBodyHTML] = useState(defaultBodyHTML);
 
   const handleChangeBody = (body: string): void => setBodyHTML(body);
 
