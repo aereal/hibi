@@ -79,6 +79,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		PostArticle         func(childComplexity int, article repository.NewArticle) int
+		UpdateArticle       func(childComplexity int, diaryID string, articleID string, article repository.ArticleToPost) int
 		UpdateDiarySettings func(childComplexity int, diaryID string, settings repository.DiarySettings) int
 	}
 
@@ -108,6 +109,7 @@ type DiaryResolver interface {
 type MutationResolver interface {
 	PostArticle(ctx context.Context, article repository.NewArticle) (string, error)
 	UpdateDiarySettings(ctx context.Context, diaryID string, settings repository.DiarySettings) (bool, error)
+	UpdateArticle(ctx context.Context, diaryID string, articleID string, article repository.ArticleToPost) (bool, error)
 }
 type QueryResolver interface {
 	Diary(ctx context.Context, id string) (*models.Diary, error)
@@ -255,6 +257,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.PostArticle(childComplexity, args["article"].(repository.NewArticle)), true
 
+	case "Mutation.updateArticle":
+		if e.complexity.Mutation.UpdateArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateArticle(childComplexity, args["diaryID"].(string), args["articleID"].(string), args["article"].(repository.ArticleToPost)), true
+
 	case "Mutation.updateDiarySettings":
 		if e.complexity.Mutation.UpdateDiarySettings == nil {
 			break
@@ -383,6 +397,12 @@ type Query {
 type Mutation {
   postArticle(article: NewArticle!): ID! @hasRole(role: ADMIN)
   updateDiarySettings(diaryID: ID!, settings: DiarySettings!): Boolean! @hasRole(role: ADMIN)
+  updateArticle(diaryID: ID!, articleID: ID!, article: ArticleToPost!): Boolean! @hasRole(role: ADMIN)
+}
+
+input ArticleToPost {
+  title: String!
+  bodyHTML: String!
 }
 
 input NewArticle {
@@ -523,6 +543,36 @@ func (ec *executionContext) field_Mutation_postArticle_args(ctx context.Context,
 		}
 	}
 	args["article"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["diaryID"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["diaryID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["articleID"]; ok {
+		arg1, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["articleID"] = arg1
+	var arg2 repository.ArticleToPost
+	if tmp, ok := rawArgs["article"]; ok {
+		arg2, err = ec.unmarshalNArticleToPost2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐArticleToPost(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["article"] = arg2
 	return args, nil
 }
 
@@ -1271,6 +1321,74 @@ func (ec *executionContext) _Mutation_updateDiarySettings(ctx context.Context, f
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
 			return ec.resolvers.Mutation().UpdateDiarySettings(rctx, args["diaryID"].(string), args["settings"].(repository.DiarySettings))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			role, err := ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx, "ADMIN")
+			if err != nil {
+				return nil, err
+			}
+			if ec.directives.HasRole == nil {
+				return nil, errors.New("directive hasRole is not implemented")
+			}
+			return ec.directives.HasRole(ctx, nil, directive0, role)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, err
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(bool); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateArticle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateArticle(rctx, args["diaryID"].(string), args["articleID"].(string), args["article"].(repository.ArticleToPost))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			role, err := ec.unmarshalORole2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx, "ADMIN")
@@ -2747,6 +2865,30 @@ func (ec *executionContext) unmarshalInputArticleOrder(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputArticleToPost(ctx context.Context, obj interface{}) (repository.ArticleToPost, error) {
+	var it repository.ArticleToPost
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "bodyHTML":
+			var err error
+			it.BodyHTML, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDiarySettings(ctx context.Context, obj interface{}) (repository.DiarySettings, error) {
 	var it repository.DiarySettings
 	var asMap = obj.(map[string]interface{})
@@ -3018,6 +3160,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateDiarySettings":
 			out.Values[i] = ec._Mutation_updateDiarySettings(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateArticle":
+			out.Values[i] = ec._Mutation_updateArticle(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3471,6 +3618,10 @@ func (ec *executionContext) marshalNArticleOrderField2githubᚗcomᚋaerealᚋhi
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNArticleToPost2githubᚗcomᚋaerealᚋhibiᚋapiᚋrepositoryᚐArticleToPost(ctx context.Context, v interface{}) (repository.ArticleToPost, error) {
+	return ec.unmarshalInputArticleToPost(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

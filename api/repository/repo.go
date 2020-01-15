@@ -26,6 +26,11 @@ type NewArticle struct {
 	BodyHTML string
 }
 
+type ArticleToPost struct {
+	Title    string
+	BodyHTML string
+}
+
 func (r *Repository) diaries() *firestore.CollectionRef {
 	return r.client.Collection("diaries")
 }
@@ -44,6 +49,24 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 		return "", xerrors.Errorf("cannot create article: %w", err)
 	}
 	return ref.ID, nil
+}
+
+func (r *Repository) UpdateArticle(ctx context.Context, articleID string, article ArticleToPost) error {
+	ref := r.articles().Doc(articleID)
+	_, err := ref.Update(ctx, []firestore.Update{
+		firestore.Update{
+			Path:  "Title",
+			Value: article.Title,
+		},
+		firestore.Update{
+			Path:  "BodyHTML",
+			Value: article.BodyHTML,
+		},
+	})
+	if err != nil {
+		return xerrors.Errorf("cannot update article(%q): %w", articleID, err)
+	}
+	return nil
 }
 
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
