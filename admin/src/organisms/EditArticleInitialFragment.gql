@@ -1,0 +1,6 @@
+fragment EditArticleInitialFragment on Article {
+  title
+  body {
+    html
+  }
+}

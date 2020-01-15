@@ -60,6 +60,7 @@ const EditArticlePageContent: FC<EditArticlePageContentProps> = ({
         onSubmit={onSubmit}
         defaultTitle={data.diary.article.title ?? ""}
         defaultBodyHTML={data.diary.article.body.html}
+        articleID={articleID}
       />
       <CompletedNotification
         open={completed}

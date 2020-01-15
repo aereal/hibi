@@ -1,10 +1,9 @@
+#import "../organisms/EditArticleInitialFragment.gql"
+
 query GetArticleQuery($diaryID: ID!, $articleID: ID!) {
   diary(id: $diaryID) {
     article(id: $articleID) {
-      title
-      body {
-        html
-      }
+      ...EditArticleInitialFragment
     }
   }
 }

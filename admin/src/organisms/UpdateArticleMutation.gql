@@ -1,0 +1,4 @@
+mutation UpdateArticleMutation($diaryID: ID!, $articleID: ID!, $articleToUpdate: ArticleToPost!) {
+  updateArticle(diaryID: $diaryID, articleID: $articleID, article: $articleToUpdate)
+}
+

@@ -3,13 +3,8 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { useMutation } from "@apollo/react-hooks";
 import { RichTextEditor } from "./RichTextEditor";
-import {
-  PostArticleMutation,
-  PostArticleMutationVariables,
-} from "./__generated__/PostArticleMutation";
-import mutation from "./PostArticleMutation.gql";
+import { usePostMutation } from "../mutations/usePostArticleMutation";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -24,18 +19,20 @@ interface ArticleEditorProps {
   readonly onSubmit: () => void;
   readonly defaultTitle: string;
   readonly defaultBodyHTML: string;
+  readonly articleID?: string;
 }
 
 export const ArticleEditor: FC<ArticleEditorProps> = ({
   onSubmit,
   defaultTitle,
   defaultBodyHTML,
+  articleID,
 }) => {
   const classes = useStyles();
-  const [doMutation, { error, loading }] = useMutation<
-    PostArticleMutation,
-    PostArticleMutationVariables
-  >(mutation);
+  const { doMutation, error, loading } = usePostMutation(
+    "gZJXFGCS7fONfpIKXWYn",
+    articleID
+  );
   const [title, setTitle] = useState(defaultTitle);
   const [bodyHTML, setBodyHTML] = useState(defaultBodyHTML);
 
@@ -46,15 +43,7 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
 
   const handleSubmit = async (event: FormEvent): Promise<void> => {
     event.preventDefault();
-    await doMutation({
-      variables: {
-        newArticle: {
-          diaryID: "gZJXFGCS7fONfpIKXWYn",
-          title,
-          bodyHTML,
-        },
-      },
-    });
+    await doMutation({ title, bodyHTML });
     setTitle("");
     setBodyHTML("");
     onSubmit();
