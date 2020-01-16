@@ -1,8 +1,8 @@
-import { Element, Node } from "slate";
+import { Element as SlateElement, Node } from "slate";
 
 type ValueType<T extends {}> = T[keyof T];
 
-export interface LinkElement extends Element {
+export interface LinkElement extends SlateElement {
   readonly type: "link";
   readonly url: string;
 }

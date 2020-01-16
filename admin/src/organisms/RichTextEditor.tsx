@@ -18,12 +18,13 @@ import {
 import { jsx } from "slate-hyperscript";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
-import { Block, BlockFormat, isLinkElement } from "../editor/formats";
+import { BlockFormat, isLinkElement, Mark } from "../editor/formats";
 import {
   SerializedMark,
   blockSerializers,
   isDeserializable,
   blockDeserializers,
+  deserializeMark,
 } from "../editor/conversion";
 import { withLink } from "../editor/link";
 import { flatMap } from "../flat-map";
@@ -139,7 +140,7 @@ const deserialize = (el: Node): Array<ReturnType<typeof jsx>> => {
       case "BR":
         return [{ text: "\n" }];
       default:
-        return [textElement(el)];
+        return [deserializeMark(el)];
     }
   }
 

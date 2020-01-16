@@ -3,7 +3,7 @@
 import React, { FC, ReactNode } from "react";
 import { Text, Element as SlateElement } from "slate";
 import { jsx } from "slate-hyperscript";
-import { Mark, Block, BlockFormat, TagType, BlockTagType } from "./formats";
+import { Mark, Block, BlockFormat, BlockTagType } from "./formats";
 
 export const SerializedMark: FC<{ readonly leaf: Text }> = ({
   children,
@@ -23,6 +23,25 @@ export const SerializedMark: FC<{ readonly leaf: Text }> = ({
     ret = <u>{ret}</u>;
   }
   return <>{ret}</>;
+};
+
+export const deserializeMark = (element: Element): Text => {
+  const slateNode: Text = { text: element.textContent ?? "" };
+  switch (element.tagName) {
+    case "CODE":
+      slateNode[Mark.Code] = true;
+      break;
+    case "EM":
+      slateNode[Mark.Italic] = true;
+      break;
+    case "STRONG":
+      slateNode[Mark.Bold] = true;
+      break;
+    case "U":
+      slateNode[Mark.Underlined] = true;
+      break;
+  }
+  return slateNode;
 };
 
 interface BlockSerializerProps {
