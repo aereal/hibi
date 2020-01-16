@@ -15,6 +15,7 @@ import {
 } from "slate-react";
 import Paper from "@material-ui/core/Paper";
 import { EditorActionToolbar } from "./EditorActionToolbar";
+import { NodePreview } from "./NodePreview";
 import { BlockFormat, isLinkElement } from "../editor/formats";
 import {
   SerializedMark,
@@ -58,7 +59,7 @@ export const RichTextEditor: FC<RichTextEditorProps> = ({
           readOnly={false}
         />
       </Paper>
-      <pre>{serialize(value)}</pre>
+      <NodePreview nodes={value} />
     </Slate>
   );
 };
