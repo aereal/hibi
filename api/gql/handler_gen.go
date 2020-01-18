@@ -513,7 +513,8 @@ input ArticleOrder {
 }
 
 enum ArticleOrderField {
-  PUBLISHED_AT
+  CREATED_AT
+  UPDATED_AT
 }
 
 enum OrderDirection {

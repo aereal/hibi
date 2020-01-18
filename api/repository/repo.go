@@ -154,12 +154,14 @@ func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID 
 type ArticleOrderField string
 
 const (
-	ArticleOrderFieldPublishedAt = ArticleOrderField("PUBLISHED_AT")
+	ArticleOrderFieldCreatedAt = ArticleOrderField("CREATED_AT")
+	ArticleOrderFieldUpdatedAt = ArticleOrderField("UPDATED_AT")
 )
 
 var (
 	articleFieldMapping = map[ArticleOrderField]string{
-		ArticleOrderFieldPublishedAt: "PublishedAt",
+		ArticleOrderFieldCreatedAt: "CreatedAt",
+		ArticleOrderFieldUpdatedAt: "UpdatedAt",
 	}
 )
 

@@ -85,7 +85,7 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page in
 	}
 
 	var (
-		field     = repository.ArticleOrderFieldPublishedAt
+		field     = repository.ArticleOrderFieldCreatedAt
 		direction = repository.OrderDirectionAsc
 	)
 	if orderBy != nil {
