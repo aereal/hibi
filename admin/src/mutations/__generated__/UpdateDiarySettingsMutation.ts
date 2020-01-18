@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { DiarySettings } from "./../../../__generated__/globalTypes";
+import { DiarySettings } from "./../../globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateDiarySettingsMutation
