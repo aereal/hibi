@@ -6,6 +6,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import clsx from "clsx";
+import Helmet from "react-helmet";
 import { Layout } from "../templates/Layout";
 import {
   useAuthentication,
@@ -39,18 +40,23 @@ export const RootPage: FC = () => {
   }
 
   return (
-    <Layout>
-      <Grid item xs={12} sm={6}>
-        {isSignedIn(status) ? (
-          <Paper className={clsx(classes.paper, classes.fixedHeight)}>
-            <List component="nav">
-              <ListItem button {...routes.diarySettings.link()}>
-                <ListItemText primary="設定" />
-              </ListItem>
-            </List>
-          </Paper>
-        ) : null}
-      </Grid>
-    </Layout>
+    <>
+      <Helmet>
+        <title>Hibi</title>
+      </Helmet>
+      <Layout>
+        <Grid item xs={12} sm={6}>
+          {isSignedIn(status) ? (
+            <Paper className={clsx(classes.paper, classes.fixedHeight)}>
+              <List component="nav">
+                <ListItem button {...routes.diarySettings.link()}>
+                  <ListItemText primary="設定" />
+                </ListItem>
+              </List>
+            </Paper>
+          ) : null}
+        </Grid>
+      </Layout>
+    </>
   );
 };

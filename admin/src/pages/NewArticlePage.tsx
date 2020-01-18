@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import Helmet from "react-helmet";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
 import { ArticleEditor } from "../organisms/ArticleEditor";
@@ -34,11 +35,18 @@ const NewArticlePageContent: FC = () => {
 };
 
 export const NewArticlePage: FC = () => (
-  <Layout>
-    <Grid item xs={12} spacing={0}>
-      <ProvideAuthenApolloClientOrRedirect onLoading={() => <LinearProgress />}>
-        <NewArticlePageContent />
-      </ProvideAuthenApolloClientOrRedirect>
-    </Grid>
-  </Layout>
+  <>
+    <Helmet>
+      <title>日記を書く - hibi</title>
+    </Helmet>
+    <Layout>
+      <Grid item xs={12} spacing={0}>
+        <ProvideAuthenApolloClientOrRedirect
+          onLoading={() => <LinearProgress />}
+        >
+          <NewArticlePageContent />
+        </ProvideAuthenApolloClientOrRedirect>
+      </Grid>
+    </Layout>
+  </>
 );

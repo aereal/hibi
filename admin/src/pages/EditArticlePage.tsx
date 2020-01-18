@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import { Route } from "type-route";
+import Helmet from "react-helmet";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
 import { ArticleEditor } from "../organisms/ArticleEditor";
@@ -80,14 +81,21 @@ export const EditArticlePage: FC<EditArticlePageProps> = ({
     params: { articleID },
   },
 }) => (
-  <Layout>
-    <Grid item xs={12} spacing={0}>
-      <ProvideAuthenApolloClientOrRedirect onLoading={() => <LinearProgress />}>
-        <EditArticlePageContent
-          diaryID="gZJXFGCS7fONfpIKXWYn"
-          articleID={articleID}
-        />
-      </ProvideAuthenApolloClientOrRedirect>
-    </Grid>
-  </Layout>
+  <>
+    <Helmet>
+      <title>日記を編集 ({articleID}) - hibi</title>
+    </Helmet>
+    <Layout>
+      <Grid item xs={12} spacing={0}>
+        <ProvideAuthenApolloClientOrRedirect
+          onLoading={() => <LinearProgress />}
+        >
+          <EditArticlePageContent
+            diaryID="gZJXFGCS7fONfpIKXWYn"
+            articleID={articleID}
+          />
+        </ProvideAuthenApolloClientOrRedirect>
+      </Grid>
+    </Layout>
+  </>
 );
