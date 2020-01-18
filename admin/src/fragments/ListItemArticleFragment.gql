@@ -1,0 +1,5 @@
+fragment ListItemArticleFragment on Article {
+  id
+  title
+  publishedAt
+}
