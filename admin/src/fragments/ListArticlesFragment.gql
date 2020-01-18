@@ -6,6 +6,7 @@ fragment ListArticlesFragment on Diary {
       hasNextPage
       nextPage
     }
+    totalCount
     nodes {
       ...ListItemArticleFragment
     }

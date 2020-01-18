@@ -22,6 +22,7 @@ export interface ListArticlesFragment_articles_nodes {
 export interface ListArticlesFragment_articles {
   readonly __typename: "ArticleConnection";
   readonly pageInfo: ListArticlesFragment_articles_pageInfo;
+  readonly totalCount: number;
   readonly nodes: ReadonlyArray<ListArticlesFragment_articles_nodes>;
 }
 

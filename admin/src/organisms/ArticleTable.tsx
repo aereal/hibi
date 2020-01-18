@@ -1,18 +1,38 @@
-import React, { FC } from "react";
+import React, { FC, MouseEvent, ChangeEventHandler } from "react";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import TablePagination from "@material-ui/core/TablePagination";
 import { ListArticlesFragment } from "../fragments/__generated__/ListArticlesFragment";
 import { ArticleRow } from "./ArticleRow";
 
+const rowsPerPageOptions = [5, 10, 30] as const;
+
+export type RowsPerPage = typeof rowsPerPageOptions[number];
+
 interface ArticleTableProps {
-  readonly articles: ListArticlesFragment["articles"]["nodes"];
+  readonly articlesList: ListArticlesFragment["articles"];
+  readonly rowsPerPage: RowsPerPage;
+  readonly currentPage: number;
+  readonly onChangePage: (
+    event: MouseEvent<HTMLButtonElement> | null,
+    page: number
+  ) => void;
+  readonly onChangeRowsPerPage: ChangeEventHandler<
+    HTMLTextAreaElement | HTMLInputElement
+  >;
 }
 
-export const ArticleTable: FC<ArticleTableProps> = ({ articles }) => (
+export const ArticleTable: FC<ArticleTableProps> = ({
+  articlesList,
+  currentPage,
+  rowsPerPage,
+  onChangePage,
+  onChangeRowsPerPage,
+}) => (
   <>
     <TableContainer>
       <Table>
@@ -24,11 +44,19 @@ export const ArticleTable: FC<ArticleTableProps> = ({ articles }) => (
           </TableRow>
         </TableHead>
         <TableBody>
-          {articles.map(article => (
+          {articlesList.nodes.map(article => (
             <ArticleRow article={article} key={article.id} />
           ))}
         </TableBody>
       </Table>
     </TableContainer>
+    <TablePagination
+      rowsPerPage={rowsPerPage}
+      rowsPerPageOptions={(rowsPerPageOptions as unknown) as number[]}
+      page={currentPage}
+      count={articlesList.totalCount}
+      onChangePage={onChangePage}
+      onChangeRowsPerPage={onChangeRowsPerPage}
+    />
   </>
 );

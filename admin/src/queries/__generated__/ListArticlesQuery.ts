@@ -24,6 +24,7 @@ export interface ListArticlesQuery_diary_articles_nodes {
 export interface ListArticlesQuery_diary_articles {
   readonly __typename: "ArticleConnection";
   readonly pageInfo: ListArticlesQuery_diary_articles_pageInfo;
+  readonly totalCount: number;
   readonly nodes: ReadonlyArray<ListArticlesQuery_diary_articles_nodes>;
 }
 
