@@ -1,4 +1,10 @@
-import React, { FC, FormEvent, useState, ChangeEventHandler } from "react";
+import React, {
+  FC,
+  FormEvent,
+  useState,
+  ChangeEventHandler,
+  MouseEvent,
+} from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -13,17 +19,22 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  saveAsDraft: {
+    margin: theme.spacing(3, 1, 2),
+  },
 }));
 
 interface ArticleEditorProps {
-  readonly onSubmit: () => void;
+  readonly onPublished: () => void;
+  readonly onDraftSaved: () => void;
   readonly defaultTitle: string;
   readonly defaultBodyHTML: string;
   readonly articleID?: string;
 }
 
 export const ArticleEditor: FC<ArticleEditorProps> = ({
-  onSubmit,
+  onPublished,
+  onDraftSaved,
   defaultTitle,
   defaultBodyHTML,
   articleID,
@@ -46,7 +57,15 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
     await doMutation({ title, bodyHTML });
     setTitle("");
     setBodyHTML("");
-    onSubmit();
+    onPublished();
+  };
+
+  const handleSaveAsDraft = async (event: MouseEvent): Promise<void> => {
+    event.preventDefault();
+    await doMutation({ title, bodyHTML, saveAsDraft: true });
+    setTitle("");
+    setBodyHTML("");
+    onDraftSaved();
   };
 
   if (error !== undefined) {
@@ -93,6 +112,18 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
               disabled={loading}
             >
               公開する
+            </Button>
+          </Grid>
+          <Grid item spacing={0}>
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              className={classes.saveAsDraft}
+              disabled={loading}
+              onClick={handleSaveAsDraft}
+            >
+              下書きとして保存する
             </Button>
           </Grid>
         </Grid>

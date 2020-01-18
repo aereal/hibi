@@ -33,6 +33,7 @@ export interface NewArticle {
   readonly diaryID: string;
   readonly title: string;
   readonly bodyHTML: string;
+  readonly isDraft: boolean;
 }
 
 //==============================================================
