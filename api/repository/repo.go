@@ -148,6 +148,11 @@ func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, l
 	return r.populateArticles(iter)
 }
 
+func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit int) ([]*models.Draft, error) {
+	iter := r.drafts().Where("DiaryID", "==", diaryID).Limit(limit).Documents(ctx)
+	return populateDrafts(iter)
+}
+
 func (r *Repository) articles() *firestore.CollectionRef {
 	return r.client.Collection("articles")
 }
@@ -188,6 +193,43 @@ func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, e
 	}, nil
 }
 
+func (r *Repository) drafts() *firestore.CollectionRef {
+	return r.client.Collection("drafts")
+}
+
+func populateDrafts(iter *firestore.DocumentIterator) ([]*models.Draft, error) {
+	results := []*models.Draft{}
+	for {
+		snapshot, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		draft, err := snapshotToDraft(snapshot)
+		results = append(results, draft)
+	}
+	return results, nil
+}
+
+func snapshotToDraft(snapshot *firestore.DocumentSnapshot) (*models.Draft, error) {
+	var dto draftDTO
+	if err := snapshot.DataTo(&dto); err != nil {
+		return nil, xerrors.Errorf("failed to decode data to draft: %w", err)
+	}
+	body := &models.ArticleBody{Markdown: dto.MarkdownBody}
+	if dto.BodyHTML != "" {
+		body.SetHTML(dto.BodyHTML)
+	}
+	return &models.Draft{
+		ID:       snapshot.Ref.ID,
+		Title:    &dto.Title,
+		Body:     body,
+		AuthorID: dto.AuthorID,
+	}, nil
+}
+
 type diaryDTO struct {
 	Name      string
 	OwnerID   string
@@ -201,6 +243,16 @@ type articleDTO struct {
 	MarkdownBody string
 	BodyHTML     string
 	PublishedAt  time.Time
+	AuthorID     string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+type draftDTO struct {
+	DiaryID      string
+	Title        string
+	MarkdownBody string
+	BodyHTML     string
 	AuthorID     string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
