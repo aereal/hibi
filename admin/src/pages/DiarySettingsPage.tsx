@@ -9,11 +9,11 @@ import { Layout } from "../templates/Layout";
 import { DiarySettingsForm } from "../organisms/DiarySettingsForm";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
 import { CompletedNotification } from "../organisms/CompletedNotification";
-import query from "./DiarySettingsQuery.gql";
+import query from "../queries/DiarySettingsQuery.gql";
 import {
   DiarySettingsQuery,
   DiarySettingsQueryVariables,
-} from "./__generated__/DiarySettingsQuery";
+} from "../queries/__generated__/DiarySettingsQuery";
 
 const useStyles = makeStyles(theme => ({
   paper: {

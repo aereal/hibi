@@ -1,4 +1,4 @@
-#import "../organisms/EditArticleInitialFragment.gql"
+#import "../fragments/EditArticleInitialFragment.gql"
 
 query GetArticleQuery($diaryID: ID!, $articleID: ID!) {
   diary(id: $diaryID) {
