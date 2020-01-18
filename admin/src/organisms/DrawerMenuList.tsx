@@ -7,6 +7,7 @@ import Divider from "@material-ui/core/Divider";
 import CloseIcon from "@material-ui/icons/Close";
 import CreateIcon from "@material-ui/icons/Create";
 import SettingsIcon from "@material-ui/icons/Settings";
+import ListIcon from "@material-ui/icons/List";
 import { signOut } from "../effects/authentication";
 import { routes } from "../routes";
 
@@ -25,6 +26,12 @@ export const DrawerMenuList: FC = () => (
           <CreateIcon />
         </ListItemIcon>
         <ListItemText primary="記事を書く" />
+      </ListItem>
+      <ListItem button {...routes.listArticles.link()}>
+        <ListItemIcon>
+          <ListIcon />
+        </ListItemIcon>
+        <ListItemText primary="記事一覧" />
       </ListItem>
       <ListItem button {...routes.diarySettings.link()}>
         <ListItemIcon>

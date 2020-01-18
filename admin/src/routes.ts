@@ -15,6 +15,7 @@ export const router = createRouter({
     p => `/articles/${p.articleID}`
   ),
   diarySettings: defineRoute("/settings"),
+  listArticles: defineRoute("/articles"),
 });
 
 export const { routes, listen, getCurrentRoute } = router;
