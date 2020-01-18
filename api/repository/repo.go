@@ -37,12 +37,14 @@ func (r *Repository) diaries() *firestore.CollectionRef {
 
 func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newDiary NewArticle) (string, error) {
 	ref := r.articles().NewDoc()
-	publishedAt := time.Now()
+	now := time.Now()
 	_, err := ref.Create(ctx, articleDTO{
 		DiaryID:     newDiary.DiaryID,
 		Title:       newDiary.Title,
 		BodyHTML:    newDiary.BodyHTML,
-		PublishedAt: publishedAt,
+		PublishedAt: now,
+		CreatedAt:   now,
+		UpdatedAt:   now,
 		AuthorID:    author.ID,
 	})
 	if err != nil {
@@ -53,6 +55,7 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 
 func (r *Repository) UpdateArticle(ctx context.Context, articleID string, article ArticleToPost) error {
 	ref := r.articles().Doc(articleID)
+	now := time.Now()
 	_, err := ref.Update(ctx, []firestore.Update{
 		firestore.Update{
 			Path:  "Title",
@@ -61,6 +64,10 @@ func (r *Repository) UpdateArticle(ctx context.Context, articleID string, articl
 		firestore.Update{
 			Path:  "BodyHTML",
 			Value: article.BodyHTML,
+		},
+		firestore.Update{
+			Path:  "UpdatedAt",
+			Value: now,
 		},
 	})
 	if err != nil {
@@ -94,8 +101,13 @@ type DiarySettings struct {
 }
 
 func (r *Repository) UpdateDiarySettings(ctx context.Context, diaryID string, settings DiarySettings) error {
+	now := time.Now()
 	_, err := r.diaries().Doc(diaryID).Update(ctx, []firestore.Update{
 		firestore.Update{Path: "Name", Value: settings.Name},
+		firestore.Update{
+			Path:  "UpdatedAt",
+			Value: now,
+		},
 	})
 	if err != nil {
 		return err
@@ -177,8 +189,10 @@ func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, e
 }
 
 type diaryDTO struct {
-	Name    string
-	OwnerID string
+	Name      string
+	OwnerID   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type articleDTO struct {
@@ -188,6 +202,8 @@ type articleDTO struct {
 	BodyHTML     string
 	PublishedAt  time.Time
 	AuthorID     string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type OrderDirection string
