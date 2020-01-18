@@ -24,6 +24,7 @@ type NewArticle struct {
 	DiaryID  string
 	Title    string
 	BodyHTML string
+	IsDraft  bool
 }
 
 type ArticleToPost struct {
@@ -35,13 +36,20 @@ func (r *Repository) diaries() *firestore.CollectionRef {
 	return r.client.Collection("diaries")
 }
 
-func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newDiary NewArticle) (string, error) {
+func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newArticle NewArticle) (string, error) {
+	if newArticle.IsDraft {
+		return r.createDraft(ctx, author, newArticle)
+	}
+	return r.createArticle(ctx, author, newArticle)
+}
+
+func (r *Repository) createArticle(ctx context.Context, author *models.User, newArticle NewArticle) (string, error) {
 	ref := r.articles().NewDoc()
 	now := time.Now()
 	_, err := ref.Create(ctx, articleDTO{
-		DiaryID:     newDiary.DiaryID,
-		Title:       newDiary.Title,
-		BodyHTML:    newDiary.BodyHTML,
+		DiaryID:     newArticle.DiaryID,
+		Title:       newArticle.Title,
+		BodyHTML:    newArticle.BodyHTML,
 		PublishedAt: now,
 		CreatedAt:   now,
 		UpdatedAt:   now,
@@ -49,6 +57,23 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 	})
 	if err != nil {
 		return "", fmt.Errorf("cannot create article: %w", err)
+	}
+	return ref.ID, nil
+}
+
+func (r *Repository) createDraft(ctx context.Context, author *models.User, newArticle NewArticle) (string, error) {
+	ref := r.drafts().NewDoc()
+	now := time.Now()
+	_, err := ref.Create(ctx, draftDTO{
+		DiaryID:   newArticle.DiaryID,
+		Title:     newArticle.Title,
+		BodyHTML:  newArticle.BodyHTML,
+		CreatedAt: now,
+		UpdatedAt: now,
+		AuthorID:  author.ID,
+	})
+	if err != nil {
+		return "", xerrors.Errorf("cannot create draft: %w", err)
 	}
 	return ref.ID, nil
 }

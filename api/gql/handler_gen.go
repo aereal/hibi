@@ -491,6 +491,7 @@ input NewArticle {
   diaryID: ID!
   title: String!
   bodyHTML: String!
+  isDraft: Boolean!
 }
 
 input DiarySettings {
@@ -3176,6 +3177,12 @@ func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj in
 		case "bodyHTML":
 			var err error
 			it.BodyHTML, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isDraft":
+			var err error
+			it.IsDraft, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -24,6 +24,7 @@ input NewArticle {
   diaryID: ID!
   title: String!
   bodyHTML: String!
+  isDraft: Boolean!
 }
 
 input DiarySettings {
