@@ -1,6 +1,7 @@
 import React, { FC, useState, MouseEvent, ChangeEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import LinearProgress from "@material-ui/core/LinearProgress";
+import Typography from "@material-ui/core/Typography";
 import Helmet from "react-helmet";
 import { useQuery } from "@apollo/react-hooks";
 import { Layout } from "../templates/Layout";
@@ -77,6 +78,7 @@ export const ListArticlesPage: FC = () => (
     </Helmet>
     <Layout>
       <Grid item xs={12} spacing={0}>
+        <Typography variant="h4">日記一覧</Typography>
         <ProvideAuthenApolloClientOrRedirect
           onLoading={() => <LinearProgress />}
         >
