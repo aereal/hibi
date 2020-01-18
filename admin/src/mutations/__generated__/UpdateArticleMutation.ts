@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ArticleToPost } from "./../../../__generated__/globalTypes";
+import { ArticleToPost } from "./../../globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateArticleMutation
