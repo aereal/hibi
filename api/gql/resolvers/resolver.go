@@ -40,6 +40,10 @@ func (r *rootResolver) Article() gql.ArticleResolver {
 	return &articleResolver{r}
 }
 
+func (r *rootResolver) Draft() gql.DraftResolver {
+	return &draftResolver{r}
+}
+
 type queryResolver struct{ *rootResolver }
 
 func (r *queryResolver) Diary(ctx context.Context, id string) (*models.Diary, error) {
@@ -58,16 +62,27 @@ func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articl
 	return r.repo.FindArticle(ctx, diary.ID, articleID)
 }
 
-func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+func paging(page int, perPage int) (countToFetch int, offset int, err error) {
 	if perPage > maxPerPage {
-		return nil, fmt.Errorf("perPage parameter too large")
+		err = fmt.Errorf("perPage parameter too large")
+		return
 	}
 
 	pageOffset := page - 1
 	if pageOffset < 0 {
 		pageOffset = 0
 	}
-	offset := pageOffset * perPage
+	offset = pageOffset * perPage
+	countToFetch = perPage + 1
+
+	return
+}
+
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+	countToFetch, offset, err := paging(page, perPage)
+	if err != nil {
+		return nil, err
+	}
 
 	var (
 		field     = repository.ArticleOrderFieldPublishedAt
@@ -77,7 +92,7 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page in
 		field = orderBy.Field
 		direction = orderBy.Direction
 	}
-	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, perPage+1, offset, field, direction)
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, countToFetch, offset, field, direction)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +127,38 @@ func (r *diaryResolver) Owner(ctx context.Context, diary *models.Diary) (*models
 		Name: record.DisplayName,
 	}
 	return user, nil
+}
+
+func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page int, perPage int) (*dto.DraftConnection, error) {
+	countToFetch, offset, err := paging(page, perPage)
+	if err != nil {
+		return nil, err
+	}
+
+	drafts, err := r.repo.FindDraftsOf(ctx, diary.ID, countToFetch, offset)
+	if err != nil {
+		return nil, err
+	}
+	conn := &dto.DraftConnection{
+		PageInfo: &dto.OffsetBasePageInfo{},
+	}
+	for _, draft := range drafts {
+		conn.Nodes = append(conn.Nodes, draft)
+		if len(conn.Nodes) == perPage {
+			break
+		}
+	}
+	conn.TotalCount = len(drafts)
+	if conn.TotalCount > perPage {
+		conn.TotalCount = perPage
+	}
+	conn.PageInfo.HasNextPage = len(drafts) > perPage
+	if conn.PageInfo.HasNextPage {
+		nextPage := page + 1
+		conn.PageInfo.NextPage = &nextPage
+	}
+
+	return conn, nil
 }
 
 type mutationResolver struct{ *rootResolver }
@@ -206,4 +253,10 @@ func (r *articleResolver) Author(ctx context.Context, article *models.Article) (
 		Name: record.DisplayName,
 	}
 	return user, nil
+}
+
+type draftResolver struct{ *rootResolver }
+
+func (r *draftResolver) Author(ctx context.Context, draft *models.Draft) (*models.User, error) {
+	return nil, nil
 }

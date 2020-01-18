@@ -34,6 +34,7 @@ type Diary {
   id: ID!
   name: String!
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
+  drafts(page: Int!, perPage: Int!): DraftConnection!
   article(id: ID!): Article
   owner: User!
 }
@@ -52,10 +53,23 @@ enum OrderDirection {
   DESC
 }
 
+type DraftConnection {
+  nodes: [Draft!]!
+  pageInfo: OffsetBasePageInfo!
+  totalCount: Int!
+}
+
 type ArticleConnection {
   nodes: [Article!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
+}
+
+type Draft {
+  id: ID!
+  title: String
+  body: ArticleBody!
+  author: User!
 }
 
 type Article {

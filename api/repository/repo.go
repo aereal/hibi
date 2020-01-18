@@ -148,8 +148,8 @@ func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, l
 	return r.populateArticles(iter)
 }
 
-func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit int) ([]*models.Draft, error) {
-	iter := r.drafts().Where("DiaryID", "==", diaryID).Limit(limit).Documents(ctx)
+func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit, offset int) ([]*models.Draft, error) {
+	iter := r.drafts().Where("DiaryID", "==", diaryID).Limit(limit).Offset(offset).Documents(ctx)
 	return populateDrafts(iter)
 }
 
