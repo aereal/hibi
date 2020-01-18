@@ -2,13 +2,13 @@ import { useMutation } from "@apollo/react-hooks";
 import {
   PostArticleMutation,
   PostArticleMutationVariables,
-} from "../organisms/__generated__/PostArticleMutation";
+} from "./__generated__/PostArticleMutation";
 import {
   UpdateArticleMutation,
   UpdateArticleMutationVariables,
-} from "../organisms/__generated__/UpdateArticleMutation";
-import postNewMutation from "../organisms/PostArticleMutation.gql";
-import updateMutation from "../organisms/UpdateArticleMutation.gql";
+} from "./__generated__/UpdateArticleMutation";
+import postNewMutation from "./PostArticleMutation.gql";
+import updateMutation from "./UpdateArticleMutation.gql";
 
 interface ArticleUpdatePayload {
   readonly title: string;

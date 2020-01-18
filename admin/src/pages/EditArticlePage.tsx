@@ -8,11 +8,11 @@ import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-cl
 import { ArticleEditor } from "../organisms/ArticleEditor";
 import { CompletedNotification } from "../organisms/CompletedNotification";
 import { routes } from "../routes";
-import query from "./GetArticleQuery.gql";
+import query from "../queries/GetArticleQuery.gql";
 import {
   GetArticleQuery,
   GetArticleQueryVariables,
-} from "./__generated__/GetArticleQuery";
+} from "../queries/__generated__/GetArticleQuery";
 import { useQuery } from "@apollo/react-hooks";
 
 interface EditArticlePageContentProps {

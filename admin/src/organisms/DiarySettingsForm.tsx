@@ -7,8 +7,8 @@ import Button from "@material-ui/core/Button";
 import {
   UpdateDiarySettingsMutation,
   UpdateDiarySettingsMutationVariables,
-} from "./__generated__/UpdateDiarySettingsMutation";
-import mutation from "./UpdateDiarySettingsMutation.gql";
+} from "../mutations/__generated__/UpdateDiarySettingsMutation";
+import mutation from "../mutations/UpdateDiarySettingsMutation.gql";
 
 interface Fields {
   readonly name: string;
