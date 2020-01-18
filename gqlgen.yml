@@ -33,3 +33,5 @@ models:
     model: github.com/aereal/hibi/api/models.User
   DiarySettings:
     model: github.com/aereal/hibi/api/repository.DiarySettings
+  ArticleToPost:
+    model: github.com/aereal/hibi/api/repository.ArticleToPost

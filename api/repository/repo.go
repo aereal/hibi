@@ -26,6 +26,11 @@ type NewArticle struct {
 	BodyHTML string
 }
 
+type ArticleToPost struct {
+	Title    string
+	BodyHTML string
+}
+
 func (r *Repository) diaries() *firestore.CollectionRef {
 	return r.client.Collection("diaries")
 }
@@ -44,6 +49,24 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 		return "", xerrors.Errorf("cannot create article: %w", err)
 	}
 	return ref.ID, nil
+}
+
+func (r *Repository) UpdateArticle(ctx context.Context, articleID string, article ArticleToPost) error {
+	ref := r.articles().Doc(articleID)
+	_, err := ref.Update(ctx, []firestore.Update{
+		firestore.Update{
+			Path:  "Title",
+			Value: article.Title,
+		},
+		firestore.Update{
+			Path:  "BodyHTML",
+			Value: article.BodyHTML,
+		},
+	})
+	if err != nil {
+		return xerrors.Errorf("cannot update article(%q): %w", articleID, err)
+	}
+	return nil
 }
 
 func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, error) {
@@ -88,22 +111,7 @@ func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID 
 	if err != nil {
 		return nil, err
 	}
-	var dto articleDTO
-	if err := snapshot.DataTo(&dto); err != nil {
-		return nil, xerrors.Errorf("failed to populate snapshot as article: %w", err)
-	}
-	if dto.DiaryID != diaryID {
-		return nil, nil
-	}
-	return &models.Article{
-		ID:    snapshot.Ref.ID,
-		Title: &dto.Title,
-		Body: &models.ArticleBody{
-			Markdown: dto.MarkdownBody,
-		},
-		PublishedAt: dto.PublishedAt,
-		AuthorID:    dto.AuthorID,
-	}, nil
+	return snapshotToArticle(snapshot)
 }
 
 type ArticleOrderField string
@@ -142,25 +150,30 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 		if err != nil {
 			return nil, err
 		}
-		var dto articleDTO
-		if err := snapshot.DataTo(&dto); err != nil {
-			return nil, xerrors.Errorf("failed to article: %w", err)
-		}
-		body := &models.ArticleBody{
-			Markdown: dto.MarkdownBody,
-		}
-		if dto.BodyHTML != "" {
-			body.SetHTML(dto.BodyHTML)
-		}
-		results = append(results, &models.Article{
-			ID:          snapshot.Ref.ID,
-			Title:       &dto.Title,
-			Body:        body,
-			PublishedAt: dto.PublishedAt,
-			AuthorID:    dto.AuthorID,
-		})
+		article, err := snapshotToArticle(snapshot)
+		results = append(results, article)
 	}
 	return results, nil
+}
+
+func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, error) {
+	var dto articleDTO
+	if err := snapshot.DataTo(&dto); err != nil {
+		return nil, xerrors.Errorf("failed to article: %w", err)
+	}
+	body := &models.ArticleBody{
+		Markdown: dto.MarkdownBody,
+	}
+	if dto.BodyHTML != "" {
+		body.SetHTML(dto.BodyHTML)
+	}
+	return &models.Article{
+		ID:          snapshot.Ref.ID,
+		Title:       &dto.Title,
+		Body:        body,
+		PublishedAt: dto.PublishedAt,
+		AuthorID:    dto.AuthorID,
+	}, nil
 }
 
 type diaryDTO struct {

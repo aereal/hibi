@@ -139,6 +139,38 @@ func (r *mutationResolver) PostArticle(ctx context.Context, newArticle repositor
 	return articleID, nil
 }
 
+func (r *mutationResolver) UpdateArticle(ctx context.Context, diaryID string, articleID string, article repository.ArticleToPost) (bool, error) {
+	visitor := auth.ForContext(ctx)
+	if visitor == nil {
+		return false, fmt.Errorf("[BUG] authentication failed")
+	}
+
+	diary, err := r.repo.FindDiary(ctx, diaryID)
+	if err != nil {
+		return false, err
+	}
+
+	if !diary.CanPostArticle(visitor) {
+		return false, fmt.Errorf("cannot post article due to lack of permission")
+	}
+
+	articleToUpdate, err := r.repo.FindArticle(ctx, diaryID, articleID)
+	if err != nil {
+		return false, xerrors.Errorf("cannot find article(%q): %w", articleID, err)
+	}
+
+	if articleToUpdate.AuthorID != visitor.ID {
+		return false, fmt.Errorf("cannot update article by others")
+	}
+
+	err = r.repo.UpdateArticle(ctx, articleID, article)
+	if err != nil {
+		return false, xerrors.Errorf("cannot update article: %w", err)
+	}
+
+	return true, nil
+}
+
 func (r *mutationResolver) UpdateDiarySettings(ctx context.Context, diaryID string, settings repository.DiarySettings) (bool, error) {
 	logger := logging.FromContext(ctx)
 	logger.Infof("diaryID=%v settings=%#v", diaryID, settings)

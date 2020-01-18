@@ -5,13 +5,13 @@
 import { NewArticle } from "./../../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: PostNewArticleMutation
+// GraphQL mutation operation: PostArticleMutation
 // ====================================================
 
-export interface PostNewArticleMutation {
+export interface PostArticleMutation {
   readonly postArticle: string;
 }
 
-export interface PostNewArticleMutationVariables {
+export interface PostArticleMutationVariables {
   readonly newArticle: NewArticle;
 }

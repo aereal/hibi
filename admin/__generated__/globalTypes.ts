@@ -6,6 +6,11 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface ArticleToPost {
+  readonly title: string;
+  readonly bodyHTML: string;
+}
+
 export interface DiarySettings {
   readonly name: string;
 }

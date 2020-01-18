@@ -1,60 +1,16 @@
-import React, { FC, useState, FormEvent } from "react";
+import React, { FC, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { useMutation } from "@apollo/react-hooks";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
-import { ArticleEditor, ChangeItem } from "../organisms/ArticleEditor";
-import mutation from "./PostNewArticleMutation.gql";
-import {
-  PostNewArticleMutation,
-  PostNewArticleMutationVariables,
-} from "./__generated__/PostNewArticleMutation";
+import { ArticleEditor } from "../organisms/ArticleEditor";
 import { CompletedNotification } from "../organisms/CompletedNotification";
 
 const NewArticlePageContent: FC = () => {
-  const [doMutation, { error, loading }] = useMutation<
-    PostNewArticleMutation,
-    PostNewArticleMutationVariables
-  >(mutation);
-  const [title, setTitle] = useState("");
-  const [bodyHTML, setBodyHTML] = useState(`<p> </p>\n`);
   const [completed, setCompleted] = useState(false);
 
-  if (error !== undefined) {
-    return (
-      <>
-        <div>! Error</div>
-        <pre>{JSON.stringify(error)}</pre>
-      </>
-    );
-  }
-
-  const onSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    await doMutation({
-      variables: {
-        newArticle: {
-          diaryID: "gZJXFGCS7fONfpIKXWYn",
-          title,
-          bodyHTML,
-        },
-      },
-    });
-    setTitle("");
-    setBodyHTML("");
+  const onSubmit = (): void => {
     setCompleted(true);
-  };
-
-  const onChange = (item: ChangeItem) => {
-    switch (item.name) {
-      case "title":
-        setTitle(item.value);
-        break;
-      case "body":
-        setBodyHTML(item.value);
-        break;
-    }
   };
 
   const onCloseNotification = () => {
@@ -65,17 +21,14 @@ const NewArticlePageContent: FC = () => {
     <>
       <ArticleEditor
         onSubmit={onSubmit}
-        loading={loading}
-        title={title}
-        bodyHTML={bodyHTML}
-        onChange={onChange}
+        defaultTitle=""
+        defaultBodyHTML="<p> </p>\n"
       />
       <CompletedNotification
         open={completed}
         onClose={onCloseNotification}
         message="公開しました"
       />
-      {loading ? <LinearProgress /> : null}
     </>
   );
 };

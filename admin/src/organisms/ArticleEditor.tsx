@@ -1,9 +1,10 @@
-import React, { FC, FormEventHandler } from "react";
+import React, { FC, FormEvent, useState, ChangeEventHandler } from "react";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import { RichTextEditor } from "./RichTextEditor";
+import { usePostMutation } from "../mutations/usePostArticleMutation";
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -14,37 +15,51 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export interface ChangeItem {
-  readonly name: "title" | "body";
-  readonly value: string;
-}
-
 interface ArticleEditorProps {
-  readonly onSubmit: FormEventHandler;
-  readonly loading: boolean;
-  readonly title: string;
-  readonly bodyHTML: string;
-  readonly onChange: (item: ChangeItem) => void;
+  readonly onSubmit: () => void;
+  readonly defaultTitle: string;
+  readonly defaultBodyHTML: string;
+  readonly articleID?: string;
 }
 
 export const ArticleEditor: FC<ArticleEditorProps> = ({
   onSubmit,
-  loading,
-  title,
-  bodyHTML,
-  onChange,
+  defaultTitle,
+  defaultBodyHTML,
+  articleID,
 }) => {
   const classes = useStyles();
+  const { doMutation, error, loading } = usePostMutation(
+    "gZJXFGCS7fONfpIKXWYn",
+    articleID
+  );
+  const [title, setTitle] = useState(defaultTitle);
+  const [bodyHTML, setBodyHTML] = useState(defaultBodyHTML);
 
-  const handleChange = (body: string): void =>
-    onChange({ name: "body", value: body });
+  const handleChangeBody = (body: string): void => setBodyHTML(body);
+
+  const handleChangeTitle: ChangeEventHandler<HTMLInputElement> = event =>
+    setTitle(event.target.value);
+
+  const handleSubmit = async (event: FormEvent): Promise<void> => {
+    event.preventDefault();
+    await doMutation({ title, bodyHTML });
+    setTitle("");
+    setBodyHTML("");
+    onSubmit();
+  };
+
+  if (error !== undefined) {
+    return (
+      <>
+        <div>! Error</div>
+        <pre>{JSON.stringify(error)}</pre>
+      </>
+    );
+  }
 
   return (
-    <form
-      noValidate
-      className={classes.form}
-      onSubmit={event => onSubmit(event)}
-    >
+    <form noValidate className={classes.form} onSubmit={handleSubmit}>
       <Grid container spacing={0}>
         <Grid item sm={12} spacing={0}>
           <TextField
@@ -57,15 +72,13 @@ export const ArticleEditor: FC<ArticleEditorProps> = ({
             placeholder="今日の日記"
             value={title}
             disabled={loading}
-            onChange={event =>
-              onChange({ name: "title", value: event.target.value })
-            }
+            onChange={handleChangeTitle}
           />
         </Grid>
         <Grid item sm={12} spacing={0}>
           <RichTextEditor
             defaultValue={bodyHTML}
-            onChangeBody={handleChange}
+            onChangeBody={handleChangeBody}
             style={{ minHeight: "50vh" }}
           />
         </Grid>

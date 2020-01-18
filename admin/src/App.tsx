@@ -5,6 +5,7 @@ import { RootPage } from "./pages/RootPage";
 import { SignInPage } from "./pages/SignInPage";
 import { NewArticlePage } from "./pages/NewArticlePage";
 import { DiarySettingsPage } from "./pages/DiarySettingsPage";
+import { EditArticlePage } from "./pages/EditArticlePage";
 import { DefaultAuthenticationProvider } from "./effects/authentication";
 
 const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
@@ -17,6 +18,8 @@ const Routing: FC<{ route: Route<typeof routes> }> = ({ route }) => {
       return <NewArticlePage />;
     case routes.diarySettings.name:
       return <DiarySettingsPage />;
+    case routes.editArticle.name:
+      return <EditArticlePage editArticlePageRoute={route} />;
     default:
       return <>Not Found</>;
   }
