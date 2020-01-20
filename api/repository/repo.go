@@ -73,7 +73,7 @@ func (r *Repository) createDraft(ctx context.Context, author *models.User, newAr
 		AuthorID:  author.ID,
 	})
 	if err != nil {
-		return "", xerrors.Errorf("cannot create draft: %w", err)
+		return "", fmt.Errorf("cannot create draft: %w", err)
 	}
 	return ref.ID, nil
 }
@@ -140,7 +140,7 @@ func (r *Repository) UpdateDiarySettings(ctx context.Context, diaryID string, se
 	return nil
 }
 
-func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID string) (*models.Article, error) {
+func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID string) (*models.PublishedArticle, error) {
 	snapshot, err := r.articles().Doc(articleID).Get(ctx)
 	if status.Code(err) == codes.NotFound {
 		return nil, nil
@@ -165,7 +165,7 @@ var (
 	}
 )
 
-func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Article, error) {
+func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.PublishedArticle, error) {
 	iter := r.articles().
 		OrderBy(articleFieldMapping[orderField], firestoreOrderDirectionMapping[dir]).
 		Where("DiaryID", "==", diaryID).
@@ -184,8 +184,8 @@ func (r *Repository) articles() *firestore.CollectionRef {
 	return r.client.Collection("articles")
 }
 
-func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) ([]*models.Article, error) {
-	results := []*models.Article{}
+func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) ([]*models.PublishedArticle, error) {
+	results := []*models.PublishedArticle{}
 	for {
 		snapshot, err := articlesIter.Next()
 		if err == iterator.Done {
@@ -200,7 +200,7 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 	return results, nil
 }
 
-func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, error) {
+func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.PublishedArticle, error) {
 	var dto articleDTO
 	if err := snapshot.DataTo(&dto); err != nil {
 		return nil, fmt.Errorf("failed to article: %w", err)
@@ -211,7 +211,7 @@ func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, e
 	if dto.BodyHTML != "" {
 		body.SetHTML(dto.BodyHTML)
 	}
-	return &models.Article{
+	return &models.PublishedArticle{
 		ID:          snapshot.Ref.ID,
 		Title:       &dto.Title,
 		Body:        body,
@@ -243,7 +243,7 @@ func populateDrafts(iter *firestore.DocumentIterator) ([]*models.Draft, error) {
 func snapshotToDraft(snapshot *firestore.DocumentSnapshot) (*models.Draft, error) {
 	var dto draftDTO
 	if err := snapshot.DataTo(&dto); err != nil {
-		return nil, xerrors.Errorf("failed to decode data to draft: %w", err)
+		return nil, fmt.Errorf("failed to decode data to draft: %w", err)
 	}
 	body := &models.ArticleBody{Markdown: dto.MarkdownBody}
 	if dto.BodyHTML != "" {

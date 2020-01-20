@@ -36,7 +36,7 @@ func (r *rootResolver) Diary() gql.DiaryResolver {
 	return &diaryResolver{r}
 }
 
-func (r *rootResolver) Article() gql.ArticleResolver {
+func (r *rootResolver) PublishedArticle() gql.PublishedArticleResolver {
 	return &articleResolver{r}
 }
 
@@ -58,7 +58,7 @@ type diaryResolver struct{ *rootResolver }
 
 const maxPerPage = 50
 
-func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articleID string) (*models.Article, error) {
+func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articleID string) (dto.Article, error) {
 	return r.repo.FindArticle(ctx, diary.ID, articleID)
 }
 
@@ -143,7 +143,12 @@ func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page in
 		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, draft := range drafts {
-		conn.Nodes = append(conn.Nodes, draft)
+		conn.Nodes = append(conn.Nodes, &dto.Draft{
+			ID:       draft.ID,
+			Title:    draft.Title,
+			Body:     draft.Body,
+			AuthorID: draft.AuthorID,
+		})
 		if len(conn.Nodes) == perPage {
 			break
 		}
@@ -243,7 +248,7 @@ func (r *mutationResolver) UpdateDiarySettings(ctx context.Context, diaryID stri
 
 type articleResolver struct{ *rootResolver }
 
-func (r *articleResolver) Author(ctx context.Context, article *models.Article) (*models.User, error) {
+func (r *articleResolver) Author(ctx context.Context, article *dto.PublishedArticle) (*models.User, error) {
 	record, err := r.authClient.GetUser(ctx, article.AuthorID)
 	if err != nil {
 		return nil, err
@@ -257,6 +262,6 @@ func (r *articleResolver) Author(ctx context.Context, article *models.Article) (
 
 type draftResolver struct{ *rootResolver }
 
-func (r *draftResolver) Author(ctx context.Context, draft *models.Draft) (*models.User, error) {
+func (r *draftResolver) Author(ctx context.Context, draft *dto.Draft) (*models.User, error) {
 	return nil, nil
 }

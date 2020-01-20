@@ -17,10 +17,12 @@ autobind: []
 models:
   Diary:
     model: github.com/aereal/hibi/api/models.Diary
-  Article:
-    model: github.com/aereal/hibi/api/models.Article
+  # Article:
+  #   model: github.com/aereal/hibi/api/models.Article
+  PublishedArticle:
+    model: github.com/aereal/hibi/api/gql/dto.PublishedArticle
   Draft:
-    model: github.com/aereal/hibi/api/models.Draft
+    model: github.com/aereal/hibi/api/gql/dto.Draft
   ArticleBody:
     model: github.com/aereal/hibi/api/models.ArticleBody
   OrderDirection:

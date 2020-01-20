@@ -23,7 +23,7 @@ func (d *Diary) CanUpdateSettings(user *User) bool {
 	return user.ID == d.OwnerID
 }
 
-type Article struct {
+type PublishedArticle struct {
 	ID          string
 	Title       *string
 	Body        *ArticleBody
@@ -31,12 +31,16 @@ type Article struct {
 	AuthorID    string
 }
 
+func (PublishedArticle) IsArticle() {}
+
 type Draft struct {
 	ID       string
 	Title    *string
 	Body     *ArticleBody
 	AuthorID string
 }
+
+func (Draft) IsArticle() {}
 
 type ArticleBody struct {
 	Markdown string

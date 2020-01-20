@@ -3,12 +3,15 @@
 package dto
 
 import (
-	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
 )
 
+type Article interface {
+	IsArticle()
+}
+
 type ArticleConnection struct {
-	Nodes      []*models.Article   `json:"nodes"`
+	Nodes      []Article           `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }
@@ -19,7 +22,7 @@ type ArticleOrder struct {
 }
 
 type DraftConnection struct {
-	Nodes      []*models.Draft     `json:"nodes"`
+	Nodes      []*Draft            `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }

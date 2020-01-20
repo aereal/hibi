@@ -67,14 +67,21 @@ type ArticleConnection {
   totalCount: Int!
 }
 
-type Draft {
+interface Article {
   id: ID!
   title: String
   body: ArticleBody!
   author: User!
 }
 
-type Article {
+type Draft implements Article {
+  id: ID!
+  title: String
+  body: ArticleBody!
+  author: User!
+}
+
+type PublishedArticle implements Article {
   id: ID!
   title: String
   body: ArticleBody!
