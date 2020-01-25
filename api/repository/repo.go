@@ -151,6 +151,17 @@ func (r *Repository) FindArticle(ctx context.Context, diaryID string, articleID 
 	return snapshotToArticle(snapshot)
 }
 
+func (r *Repository) FindDraft(ctx context.Context, diaryID string, articleID string) (*models.Draft, error) {
+	snapshot, err := r.drafts().Doc(articleID).Get(ctx)
+	if status.Code(err) == codes.NotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return snapshotToDraft(snapshot)
+}
+
 type ArticleOrderField string
 
 const (
