@@ -100,15 +100,7 @@ func (r *diaryResolver) PublishedArticles(ctx context.Context, obj *models.Diary
 		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, article := range articles {
-		conn.Nodes = append(conn.Nodes, &dto.PublishedArticle{
-			ID:          article.ID,
-			Title:       article.Title,
-			Body:        article.Body,
-			PublishedAt: article.PublishedAt,
-			AuthorID:    article.AuthorID,
-			CreatedAt:   article.CreatedAt,
-			UpdatedAt:   article.UpdatedAt,
-		})
+		conn.Nodes = append(conn.Nodes, article)
 		if len(conn.Nodes) == perPage {
 			break
 		}
@@ -147,15 +139,7 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page in
 		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, article := range articles {
-		conn.Nodes = append(conn.Nodes, &dto.PublishedArticle{
-			ID:          article.ID,
-			Title:       article.Title,
-			Body:        article.Body,
-			PublishedAt: article.PublishedAt,
-			AuthorID:    article.AuthorID,
-			CreatedAt:   article.CreatedAt,
-			UpdatedAt:   article.UpdatedAt,
-		})
+		conn.Nodes = append(conn.Nodes, article)
 		if len(conn.Nodes) == perPage {
 			break
 		}
@@ -198,14 +182,7 @@ func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page in
 		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, draft := range drafts {
-		conn.Nodes = append(conn.Nodes, &dto.Draft{
-			ID:        draft.ID,
-			Title:     draft.Title,
-			Body:      draft.Body,
-			AuthorID:  draft.AuthorID,
-			CreatedAt: draft.CreatedAt,
-			UpdatedAt: draft.UpdatedAt,
-		})
+		conn.Nodes = append(conn.Nodes, draft)
 		if len(conn.Nodes) == perPage {
 			break
 		}
@@ -305,7 +282,7 @@ func (r *mutationResolver) UpdateDiarySettings(ctx context.Context, diaryID stri
 
 type articleResolver struct{ *rootResolver }
 
-func (r *articleResolver) Author(ctx context.Context, article *dto.PublishedArticle) (*models.User, error) {
+func (r *articleResolver) Author(ctx context.Context, article *models.PublishedArticle) (*models.User, error) {
 	record, err := r.authClient.GetUser(ctx, article.AuthorID)
 	if err != nil {
 		return nil, err
@@ -319,6 +296,7 @@ func (r *articleResolver) Author(ctx context.Context, article *dto.PublishedArti
 
 type draftResolver struct{ *rootResolver }
 
-func (r *draftResolver) Author(ctx context.Context, draft *dto.Draft) (*models.User, error) {
+func (r *draftResolver) Author(ctx context.Context, draft *models.Draft) (*models.User, error) {
+	// TODO
 	return nil, nil
 }

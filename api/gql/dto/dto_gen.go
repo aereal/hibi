@@ -3,6 +3,7 @@
 package dto
 
 import (
+	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
 )
 
@@ -11,9 +12,9 @@ type Article interface {
 }
 
 type ArticleConnection struct {
-	Nodes      []*PublishedArticle `json:"nodes"`
-	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
-	TotalCount int                 `json:"totalCount"`
+	Nodes      []*models.PublishedArticle `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo        `json:"pageInfo"`
+	TotalCount int                        `json:"totalCount"`
 }
 
 type ArticleOrder struct {
@@ -22,7 +23,7 @@ type ArticleOrder struct {
 }
 
 type DraftConnection struct {
-	Nodes      []*Draft            `json:"nodes"`
+	Nodes      []*models.Draft     `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }
@@ -33,7 +34,7 @@ type OffsetBasePageInfo struct {
 }
 
 type PublishedArticleConnection struct {
-	Nodes      []*PublishedArticle `json:"nodes"`
-	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
-	TotalCount int                 `json:"totalCount"`
+	Nodes      []*models.PublishedArticle `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo        `json:"pageInfo"`
+	TotalCount int                        `json:"totalCount"`
 }

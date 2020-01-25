@@ -20,9 +20,9 @@ models:
   # Article:
   #   model: github.com/aereal/hibi/api/models.Article
   PublishedArticle:
-    model: github.com/aereal/hibi/api/gql/dto.PublishedArticle
+    model: github.com/aereal/hibi/api/models.PublishedArticle
   Draft:
-    model: github.com/aereal/hibi/api/gql/dto.Draft
+    model: github.com/aereal/hibi/api/models.Draft
   ArticleBody:
     model: github.com/aereal/hibi/api/models.ArticleBody
   OrderDirection:
