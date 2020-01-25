@@ -15,9 +15,15 @@ type Mutation {
   updateArticle(diaryID: ID!, articleID: ID!, article: ArticleToPost!): Boolean! @hasRole(role: ADMIN)
 }
 
+enum PublishState {
+  PUBLISHED
+  DRAFT
+}
+
 input ArticleToPost {
   title: String!
   bodyHTML: String!
+  publishState: PublishState
 }
 
 input NewArticle {

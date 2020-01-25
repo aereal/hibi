@@ -29,8 +29,9 @@ type NewArticle struct {
 }
 
 type ArticleToPost struct {
-	Title    string
-	BodyHTML string
+	Title        string
+	BodyHTML     string
+	PublishState *models.PublishState
 }
 
 func (r *Repository) diaries() *firestore.CollectionRef {
@@ -91,6 +92,14 @@ func (r *Repository) guessedCollection(article models.Article) (*firestore.Colle
 }
 
 func (r *Repository) UpdateArticle(ctx context.Context, prevArticle models.Article, article ArticleToPost) error {
+	nextState := prevArticle.GetPublishState()
+	if article.PublishState != nil {
+		nextState = *article.PublishState
+	}
+	if !prevArticle.GetPublishState().CanChangeTo(nextState) {
+		return fmt.Errorf("current state (%s) cannot change to %s", prevArticle.GetPublishState(), nextState)
+	}
+
 	coll, err := r.guessedCollection(prevArticle)
 	if err != nil {
 		return err

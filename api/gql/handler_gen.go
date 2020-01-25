@@ -482,9 +482,15 @@ type Mutation {
   updateArticle(diaryID: ID!, articleID: ID!, article: ArticleToPost!): Boolean! @hasRole(role: ADMIN)
 }
 
+enum PublishState {
+  PUBLISHED
+  DRAFT
+}
+
 input ArticleToPost {
   title: String!
   bodyHTML: String!
+  publishState: PublishState
 }
 
 input NewArticle {
@@ -3170,6 +3176,12 @@ func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "publishState":
+			var err error
+			it.PublishState, err = ec.unmarshalOPublishState2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -4467,6 +4479,30 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return ec.marshalOInt2int(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, v interface{}) (models.PublishState, error) {
+	var res models.PublishState
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalOPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, sel ast.SelectionSet, v models.PublishState) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOPublishState2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, v interface{}) (*models.PublishState, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOPublishState2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, sel ast.SelectionSet, v *models.PublishState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, v interface{}) (models.Role, error) {

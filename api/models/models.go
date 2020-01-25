@@ -86,6 +86,7 @@ type Article interface {
 	GetTitle() *string
 	GetBody() *ArticleBody
 	GetAuthorID() string
+	GetPublishState() PublishState
 }
 
 type PublishedArticle struct {
@@ -114,6 +115,10 @@ func (a *PublishedArticle) GetAuthorID() string {
 	return a.AuthorID
 }
 
+func (PublishedArticle) GetPublishState() PublishState {
+	return PublishStatePublished
+}
+
 type Draft struct {
 	ID       string
 	Title    *string
@@ -137,6 +142,10 @@ func (a *Draft) GetBody() *ArticleBody {
 
 func (a *Draft) GetAuthorID() string {
 	return a.AuthorID
+}
+
+func (Draft) GetPublishState() PublishState {
+	return PublishStateDraft
 }
 
 type ArticleBody struct {
