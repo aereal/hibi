@@ -23,6 +23,64 @@ func (d *Diary) CanUpdateSettings(user *User) bool {
 	return user.ID == d.OwnerID
 }
 
+type PublishState string
+
+const (
+	PublishStatePublished PublishState = "PUBLISHED"
+	PublishStateDraft     PublishState = "DRAFT"
+)
+
+var AllPublishState = []PublishState{
+	PublishStatePublished,
+	PublishStateDraft,
+}
+
+var availableNextStates = map[PublishState][]PublishState{
+	PublishStateDraft: []PublishState{PublishStatePublished},
+}
+
+func (s PublishState) CanChangeTo(next PublishState) bool {
+	if s == next {
+		return true
+	}
+	candidates := availableNextStates[s]
+	for _, candidate := range candidates {
+		if candidate == next {
+			return true
+		}
+	}
+	return false
+}
+
+func (e PublishState) IsValid() bool {
+	switch e {
+	case PublishStatePublished, PublishStateDraft:
+		return true
+	}
+	return false
+}
+
+func (e PublishState) String() string {
+	return string(e)
+}
+
+func (e *PublishState) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PublishState(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PublishState", str)
+	}
+	return nil
+}
+
+func (e PublishState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type Article interface {
 	GetID() string
 	GetTitle() *string
