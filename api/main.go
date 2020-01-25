@@ -20,7 +20,6 @@ import (
 	"github.com/aereal/hibi/api/web"
 	clog "github.com/yfuruyama/stackdriver-request-context-log"
 	"go.opencensus.io/trace"
-	"golang.org/x/xerrors"
 )
 
 var onGAE bool
@@ -61,22 +60,22 @@ func run() error {
 
 	app, err := firebase.NewApp(ctx, nil)
 	if err != nil {
-		return xerrors.Errorf("failed to initialize firebase admin SDK: %w", err)
+		return fmt.Errorf("failed to initialize firebase admin SDK: %w", err)
 	}
 
 	authClient, err := app.Auth(ctx)
 	if err != nil {
-		return xerrors.Errorf("failed to initialize Firebase Authentication client: %w", err)
+		return fmt.Errorf("failed to initialize Firebase Authentication client: %w", err)
 	}
 
 	client, err := app.Firestore(ctx)
 	if err != nil {
-		return xerrors.Errorf("failed to build firestore client: %w", err)
+		return fmt.Errorf("failed to build firestore client: %w", err)
 	}
 
 	repo, err := repository.New(client)
 	if err != nil {
-		return xerrors.Errorf("failed to build repo: %w", err)
+		return fmt.Errorf("failed to build repo: %w", err)
 	}
 
 	schema := gql.NewExecutableSchema(gql.Config{
@@ -91,14 +90,14 @@ func run() error {
 
 	w, err := web.New(onGAE, schema, authClient)
 	if err != nil {
-		return xerrors.Errorf("failed to build web: %w", err)
+		return fmt.Errorf("failed to build web: %w", err)
 	}
 	server := w.Server(port, clog.RequestLogging(cfg))
 	go graceful(ctx, server, 5*time.Second)
 
 	log.Printf("starting server; accepting request on %s", server.Addr)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
-		return xerrors.Errorf("cannot start server: %w", err)
+		return fmt.Errorf("cannot start server: %w", err)
 	}
 
 	return nil
