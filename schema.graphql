@@ -78,6 +78,8 @@ interface Article {
   title: String
   body: ArticleBody!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type Draft implements Article {
@@ -85,6 +87,8 @@ type Draft implements Article {
   title: String
   body: ArticleBody!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type PublishedArticle implements Article {
@@ -93,6 +97,8 @@ type PublishedArticle implements Article {
   body: ArticleBody!
   publishedAt: Time!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type ArticleBody {

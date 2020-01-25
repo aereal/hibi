@@ -87,6 +87,8 @@ type Article interface {
 	GetBody() *ArticleBody
 	GetAuthorID() string
 	GetPublishState() PublishState
+	GetCreatedAt() time.Time
+	GetUpdatedAt() time.Time
 }
 
 type PublishedArticle struct {
@@ -95,6 +97,8 @@ type PublishedArticle struct {
 	Body        *ArticleBody
 	PublishedAt time.Time
 	AuthorID    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 func (PublishedArticle) IsArticle() {}
@@ -115,15 +119,25 @@ func (a *PublishedArticle) GetAuthorID() string {
 	return a.AuthorID
 }
 
+func (a *PublishedArticle) GetCreatedAt() time.Time {
+	return a.CreatedAt
+}
+
+func (a *PublishedArticle) GetUpdatedAt() time.Time {
+	return a.UpdatedAt
+}
+
 func (PublishedArticle) GetPublishState() PublishState {
 	return PublishStatePublished
 }
 
 type Draft struct {
-	ID       string
-	Title    *string
-	Body     *ArticleBody
-	AuthorID string
+	ID        string
+	Title     *string
+	Body      *ArticleBody
+	AuthorID  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (Draft) IsArticle() {}
@@ -142,6 +156,14 @@ func (a *Draft) GetBody() *ArticleBody {
 
 func (a *Draft) GetAuthorID() string {
 	return a.AuthorID
+}
+
+func (a *Draft) GetCreatedAt() time.Time {
+	return a.CreatedAt
+}
+
+func (a *Draft) GetUpdatedAt() time.Time {
+	return a.UpdatedAt
 }
 
 func (Draft) GetPublishState() PublishState {

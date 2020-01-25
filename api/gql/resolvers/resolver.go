@@ -144,10 +144,12 @@ func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page in
 	}
 	for _, draft := range drafts {
 		conn.Nodes = append(conn.Nodes, &dto.Draft{
-			ID:       draft.ID,
-			Title:    draft.Title,
-			Body:     draft.Body,
-			AuthorID: draft.AuthorID,
+			ID:        draft.ID,
+			Title:     draft.Title,
+			Body:      draft.Body,
+			AuthorID:  draft.AuthorID,
+			CreatedAt: draft.CreatedAt,
+			UpdatedAt: draft.UpdatedAt,
 		})
 		if len(conn.Nodes) == perPage {
 			break

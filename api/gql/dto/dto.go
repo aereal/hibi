@@ -7,10 +7,12 @@ import (
 )
 
 type Draft struct {
-	ID       string              `json:"id"`
-	Title    *string             `json:"title"`
-	Body     *models.ArticleBody `json:"body"`
-	AuthorID string
+	ID        string              `json:"id"`
+	Title     *string             `json:"title"`
+	Body      *models.ArticleBody `json:"body"`
+	AuthorID  string
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (Draft) IsArticle() {}
@@ -21,6 +23,8 @@ type PublishedArticle struct {
 	Body        *models.ArticleBody `json:"body"`
 	PublishedAt time.Time           `json:"publishedAt"`
 	AuthorID    string
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 func (PublishedArticle) IsArticle() {}

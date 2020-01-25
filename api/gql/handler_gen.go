@@ -72,10 +72,12 @@ type ComplexityRoot struct {
 	}
 
 	Draft struct {
-		Author func(childComplexity int) int
-		Body   func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Title  func(childComplexity int) int
+		Author    func(childComplexity int) int
+		Body      func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Title     func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	DraftConnection struct {
@@ -98,9 +100,11 @@ type ComplexityRoot struct {
 	PublishedArticle struct {
 		Author      func(childComplexity int) int
 		Body        func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
 		ID          func(childComplexity int) int
 		PublishedAt func(childComplexity int) int
 		Title       func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	Query struct {
@@ -255,6 +259,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Draft.Body(childComplexity), true
 
+	case "Draft.createdAt":
+		if e.complexity.Draft.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Draft.CreatedAt(childComplexity), true
+
 	case "Draft.id":
 		if e.complexity.Draft.ID == nil {
 			break
@@ -268,6 +279,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Draft.Title(childComplexity), true
+
+	case "Draft.updatedAt":
+		if e.complexity.Draft.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Draft.UpdatedAt(childComplexity), true
 
 	case "DraftConnection.nodes":
 		if e.complexity.DraftConnection.Nodes == nil {
@@ -354,6 +372,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PublishedArticle.Body(childComplexity), true
 
+	case "PublishedArticle.createdAt":
+		if e.complexity.PublishedArticle.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.PublishedArticle.CreatedAt(childComplexity), true
+
 	case "PublishedArticle.id":
 		if e.complexity.PublishedArticle.ID == nil {
 			break
@@ -374,6 +399,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PublishedArticle.Title(childComplexity), true
+
+	case "PublishedArticle.updatedAt":
+		if e.complexity.PublishedArticle.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.PublishedArticle.UpdatedAt(childComplexity), true
 
 	case "Query.diary":
 		if e.complexity.Query.Diary == nil {
@@ -545,6 +577,8 @@ interface Article {
   title: String
   body: ArticleBody!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type Draft implements Article {
@@ -552,6 +586,8 @@ type Draft implements Article {
   title: String
   body: ArticleBody!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type PublishedArticle implements Article {
@@ -560,6 +596,8 @@ type PublishedArticle implements Article {
   body: ArticleBody!
   publishedAt: Time!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type ArticleBody {
@@ -1321,6 +1359,80 @@ func (ec *executionContext) _Draft_author(ctx context.Context, field graphql.Col
 	return ec.marshalNUser2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Draft_createdAt(ctx context.Context, field graphql.CollectedField, obj *dto.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Draft_updatedAt(ctx context.Context, field graphql.CollectedField, obj *dto.Draft) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Draft",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DraftConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *dto.DraftConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1848,6 +1960,80 @@ func (ec *executionContext) _PublishedArticle_author(ctx context.Context, field 
 	res := resTmp.(*models.User)
 	fc.Result = res
 	return ec.marshalNUser2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublishedArticle_createdAt(ctx context.Context, field graphql.CollectedField, obj *dto.PublishedArticle) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PublishedArticle",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublishedArticle_updatedAt(ctx context.Context, field graphql.CollectedField, obj *dto.PublishedArticle) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PublishedArticle",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3410,6 +3596,16 @@ func (ec *executionContext) _Draft(ctx context.Context, sel ast.SelectionSet, ob
 				}
 				return res
 			})
+		case "createdAt":
+			out.Values[i] = ec._Draft_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Draft_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3570,6 +3766,16 @@ func (ec *executionContext) _PublishedArticle(ctx context.Context, sel ast.Selec
 				}
 				return res
 			})
+		case "createdAt":
+			out.Values[i] = ec._PublishedArticle_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._PublishedArticle_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
