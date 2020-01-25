@@ -79,10 +79,27 @@ func (r *Repository) createDraft(ctx context.Context, author *models.User, newAr
 	return ref.ID, nil
 }
 
-func (r *Repository) UpdateArticle(ctx context.Context, articleID string, article ArticleToPost) error {
-	ref := r.articles().Doc(articleID)
+func (r *Repository) guessedCollection(article models.Article) (*firestore.CollectionRef, error) {
+	switch t := article.(type) {
+	case *models.PublishedArticle:
+		return r.articles(), nil
+	case *models.Draft:
+		return r.drafts(), nil
+	default:
+		return nil, fmt.Errorf("[BUG] unknown type: %T", t)
+	}
+}
+
+func (r *Repository) UpdateArticle(ctx context.Context, prevArticle models.Article, article ArticleToPost) error {
+	coll, err := r.guessedCollection(prevArticle)
+	if err != nil {
+		return err
+	}
+
+	articleID := prevArticle.GetID()
+	ref := coll.Doc(articleID)
 	now := time.Now()
-	_, err := ref.Update(ctx, []firestore.Update{
+	_, err = ref.Update(ctx, []firestore.Update{
 		firestore.Update{
 			Path:  "Title",
 			Value: article.Title,

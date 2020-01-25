@@ -23,6 +23,13 @@ func (d *Diary) CanUpdateSettings(user *User) bool {
 	return user.ID == d.OwnerID
 }
 
+type Article interface {
+	GetID() string
+	GetTitle() *string
+	GetBody() *ArticleBody
+	GetAuthorID() string
+}
+
 type PublishedArticle struct {
 	ID          string
 	Title       *string
@@ -33,6 +40,22 @@ type PublishedArticle struct {
 
 func (PublishedArticle) IsArticle() {}
 
+func (a *PublishedArticle) GetID() string {
+	return a.ID
+}
+
+func (a *PublishedArticle) GetTitle() *string {
+	return a.Title
+}
+
+func (a *PublishedArticle) GetBody() *ArticleBody {
+	return a.Body
+}
+
+func (a *PublishedArticle) GetAuthorID() string {
+	return a.AuthorID
+}
+
 type Draft struct {
 	ID       string
 	Title    *string
@@ -41,6 +64,22 @@ type Draft struct {
 }
 
 func (Draft) IsArticle() {}
+
+func (a *Draft) GetID() string {
+	return a.ID
+}
+
+func (a *Draft) GetTitle() *string {
+	return a.Title
+}
+
+func (a *Draft) GetBody() *ArticleBody {
+	return a.Body
+}
+
+func (a *Draft) GetAuthorID() string {
+	return a.AuthorID
+}
 
 type ArticleBody struct {
 	Markdown string

@@ -205,16 +205,16 @@ func (r *mutationResolver) UpdateArticle(ctx context.Context, diaryID string, ar
 		return false, fmt.Errorf("cannot post article due to lack of permission")
 	}
 
-	articleToUpdate, err := r.repo.FindArticle(ctx, diaryID, articleID)
+	articleToUpdate, err := r.repo.FindArticleOrDraftByID(ctx, diaryID, articleID)
 	if err != nil {
 		return false, fmt.Errorf("cannot find article(%q): %w", articleID, err)
 	}
 
-	if articleToUpdate.AuthorID != visitor.ID {
+	if articleToUpdate.GetAuthorID() != visitor.ID {
 		return false, fmt.Errorf("cannot update article by others")
 	}
 
-	err = r.repo.UpdateArticle(ctx, articleID, article)
+	err = r.repo.UpdateArticle(ctx, articleToUpdate, article)
 	if err != nil {
 		return false, fmt.Errorf("cannot update article: %w", err)
 	}
