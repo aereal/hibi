@@ -68,7 +68,7 @@ type DraftConnection {
 }
 
 type ArticleConnection {
-  nodes: [Article!]!
+  nodes: [PublishedArticle!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }

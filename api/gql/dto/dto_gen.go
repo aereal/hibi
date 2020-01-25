@@ -11,7 +11,7 @@ type Article interface {
 }
 
 type ArticleConnection struct {
-	Nodes      []Article           `json:"nodes"`
+	Nodes      []*PublishedArticle `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }

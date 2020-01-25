@@ -100,7 +100,15 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page in
 		PageInfo: &dto.OffsetBasePageInfo{},
 	}
 	for _, article := range articles {
-		conn.Nodes = append(conn.Nodes, article)
+		conn.Nodes = append(conn.Nodes, &dto.PublishedArticle{
+			ID:          article.ID,
+			Title:       article.Title,
+			Body:        article.Body,
+			PublishedAt: article.PublishedAt,
+			AuthorID:    article.AuthorID,
+			CreatedAt:   article.CreatedAt,
+			UpdatedAt:   article.UpdatedAt,
+		})
 		if len(conn.Nodes) == perPage {
 			break
 		}
