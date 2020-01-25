@@ -82,6 +82,7 @@ func (e PublishState) MarshalGQL(w io.Writer) {
 }
 
 type Article interface {
+	IsArticle()
 	GetID() string
 	GetTitle() *string
 	GetBody() *ArticleBody

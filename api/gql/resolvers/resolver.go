@@ -58,7 +58,7 @@ type diaryResolver struct{ *rootResolver }
 
 const maxPerPage = 50
 
-func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articleID string) (dto.Article, error) {
+func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articleID string) (models.Article, error) {
 	return r.repo.FindArticle(ctx, diary.ID, articleID)
 }
 

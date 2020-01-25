@@ -128,7 +128,7 @@ type DiaryResolver interface {
 	PublishedArticles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.PublishedArticleConnection, error)
 	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
 	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error)
-	Article(ctx context.Context, obj *models.Diary, id string) (dto.Article, error)
+	Article(ctx context.Context, obj *models.Diary, id string) (models.Article, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
 }
 type DraftResolver interface {
@@ -1314,9 +1314,9 @@ func (ec *executionContext) _Diary_article(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(dto.Article)
+	res := resTmp.(models.Article)
 	fc.Result = res
-	return ec.marshalOArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticle(ctx, field.Selections, res)
+	return ec.marshalOArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Diary_owner(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
@@ -3595,19 +3595,15 @@ func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj in
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, obj dto.Article) graphql.Marshaler {
+func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, obj models.Article) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case models.Draft:
-		return ec._Draft(ctx, sel, &obj)
 	case *models.Draft:
 		if obj == nil {
 			return graphql.Null
 		}
 		return ec._Draft(ctx, sel, obj)
-	case models.PublishedArticle:
-		return ec._PublishedArticle(ctx, sel, &obj)
 	case *models.PublishedArticle:
 		if obj == nil {
 			return graphql.Null
@@ -4897,7 +4893,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticle(ctx context.Context, sel ast.SelectionSet, v dto.Article) graphql.Marshaler {
+func (ec *executionContext) marshalOArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx context.Context, sel ast.SelectionSet, v models.Article) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

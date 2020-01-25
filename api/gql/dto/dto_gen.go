@@ -7,10 +7,6 @@ import (
 	"github.com/aereal/hibi/api/repository"
 )
 
-type Article interface {
-	IsArticle()
-}
-
 type ArticleConnection struct {
 	Nodes      []*models.PublishedArticle `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo        `json:"pageInfo"`
