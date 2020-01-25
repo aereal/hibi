@@ -289,6 +289,8 @@ func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.PublishedA
 		Body:        body,
 		PublishedAt: dto.PublishedAt,
 		AuthorID:    dto.AuthorID,
+		CreatedAt:   dto.CreatedAt,
+		UpdatedAt:   dto.UpdatedAt,
 	}, nil
 }
 
@@ -322,10 +324,12 @@ func snapshotToDraft(snapshot *firestore.DocumentSnapshot) (*models.Draft, error
 		body.SetHTML(dto.BodyHTML)
 	}
 	return &models.Draft{
-		ID:       snapshot.Ref.ID,
-		Title:    &dto.Title,
-		Body:     body,
-		AuthorID: dto.AuthorID,
+		ID:        snapshot.Ref.ID,
+		Title:     &dto.Title,
+		Body:      body,
+		AuthorID:  dto.AuthorID,
+		CreatedAt: dto.CreatedAt,
+		UpdatedAt: dto.UpdatedAt,
 	}, nil
 }
 
