@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/aereal/hibi/api/models"
-	"golang.org/x/xerrors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -48,7 +48,7 @@ func (r *Repository) CreateArticle(ctx context.Context, author *models.User, new
 		AuthorID:    author.ID,
 	})
 	if err != nil {
-		return "", xerrors.Errorf("cannot create article: %w", err)
+		return "", fmt.Errorf("cannot create article: %w", err)
 	}
 	return ref.ID, nil
 }
@@ -71,7 +71,7 @@ func (r *Repository) UpdateArticle(ctx context.Context, articleID string, articl
 		},
 	})
 	if err != nil {
-		return xerrors.Errorf("cannot update article(%q): %w", articleID, err)
+		return fmt.Errorf("cannot update article(%q): %w", articleID, err)
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func (r *Repository) FindDiary(ctx context.Context, id string) (*models.Diary, e
 	}
 	var dto diaryDTO
 	if err := snapshot.DataTo(&dto); err != nil {
-		return nil, xerrors.Errorf("failed to populate snapshot as diary: %w", err)
+		return nil, fmt.Errorf("failed to populate snapshot as diary: %w", err)
 	}
 	diary := &models.Diary{
 		Name:    dto.Name,
@@ -171,7 +171,7 @@ func (r *Repository) populateArticles(articlesIter *firestore.DocumentIterator) 
 func snapshotToArticle(snapshot *firestore.DocumentSnapshot) (*models.Article, error) {
 	var dto articleDTO
 	if err := snapshot.DataTo(&dto); err != nil {
-		return nil, xerrors.Errorf("failed to article: %w", err)
+		return nil, fmt.Errorf("failed to article: %w", err)
 	}
 	body := &models.ArticleBody{
 		Markdown: dto.MarkdownBody,

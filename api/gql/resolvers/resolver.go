@@ -13,7 +13,6 @@ import (
 	"github.com/aereal/hibi/api/logging"
 	"github.com/aereal/hibi/api/models"
 	"github.com/aereal/hibi/api/repository"
-	"golang.org/x/xerrors"
 )
 
 func New(repo *repository.Repository, authClient *firebaseauth.Client) gql.ResolverRoot {
@@ -156,7 +155,7 @@ func (r *mutationResolver) UpdateArticle(ctx context.Context, diaryID string, ar
 
 	articleToUpdate, err := r.repo.FindArticle(ctx, diaryID, articleID)
 	if err != nil {
-		return false, xerrors.Errorf("cannot find article(%q): %w", articleID, err)
+		return false, fmt.Errorf("cannot find article(%q): %w", articleID, err)
 	}
 
 	if articleToUpdate.AuthorID != visitor.ID {
@@ -165,7 +164,7 @@ func (r *mutationResolver) UpdateArticle(ctx context.Context, diaryID string, ar
 
 	err = r.repo.UpdateArticle(ctx, articleID, article)
 	if err != nil {
-		return false, xerrors.Errorf("cannot update article: %w", err)
+		return false, fmt.Errorf("cannot update article: %w", err)
 	}
 
 	return true, nil
@@ -190,7 +189,7 @@ func (r *mutationResolver) UpdateDiarySettings(ctx context.Context, diaryID stri
 	}
 
 	if err := r.repo.UpdateDiarySettings(ctx, diary.ID, settings); err != nil {
-		return false, xerrors.Errorf("failed to update diary settings: %w", err)
+		return false, fmt.Errorf("failed to update diary settings: %w", err)
 	}
 	return true, nil
 }
