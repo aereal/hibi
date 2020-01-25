@@ -3,10 +3,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: ListItemArticleFragment
+// GraphQL fragment: ListItemPublishedArticleFragment
 // ====================================================
 
-export interface ListItemArticleFragment {
+export interface ListItemPublishedArticleFragment {
   readonly __typename: "PublishedArticle";
   readonly id: string;
   readonly title: string | null;

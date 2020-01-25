@@ -1,5 +1,0 @@
-fragment ListItemArticleFragment on PublishedArticle {
-  id
-  title
-  createdAt
-}

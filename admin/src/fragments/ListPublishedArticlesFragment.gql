@@ -1,0 +1,14 @@
+#import "./ListItemPublishedArticleFragment.gql"
+
+fragment ListPublishedArticlesFragment on Diary {
+  publishedArticles(page: $currentPage, perPage: $perPage, orderBy: $order) {
+    pageInfo {
+      hasNextPage
+      nextPage
+    }
+    totalCount
+    nodes {
+      ...ListItemPublishedArticleFragment
+    }
+  }
+}

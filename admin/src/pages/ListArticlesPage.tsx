@@ -8,10 +8,10 @@ import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
 import { ArticleTable, RowsPerPage } from "../organisms/ArticleTable";
 import {
-  ListArticlesQuery,
-  ListArticlesQueryVariables,
-} from "../queries/__generated__/ListArticlesQuery";
-import query from "../queries/ListArticlesQuery.gql";
+  ListPublishedArticlesQuery,
+  ListPublishedArticlesQueryVariables,
+} from "../queries/__generated__/ListPublishedArticlesQuery";
+import query from "../queries/ListPublishedArticlesQuery.gql";
 import { ArticleOrderField, OrderDirection } from "../globalTypes";
 
 const Content: FC = () => {
@@ -22,8 +22,8 @@ const Content: FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage, setPerPage] = useState<RowsPerPage>(10);
   const { data, loading, error } = useQuery<
-    ListArticlesQuery,
-    ListArticlesQueryVariables
+    ListPublishedArticlesQuery,
+    ListPublishedArticlesQueryVariables
   >(query, {
     variables: {
       diaryID,
@@ -61,7 +61,7 @@ const Content: FC = () => {
   return (
     <>
       <ArticleTable
-        articlesList={data.diary.articles}
+        articlesList={data.diary.publishedArticles}
         rowsPerPage={perPage}
         currentPage={currentPage}
         onChangePage={handleChangePage}

@@ -63,12 +63,13 @@ type ComplexityRoot struct {
 	}
 
 	Diary struct {
-		Article  func(childComplexity int, id string) int
-		Articles func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
-		Drafts   func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
-		ID       func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Owner    func(childComplexity int) int
+		Article           func(childComplexity int, id string) int
+		Articles          func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
+		Drafts            func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
+		ID                func(childComplexity int) int
+		Name              func(childComplexity int) int
+		Owner             func(childComplexity int) int
+		PublishedArticles func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
 	}
 
 	Draft struct {
@@ -107,6 +108,12 @@ type ComplexityRoot struct {
 		UpdatedAt   func(childComplexity int) int
 	}
 
+	PublishedArticleConnection struct {
+		Nodes      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	Query struct {
 		Diary func(childComplexity int, id string) int
 	}
@@ -118,6 +125,7 @@ type ComplexityRoot struct {
 }
 
 type DiaryResolver interface {
+	PublishedArticles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.PublishedArticleConnection, error)
 	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
 	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error)
 	Article(ctx context.Context, obj *models.Diary, id string) (dto.Article, error)
@@ -244,6 +252,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Diary.Owner(childComplexity), true
+
+	case "Diary.publishedArticles":
+		if e.complexity.Diary.PublishedArticles == nil {
+			break
+		}
+
+		args, err := ec.field_Diary_publishedArticles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Diary.PublishedArticles(childComplexity, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder)), true
 
 	case "Draft.author":
 		if e.complexity.Draft.Author == nil {
@@ -407,6 +427,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PublishedArticle.UpdatedAt(childComplexity), true
 
+	case "PublishedArticleConnection.nodes":
+		if e.complexity.PublishedArticleConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.PublishedArticleConnection.Nodes(childComplexity), true
+
+	case "PublishedArticleConnection.pageInfo":
+		if e.complexity.PublishedArticleConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.PublishedArticleConnection.PageInfo(childComplexity), true
+
+	case "PublishedArticleConnection.totalCount":
+		if e.complexity.PublishedArticleConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.PublishedArticleConnection.TotalCount(childComplexity), true
+
 	case "Query.diary":
 		if e.complexity.Query.Diary == nil {
 			break
@@ -539,6 +580,7 @@ input DiarySettings {
 type Diary {
   id: ID!
   name: String!
+  publishedArticles(page: Int!, perPage: Int!, orderBy: ArticleOrder): PublishedArticleConnection!
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
@@ -562,6 +604,12 @@ enum OrderDirection {
 
 type DraftConnection {
   nodes: [Draft!]!
+  pageInfo: OffsetBasePageInfo!
+  totalCount: Int!
+}
+
+type PublishedArticleConnection {
+  nodes: [PublishedArticle!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }
@@ -683,6 +731,36 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 }
 
 func (ec *executionContext) field_Diary_drafts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["page"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["perPage"]; ok {
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["perPage"] = arg1
+	var arg2 *dto.ArticleOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		arg2, err = ec.unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Diary_publishedArticles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -1078,6 +1156,50 @@ func (ec *executionContext) _Diary_name(ctx context.Context, field graphql.Colle
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Diary_publishedArticles(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "Diary",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Diary_publishedArticles_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Diary().PublishedArticles(rctx, obj, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.PublishedArticleConnection)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPublishedArticleConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPublishedArticleConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
@@ -2030,6 +2152,117 @@ func (ec *executionContext) _PublishedArticle_updatedAt(ctx context.Context, fie
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublishedArticleConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *dto.PublishedArticleConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PublishedArticleConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*dto.PublishedArticle)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNPublishedArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPublishedArticleᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublishedArticleConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *dto.PublishedArticleConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PublishedArticleConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*dto.OffsetBasePageInfo)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNOffsetBasePageInfo2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐOffsetBasePageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PublishedArticleConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *dto.PublishedArticleConnection) (ret graphql.Marshaler) {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+		ec.Tracer.EndFieldExecution(ctx)
+	}()
+	rctx := &graphql.ResolverContext{
+		Object:   "PublishedArticleConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_diary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3491,6 +3724,20 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "publishedArticles":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Diary_publishedArticles(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "articles":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3771,6 +4018,43 @@ func (ec *executionContext) _PublishedArticle(ctx context.Context, sel ast.Selec
 			out.Values[i] = ec._PublishedArticle_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var publishedArticleConnectionImplementors = []string{"PublishedArticleConnection"}
+
+func (ec *executionContext) _PublishedArticleConnection(ctx context.Context, sel ast.SelectionSet, obj *dto.PublishedArticleConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.RequestContext, sel, publishedArticleConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublishedArticleConnection")
+		case "nodes":
+			out.Values[i] = ec._PublishedArticleConnection_nodes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pageInfo":
+			out.Values[i] = ec._PublishedArticleConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._PublishedArticleConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -4341,6 +4625,20 @@ func (ec *executionContext) marshalNPublishedArticle2ᚖgithubᚗcomᚋaerealᚋ
 		return graphql.Null
 	}
 	return ec._PublishedArticle(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPublishedArticleConnection2githubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPublishedArticleConnection(ctx context.Context, sel ast.SelectionSet, v dto.PublishedArticleConnection) graphql.Marshaler {
+	return ec._PublishedArticleConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPublishedArticleConnection2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐPublishedArticleConnection(ctx context.Context, sel ast.SelectionSet, v *dto.PublishedArticleConnection) graphql.Marshaler {
+	if v == nil {
+		if !ec.HasError(graphql.GetResolverContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PublishedArticleConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

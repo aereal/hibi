@@ -40,6 +40,7 @@ input DiarySettings {
 type Diary {
   id: ID!
   name: String!
+  publishedArticles(page: Int!, perPage: Int!, orderBy: ArticleOrder): PublishedArticleConnection!
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
@@ -63,6 +64,12 @@ enum OrderDirection {
 
 type DraftConnection {
   nodes: [Draft!]!
+  pageInfo: OffsetBasePageInfo!
+  totalCount: Int!
+}
+
+type PublishedArticleConnection {
+  nodes: [PublishedArticle!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }

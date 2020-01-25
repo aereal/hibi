@@ -31,3 +31,9 @@ type OffsetBasePageInfo struct {
 	HasNextPage bool `json:"hasNextPage"`
 	NextPage    *int `json:"nextPage"`
 }
+
+type PublishedArticleConnection struct {
+	Nodes      []*PublishedArticle `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}

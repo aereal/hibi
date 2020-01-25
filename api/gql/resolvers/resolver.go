@@ -78,6 +78,53 @@ func paging(page int, perPage int) (countToFetch int, offset int, err error) {
 	return
 }
 
+func (r *diaryResolver) PublishedArticles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.PublishedArticleConnection, error) {
+	countToFetch, offset, err := paging(page, perPage)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		field     = repository.ArticleOrderFieldCreatedAt
+		direction = repository.OrderDirectionAsc
+	)
+	if orderBy != nil {
+		field = orderBy.Field
+		direction = orderBy.Direction
+	}
+	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, countToFetch, offset, field, direction)
+	if err != nil {
+		return nil, err
+	}
+	conn := &dto.PublishedArticleConnection{
+		PageInfo: &dto.OffsetBasePageInfo{},
+	}
+	for _, article := range articles {
+		conn.Nodes = append(conn.Nodes, &dto.PublishedArticle{
+			ID:          article.ID,
+			Title:       article.Title,
+			Body:        article.Body,
+			PublishedAt: article.PublishedAt,
+			AuthorID:    article.AuthorID,
+			CreatedAt:   article.CreatedAt,
+			UpdatedAt:   article.UpdatedAt,
+		})
+		if len(conn.Nodes) == perPage {
+			break
+		}
+	}
+	conn.PageInfo.HasNextPage = len(articles) > perPage
+	if conn.PageInfo.HasNextPage {
+		nextPage := page + 1
+		conn.PageInfo.NextPage = &nextPage
+	}
+	conn.TotalCount = len(articles)
+	if conn.TotalCount > perPage {
+		conn.TotalCount = perPage
+	}
+	return conn, nil
+}
+
 func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
 	countToFetch, offset, err := paging(page, perPage)
 	if err != nil {

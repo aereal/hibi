@@ -6,7 +6,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TablePagination from "@material-ui/core/TablePagination";
-import { ListArticlesFragment } from "../fragments/__generated__/ListArticlesFragment";
+import { ListPublishedArticlesFragment } from "../fragments/__generated__/ListPublishedArticlesFragment";
 import { ListDraftsFragment } from "../fragments/__generated__/ListDraftsFragment";
 import { ArticleRow, ArticleType } from "./ArticleRow";
 
@@ -17,7 +17,7 @@ export type RowsPerPage = typeof rowsPerPageOptions[number];
 interface ArticlesList {
   readonly totalCount: number;
   readonly pageInfo: ListDraftsFragment["drafts"]["pageInfo"] &
-    ListArticlesFragment["articles"]["pageInfo"];
+    ListPublishedArticlesFragment["publishedArticles"]["pageInfo"];
   readonly nodes: readonly ArticleType[];
 }
 
