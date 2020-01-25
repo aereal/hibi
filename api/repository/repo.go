@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/aereal/hibi/api/models"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -160,6 +161,40 @@ func (r *Repository) FindDraft(ctx context.Context, diaryID string, articleID st
 		return nil, err
 	}
 	return snapshotToDraft(snapshot)
+}
+
+func (r *Repository) FindArticleOrDraftByID(ctx context.Context, diaryID string, id string) (models.Article, error) {
+	var (
+		eg        *errgroup.Group
+		published *models.PublishedArticle
+		draft     *models.Draft
+	)
+	eg, ctx = errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		var err error
+		published, err = r.FindArticle(ctx, diaryID, id)
+		return err
+	})
+	eg.Go(func() error {
+		var err error
+		draft, err = r.FindDraft(ctx, diaryID, id)
+		return err
+	})
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	if published != nil && draft != nil {
+		return nil, fmt.Errorf("[BUG]")
+	}
+	if published != nil {
+		return published, nil
+	}
+	if draft != nil {
+		return draft, nil
+	}
+
+	return nil, nil
 }
 
 type ArticleOrderField string
