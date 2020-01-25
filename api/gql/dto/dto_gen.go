@@ -8,9 +8,9 @@ import (
 )
 
 type ArticleConnection struct {
-	Nodes      []*models.PublishedArticle `json:"nodes"`
-	PageInfo   *OffsetBasePageInfo        `json:"pageInfo"`
-	TotalCount int                        `json:"totalCount"`
+	Nodes      []models.Article    `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
 }
 
 type ArticleOrder struct {

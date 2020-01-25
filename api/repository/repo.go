@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -246,6 +247,63 @@ func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, l
 		Documents(ctx)
 	return r.populateArticles(iter)
 }
+
+func (r *Repository) findDrafts(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Draft, error) {
+	iter := r.drafts().
+		OrderBy(articleFieldMapping[orderField], firestoreOrderDirectionMapping[dir]).
+		Where("DiaryID", "==", diaryID).
+		Limit(limit).
+		Offset(offset).
+		Documents(ctx)
+	return populateDrafts(iter)
+}
+
+func (r *Repository) FindArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection, states []models.PublishState) ([]models.Article, error) {
+	published := []*models.PublishedArticle{}
+	drafts := []*models.Draft{}
+
+	var eg *errgroup.Group
+	eg, ctx = errgroup.WithContext(ctx)
+	for _, state := range states {
+		switch state {
+		case models.PublishStatePublished:
+			eg.Go(func() error {
+				var err error
+				published, err = r.FindLatestArticlesOf(ctx, diaryID, limit, offset, orderField, dir)
+				return err
+			})
+		case models.PublishStateDraft:
+			eg.Go(func() error {
+				var err error
+				drafts, err = r.findDrafts(ctx, diaryID, limit, offset, orderField, dir)
+				return err
+			})
+		}
+	}
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	results := byCreatedAt{}
+	for _, a := range published {
+		results = append(results, a)
+	}
+	for _, d := range drafts {
+		results = append(results, d)
+	}
+	sort.Sort(results)
+	if len(results) > limit {
+		results = results[0 : limit-1]
+	}
+	return results, nil
+}
+
+type byCreatedAt []models.Article
+
+func (a byCreatedAt) Len() int           { return len(a) }
+func (a byCreatedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byCreatedAt) Less(i, j int) bool { return a[i].GetCreatedAt().Before(a[j].GetCreatedAt()) }
 
 func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit, offset int) ([]*models.Draft, error) {
 	iter := r.drafts().Where("DiaryID", "==", diaryID).Limit(limit).Offset(offset).Documents(ctx)
