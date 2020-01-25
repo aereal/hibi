@@ -117,7 +117,7 @@ func (r *diaryResolver) PublishedArticles(ctx context.Context, obj *models.Diary
 	return conn, nil
 }
 
-func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error) {
+func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder, states []models.PublishState) (*dto.ArticleConnection, error) {
 	countToFetch, offset, err := paging(page, perPage)
 	if err != nil {
 		return nil, err
@@ -131,7 +131,10 @@ func (r *diaryResolver) Articles(ctx context.Context, obj *models.Diary, page in
 		field = orderBy.Field
 		direction = orderBy.Direction
 	}
-	articles, err := r.repo.FindLatestArticlesOf(ctx, obj.ID, countToFetch, offset, field, direction)
+	if states == nil {
+		states = []models.PublishState{models.PublishStatePublished}
+	}
+	articles, err := r.repo.FindArticlesOf(ctx, obj.ID, countToFetch, offset, field, direction, states)
 	if err != nil {
 		return nil, err
 	}

@@ -64,7 +64,7 @@ type ComplexityRoot struct {
 
 	Diary struct {
 		Article           func(childComplexity int, id string) int
-		Articles          func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
+		Articles          func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder, states []models.PublishState) int
 		Drafts            func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
 		ID                func(childComplexity int) int
 		Name              func(childComplexity int) int
@@ -126,7 +126,7 @@ type ComplexityRoot struct {
 
 type DiaryResolver interface {
 	PublishedArticles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.PublishedArticleConnection, error)
-	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
+	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder, states []models.PublishState) (*dto.ArticleConnection, error)
 	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error)
 	Article(ctx context.Context, obj *models.Diary, id string) (models.Article, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
@@ -218,7 +218,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Diary.Articles(childComplexity, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder)), true
+		return e.complexity.Diary.Articles(childComplexity, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder), args["states"].([]models.PublishState)), true
 
 	case "Diary.drafts":
 		if e.complexity.Diary.Drafts == nil {
@@ -581,7 +581,7 @@ type Diary {
   id: ID!
   name: String!
   publishedArticles(page: Int!, perPage: Int!, orderBy: ArticleOrder): PublishedArticleConnection!
-  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
+  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder, states: [PublishState!]): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
   owner: User!
@@ -615,7 +615,7 @@ type PublishedArticleConnection {
 }
 
 type ArticleConnection {
-  nodes: [PublishedArticle!]!
+  nodes: [Article!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }
@@ -727,6 +727,14 @@ func (ec *executionContext) field_Diary_articles_args(ctx context.Context, rawAr
 		}
 	}
 	args["orderBy"] = arg2
+	var arg3 []models.PublishState
+	if tmp, ok := rawArgs["states"]; ok {
+		arg3, err = ec.unmarshalOPublishState2ᚕgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishStateᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["states"] = arg3
 	return args, nil
 }
 
@@ -1017,9 +1025,9 @@ func (ec *executionContext) _ArticleConnection_nodes(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.PublishedArticle)
+	res := resTmp.([]models.Article)
 	fc.Result = res
-	return ec.marshalNPublishedArticle2ᚕᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishedArticleᚄ(ctx, field.Selections, res)
+	return ec.marshalNArticle2ᚕgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ArticleConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *dto.ArticleConnection) (ret graphql.Marshaler) {
@@ -1223,7 +1231,7 @@ func (ec *executionContext) _Diary_articles(ctx context.Context, field graphql.C
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Diary().Articles(rctx, obj, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder))
+		return ec.resolvers.Diary().Articles(rctx, obj, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder), args["states"].([]models.PublishState))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4369,6 +4377,53 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx context.Context, sel ast.SelectionSet, v models.Article) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Article(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNArticle2ᚕgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleᚄ(ctx context.Context, sel ast.SelectionSet, v []models.Article) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNArticleBody2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticleBody(ctx context.Context, sel ast.SelectionSet, v models.ArticleBody) graphql.Marshaler {
 	return ec._ArticleBody(ctx, sel, &v)
 }
@@ -4558,6 +4613,15 @@ func (ec *executionContext) marshalNOrderDirection2githubᚗcomᚋaerealᚋhibi�
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, v interface{}) (models.PublishState, error) {
+	var res models.PublishState
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, sel ast.SelectionSet, v models.PublishState) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNPublishedArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishedArticle(ctx context.Context, sel ast.SelectionSet, v models.PublishedArticle) graphql.Marshaler {
@@ -4976,6 +5040,66 @@ func (ec *executionContext) unmarshalOPublishState2githubᚗcomᚋaerealᚋhibi�
 
 func (ec *executionContext) marshalOPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, sel ast.SelectionSet, v models.PublishState) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalOPublishState2ᚕgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishStateᚄ(ctx context.Context, v interface{}) ([]models.PublishState, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]models.PublishState, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOPublishState2ᚕgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishStateᚄ(ctx context.Context, sel ast.SelectionSet, v []models.PublishState) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPublishState2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) unmarshalOPublishState2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishState(ctx context.Context, v interface{}) (*models.PublishState, error) {

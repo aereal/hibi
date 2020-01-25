@@ -41,7 +41,7 @@ type Diary {
   id: ID!
   name: String!
   publishedArticles(page: Int!, perPage: Int!, orderBy: ArticleOrder): PublishedArticleConnection!
-  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
+  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder, states: [PublishState!]): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
   owner: User!
@@ -75,7 +75,7 @@ type PublishedArticleConnection {
 }
 
 type ArticleConnection {
-  nodes: [PublishedArticle!]!
+  nodes: [Article!]!
   pageInfo: OffsetBasePageInfo!
   totalCount: Int!
 }
