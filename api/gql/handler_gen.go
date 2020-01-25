@@ -65,7 +65,7 @@ type ComplexityRoot struct {
 	Diary struct {
 		Article  func(childComplexity int, id string) int
 		Articles func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
-		Drafts   func(childComplexity int, page int, perPage int) int
+		Drafts   func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Owner    func(childComplexity int) int
@@ -119,7 +119,7 @@ type ComplexityRoot struct {
 
 type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.ArticleConnection, error)
-	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int) (*dto.DraftConnection, error)
+	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error)
 	Article(ctx context.Context, obj *models.Diary, id string) (dto.Article, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
 }
@@ -222,7 +222,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Diary.Drafts(childComplexity, args["page"].(int), args["perPage"].(int)), true
+		return e.complexity.Diary.Drafts(childComplexity, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder)), true
 
 	case "Diary.id":
 		if e.complexity.Diary.ID == nil {
@@ -540,7 +540,7 @@ type Diary {
   id: ID!
   name: String!
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
-  drafts(page: Int!, perPage: Int!): DraftConnection!
+  drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
   owner: User!
 }
@@ -701,6 +701,14 @@ func (ec *executionContext) field_Diary_drafts_args(ctx context.Context, rawArgs
 		}
 	}
 	args["perPage"] = arg1
+	var arg2 *dto.ArticleOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		arg2, err = ec.unmarshalOArticleOrder2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋgqlᚋdtoᚐArticleOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg2
 	return args, nil
 }
 
@@ -1137,7 +1145,7 @@ func (ec *executionContext) _Diary_drafts(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Diary().Drafts(rctx, obj, args["page"].(int), args["perPage"].(int))
+		return ec.resolvers.Diary().Drafts(rctx, obj, args["page"].(int), args["perPage"].(int), args["orderBy"].(*dto.ArticleOrder))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -12,7 +12,7 @@ export interface GetArticleQuery_diary_article_body {
 }
 
 export interface GetArticleQuery_diary_article {
-  readonly __typename: "Article";
+  readonly __typename: "PublishedArticle" | "Draft";
   readonly title: string | null;
   readonly body: GetArticleQuery_diary_article_body;
 }

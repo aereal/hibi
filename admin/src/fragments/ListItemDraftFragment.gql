@@ -1,0 +1,5 @@
+fragment ListItemDraftFragment on Draft {
+  id
+  title
+  createdAt
+}

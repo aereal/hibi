@@ -137,7 +137,7 @@ func (r *diaryResolver) Owner(ctx context.Context, diary *models.Diary) (*models
 	return user, nil
 }
 
-func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page int, perPage int) (*dto.DraftConnection, error) {
+func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error) {
 	countToFetch, offset, err := paging(page, perPage)
 	if err != nil {
 		return nil, err

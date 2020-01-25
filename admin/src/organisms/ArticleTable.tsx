@@ -7,14 +7,22 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TablePagination from "@material-ui/core/TablePagination";
 import { ListArticlesFragment } from "../fragments/__generated__/ListArticlesFragment";
-import { ArticleRow } from "./ArticleRow";
+import { ListDraftsFragment } from "../fragments/__generated__/ListDraftsFragment";
+import { ArticleRow, ArticleType } from "./ArticleRow";
 
 const rowsPerPageOptions = [5, 10, 30] as const;
 
 export type RowsPerPage = typeof rowsPerPageOptions[number];
 
+interface ArticlesList {
+  readonly totalCount: number;
+  readonly pageInfo: ListDraftsFragment["drafts"]["pageInfo"] &
+    ListArticlesFragment["articles"]["pageInfo"];
+  readonly nodes: readonly ArticleType[];
+}
+
 interface ArticleTableProps {
-  readonly articlesList: ListArticlesFragment["articles"];
+  readonly articlesList: ArticlesList;
   readonly rowsPerPage: RowsPerPage;
   readonly currentPage: number;
   readonly onChangePage: (

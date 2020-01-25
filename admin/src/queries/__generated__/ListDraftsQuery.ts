@@ -5,39 +5,39 @@
 import { ArticleOrder } from "./../../globalTypes";
 
 // ====================================================
-// GraphQL query operation: ListArticlesQuery
+// GraphQL query operation: ListDraftsQuery
 // ====================================================
 
-export interface ListArticlesQuery_diary_articles_pageInfo {
+export interface ListDraftsQuery_diary_drafts_pageInfo {
   readonly __typename: "OffsetBasePageInfo";
   readonly hasNextPage: boolean;
   readonly nextPage: number | null;
 }
 
-export interface ListArticlesQuery_diary_articles_nodes {
-  readonly __typename: "PublishedArticle";
+export interface ListDraftsQuery_diary_drafts_nodes {
+  readonly __typename: "Draft";
   readonly id: string;
   readonly title: string | null;
   readonly createdAt: any;
 }
 
-export interface ListArticlesQuery_diary_articles {
-  readonly __typename: "ArticleConnection";
-  readonly pageInfo: ListArticlesQuery_diary_articles_pageInfo;
+export interface ListDraftsQuery_diary_drafts {
+  readonly __typename: "DraftConnection";
+  readonly pageInfo: ListDraftsQuery_diary_drafts_pageInfo;
   readonly totalCount: number;
-  readonly nodes: ReadonlyArray<ListArticlesQuery_diary_articles_nodes>;
+  readonly nodes: ReadonlyArray<ListDraftsQuery_diary_drafts_nodes>;
 }
 
-export interface ListArticlesQuery_diary {
+export interface ListDraftsQuery_diary {
   readonly __typename: "Diary";
-  readonly articles: ListArticlesQuery_diary_articles;
+  readonly drafts: ListDraftsQuery_diary_drafts;
 }
 
-export interface ListArticlesQuery {
-  readonly diary: ListArticlesQuery_diary | null;
+export interface ListDraftsQuery {
+  readonly diary: ListDraftsQuery_diary | null;
 }
 
-export interface ListArticlesQueryVariables {
+export interface ListDraftsQueryVariables {
   readonly diaryID: string;
   readonly currentPage: number;
   readonly perPage: number;

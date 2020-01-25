@@ -13,10 +13,10 @@ export interface ListArticlesFragment_articles_pageInfo {
 }
 
 export interface ListArticlesFragment_articles_nodes {
-  readonly __typename: "Article";
+  readonly __typename: "PublishedArticle";
   readonly id: string;
   readonly title: string | null;
-  readonly publishedAt: any;
+  readonly createdAt: any;
 }
 
 export interface ListArticlesFragment_articles {

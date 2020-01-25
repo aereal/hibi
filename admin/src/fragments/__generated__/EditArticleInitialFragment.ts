@@ -12,7 +12,7 @@ export interface EditArticleInitialFragment_body {
 }
 
 export interface EditArticleInitialFragment {
-  readonly __typename: "Article";
+  readonly __typename: "PublishedArticle" | "Draft";
   readonly title: string | null;
   readonly body: EditArticleInitialFragment_body;
 }
