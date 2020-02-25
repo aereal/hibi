@@ -15212,10 +15212,10 @@ type-is@~1.6.17, type-is@~1.6.18:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-type-route@^0.3.4:
-  version "0.3.4"
-  resolved "https://registry.yarnpkg.com/type-route/-/type-route-0.3.4.tgz#e9024232f10dfbf76744e8eb249ab79b273e6e2e"
-  integrity sha512-v8sKfnkhj/v6HpdQknzhgWePjOS3U7KpNeXHSCXQCTITvBNo6kgfix/s+fYlIyM4qs1pyERv35djHWprLv/V4Q==
+type-route@^0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/type-route/-/type-route-0.3.6.tgz#43d50cd7a5082e50fb85caa0871bd0d84621b2a5"
+  integrity sha512-RyAxlYYN8Slj1avJ/K5eg0ht53ygli0mKVgEtYYsatgG7Ki60RdNYwu6Nd7oQXhiXxgNOR9EqgGiWsIDXBniiQ==
   dependencies:
     "@types/history" "^4.7.2"
     history "^4.9.0"
