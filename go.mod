@@ -25,7 +25,7 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/vektah/gqlparser v1.2.1
 	github.com/yfuruyama/stackdriver-request-context-log v0.0.0-20181011004750-72ecb0f55398
-	go.opencensus.io v0.22.2
+	go.opencensus.io v0.22.3
 	golang.org/x/exp v0.0.0-20191129062945-2f5052295587 // indirect
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
 	golang.org/x/net v0.0.0-20191207000613-e7e4b65ae663 // indirect
