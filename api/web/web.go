@@ -7,7 +7,6 @@ import (
 
 	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
 	firebaseauth "firebase.google.com/go/auth"
-	"github.com/99designs/gqlgen-contrib/gqlopencensus"
 	"github.com/99designs/gqlgen/graphql"
 	gqlgenhandler "github.com/99designs/gqlgen/handler"
 	"github.com/aereal/hibi/api/auth"
@@ -58,7 +57,7 @@ func (w *Web) handler() http.Handler {
 		logger.Info("OK")
 		fmt.Fprintln(w, "OK")
 	})).ServeHTTP)
-	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
+	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema)
 	allow := cors.New(cors.Options{
 		Debug: true,
 		AllowOriginFunc: func(origin string) bool {
