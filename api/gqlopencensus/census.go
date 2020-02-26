@@ -13,9 +13,8 @@ type (
 )
 
 var _ interface {
-	graphql.HandlerExtension
-	graphql.ResponseInterceptor
 	graphql.FieldInterceptor
+	graphql.OperationInterceptor
 } = Tracer{}
 
 func (a Tracer) ExtensionName() string {
@@ -63,7 +62,7 @@ func (a Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (res 
 	return next(ctx)
 }
 
-func (a Tracer) InterceptResponse(ctx context.Context, next graphql.ResponseHandler) *graphql.Response {
+func (a Tracer) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 	oc := graphql.GetOperationContext(ctx)
 
 	ctx, span := trace.StartSpan(ctx, operationName(ctx))
