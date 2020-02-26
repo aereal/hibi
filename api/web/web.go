@@ -7,9 +7,8 @@ import (
 
 	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
 	firebaseauth "firebase.google.com/go/auth"
-	"github.com/99designs/gqlgen-contrib/gqlopencensus"
 	"github.com/99designs/gqlgen/graphql"
-	gqlgenhandler "github.com/99designs/gqlgen/handler"
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/logging"
 	"github.com/dimfeld/httptreemux"
@@ -58,7 +57,7 @@ func (w *Web) handler() http.Handler {
 		logger.Info("OK")
 		fmt.Fprintln(w, "OK")
 	})).ServeHTTP)
-	graphqlHandler := gqlgenhandler.GraphQL(w.executableSchema, gqlgenhandler.Tracer(gqlopencensus.New()))
+	srv := handler.New(w.executableSchema)
 	allow := cors.New(cors.Options{
 		Debug: true,
 		AllowOriginFunc: func(origin string) bool {
@@ -70,8 +69,8 @@ func (w *Web) handler() http.Handler {
 	handle := func(next http.Handler) http.Handler {
 		return logging.InjectLogger(allow.Handler(auth.WithAuthentication(w.authClient)(next)))
 	}
-	router.UsingContext().Handler(http.MethodOptions, "/graphql", handle(graphqlHandler))
-	router.UsingContext().Handler(http.MethodPost, "/graphql", handle(graphqlHandler))
+	router.UsingContext().Handler(http.MethodOptions, "/graphql", handle(srv))
+	router.UsingContext().Handler(http.MethodPost, "/graphql", handle(srv))
 	router.UsingContext().Handler(http.MethodOptions, "/auth", handle(w.authHandler()))
 	router.UsingContext().Handler(http.MethodGet, "/auth", handle(w.authHandler()))
 	return router
