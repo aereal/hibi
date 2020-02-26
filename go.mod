@@ -25,7 +25,7 @@ require (
 	github.com/yfuruyama/stackdriver-request-context-log v0.0.0-20181011004750-72ecb0f55398
 	go.opencensus.io v0.22.3
 	golang.org/x/tools v0.0.0-20200225022059-a0ec867d517c // indirect
-	google.golang.org/api v0.18.0
+	google.golang.org/api v0.19.0
 	google.golang.org/genproto v0.0.0-20200225123651-fc8f55426688 // indirect
 	google.golang.org/grpc v1.27.1
 	gopkg.in/russross/blackfriday.v2 v2.0.1
