@@ -77,7 +77,7 @@
     "slate-react": "^0.57.1",
     "style-loader": "1.0.2",
     "terser-webpack-plugin": "2.3.5",
-    "ts-pnp": "1.1.5",
+    "ts-pnp": "1.1.6",
     "type-route": "^0.3.6",
     "typescript": "~3.7.3",
     "url-loader": "3.0.0",
