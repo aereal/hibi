@@ -9,7 +9,9 @@ import (
 	firebaseauth "firebase.google.com/go/auth"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/aereal/hibi/api/auth"
+	"github.com/aereal/hibi/api/gqlopencensus"
 	"github.com/aereal/hibi/api/logging"
 	"github.com/dimfeld/httptreemux"
 	"github.com/rs/cors"
@@ -58,6 +60,9 @@ func (w *Web) handler() http.Handler {
 		fmt.Fprintln(w, "OK")
 	})).ServeHTTP)
 	srv := handler.New(w.executableSchema)
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.Options{})
+	srv.Use(gqlopencensus.Tracer{})
 	allow := cors.New(cors.Options{
 		Debug: true,
 		AllowOriginFunc: func(origin string) bool {
