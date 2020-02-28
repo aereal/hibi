@@ -6,15 +6,23 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TablePagination from "@material-ui/core/TablePagination";
-import { ListArticlesFragment } from "../fragments/__generated__/ListArticlesFragment";
-import { ArticleRow } from "./ArticleRow";
+import { ListPublishedArticlesFragment } from "../fragments/__generated__/ListPublishedArticlesFragment";
+import { ListDraftsFragment } from "../fragments/__generated__/ListDraftsFragment";
+import { ArticleRow, ArticleType } from "./ArticleRow";
 
 const rowsPerPageOptions = [5, 10, 30] as const;
 
 export type RowsPerPage = typeof rowsPerPageOptions[number];
 
+interface ArticlesList {
+  readonly totalCount: number;
+  readonly pageInfo: ListDraftsFragment["drafts"]["pageInfo"] &
+    ListPublishedArticlesFragment["publishedArticles"]["pageInfo"];
+  readonly nodes: readonly ArticleType[];
+}
+
 interface ArticleTableProps {
-  readonly articlesList: ListArticlesFragment["articles"];
+  readonly articlesList: ArticlesList;
   readonly rowsPerPage: RowsPerPage;
   readonly currentPage: number;
   readonly onChangePage: (

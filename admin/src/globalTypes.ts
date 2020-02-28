@@ -7,12 +7,18 @@
 //==============================================================
 
 export enum ArticleOrderField {
-  PUBLISHED_AT = "PUBLISHED_AT",
+  CREATED_AT = "CREATED_AT",
+  UPDATED_AT = "UPDATED_AT",
 }
 
 export enum OrderDirection {
   ASC = "ASC",
   DESC = "DESC",
+}
+
+export enum PublishState {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
 }
 
 export interface ArticleOrder {
@@ -23,6 +29,7 @@ export interface ArticleOrder {
 export interface ArticleToPost {
   readonly title: string;
   readonly bodyHTML: string;
+  readonly publishState?: PublishState | null;
 }
 
 export interface DiarySettings {
@@ -33,6 +40,7 @@ export interface NewArticle {
   readonly diaryID: string;
   readonly title: string;
   readonly bodyHTML: string;
+  readonly isDraft: boolean;
 }
 
 //==============================================================

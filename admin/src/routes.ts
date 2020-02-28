@@ -16,6 +16,7 @@ export const router = createRouter({
   ),
   diarySettings: defineRoute("/settings"),
   listArticles: defineRoute("/articles"),
+  listDrafts: defineRoute("/drafts"),
 });
 
 export const { routes, listen, getCurrentRoute } = router;

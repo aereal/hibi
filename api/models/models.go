@@ -23,12 +23,152 @@ func (d *Diary) CanUpdateSettings(user *User) bool {
 	return user.ID == d.OwnerID
 }
 
-type Article struct {
+type PublishState string
+
+const (
+	PublishStatePublished PublishState = "PUBLISHED"
+	PublishStateDraft     PublishState = "DRAFT"
+)
+
+var AllPublishState = []PublishState{
+	PublishStatePublished,
+	PublishStateDraft,
+}
+
+var availableNextStates = map[PublishState][]PublishState{
+	PublishStateDraft: []PublishState{PublishStatePublished},
+}
+
+func (s PublishState) CanChangeTo(next PublishState) bool {
+	if s == next {
+		return true
+	}
+	candidates := availableNextStates[s]
+	for _, candidate := range candidates {
+		if candidate == next {
+			return true
+		}
+	}
+	return false
+}
+
+func (e PublishState) IsValid() bool {
+	switch e {
+	case PublishStatePublished, PublishStateDraft:
+		return true
+	}
+	return false
+}
+
+func (e PublishState) String() string {
+	return string(e)
+}
+
+func (e *PublishState) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PublishState(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PublishState", str)
+	}
+	return nil
+}
+
+func (e PublishState) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Article interface {
+	IsArticle()
+	GetID() string
+	GetTitle() *string
+	GetBody() *ArticleBody
+	GetAuthorID() string
+	GetPublishState() PublishState
+	GetCreatedAt() time.Time
+	GetUpdatedAt() time.Time
+}
+
+type PublishedArticle struct {
 	ID          string
 	Title       *string
 	Body        *ArticleBody
 	PublishedAt time.Time
 	AuthorID    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (PublishedArticle) IsArticle() {}
+
+func (a *PublishedArticle) GetID() string {
+	return a.ID
+}
+
+func (a *PublishedArticle) GetTitle() *string {
+	return a.Title
+}
+
+func (a *PublishedArticle) GetBody() *ArticleBody {
+	return a.Body
+}
+
+func (a *PublishedArticle) GetAuthorID() string {
+	return a.AuthorID
+}
+
+func (a *PublishedArticle) GetCreatedAt() time.Time {
+	return a.CreatedAt
+}
+
+func (a *PublishedArticle) GetUpdatedAt() time.Time {
+	return a.UpdatedAt
+}
+
+func (PublishedArticle) GetPublishState() PublishState {
+	return PublishStatePublished
+}
+
+type Draft struct {
+	ID        string
+	Title     *string
+	Body      *ArticleBody
+	AuthorID  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (Draft) IsArticle() {}
+
+func (a *Draft) GetID() string {
+	return a.ID
+}
+
+func (a *Draft) GetTitle() *string {
+	return a.Title
+}
+
+func (a *Draft) GetBody() *ArticleBody {
+	return a.Body
+}
+
+func (a *Draft) GetAuthorID() string {
+	return a.AuthorID
+}
+
+func (a *Draft) GetCreatedAt() time.Time {
+	return a.CreatedAt
+}
+
+func (a *Draft) GetUpdatedAt() time.Time {
+	return a.UpdatedAt
+}
+
+func (Draft) GetPublishState() PublishState {
+	return PublishStateDraft
 }
 
 type ArticleBody struct {

@@ -8,7 +8,7 @@ import (
 )
 
 type ArticleConnection struct {
-	Nodes      []*models.Article   `json:"nodes"`
+	Nodes      []models.Article    `json:"nodes"`
 	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
 	TotalCount int                 `json:"totalCount"`
 }
@@ -18,7 +18,19 @@ type ArticleOrder struct {
 	Direction repository.OrderDirection    `json:"direction"`
 }
 
+type DraftConnection struct {
+	Nodes      []*models.Draft     `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
 type OffsetBasePageInfo struct {
 	HasNextPage bool `json:"hasNextPage"`
 	NextPage    *int `json:"nextPage"`
+}
+
+type PublishedArticleConnection struct {
+	Nodes      []*models.PublishedArticle `json:"nodes"`
+	PageInfo   *OffsetBasePageInfo        `json:"pageInfo"`
+	TotalCount int                        `json:"totalCount"`
 }

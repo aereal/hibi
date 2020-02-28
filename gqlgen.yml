@@ -19,6 +19,10 @@ models:
     model: github.com/aereal/hibi/api/models.Diary
   Article:
     model: github.com/aereal/hibi/api/models.Article
+  PublishedArticle:
+    model: github.com/aereal/hibi/api/models.PublishedArticle
+  Draft:
+    model: github.com/aereal/hibi/api/models.Draft
   ArticleBody:
     model: github.com/aereal/hibi/api/models.ArticleBody
   OrderDirection:
@@ -35,3 +39,5 @@ models:
     model: github.com/aereal/hibi/api/repository.DiarySettings
   ArticleToPost:
     model: github.com/aereal/hibi/api/repository.ArticleToPost
+  PublishState:
+    model: github.com/aereal/hibi/api/models.PublishState

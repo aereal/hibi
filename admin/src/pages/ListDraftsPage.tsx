@@ -7,12 +7,12 @@ import { useQuery } from "@apollo/react-hooks";
 import { Layout } from "../templates/Layout";
 import { ProvideAuthenApolloClientOrRedirect } from "../effects/authen-apollo-client";
 import { ArticleTable, RowsPerPage } from "../organisms/ArticleTable";
-import {
-  ListPublishedArticlesQuery,
-  ListPublishedArticlesQueryVariables,
-} from "../queries/__generated__/ListPublishedArticlesQuery";
-import query from "../queries/ListPublishedArticlesQuery.gql";
+import query from "../queries/ListDraftsQuery.gql";
 import { ArticleOrderField, OrderDirection } from "../globalTypes";
+import {
+  ListDraftsQuery,
+  ListDraftsQueryVariables,
+} from "../queries/__generated__/ListDraftsQuery";
 
 const Content: FC = () => {
   const diaryID = "gZJXFGCS7fONfpIKXWYn";
@@ -22,8 +22,8 @@ const Content: FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage, setPerPage] = useState<RowsPerPage>(10);
   const { data, loading, error } = useQuery<
-    ListPublishedArticlesQuery,
-    ListPublishedArticlesQueryVariables
+    ListDraftsQuery,
+    ListDraftsQueryVariables
   >(query, {
     variables: {
       diaryID,
@@ -61,7 +61,7 @@ const Content: FC = () => {
   return (
     <>
       <ArticleTable
-        articlesList={data.diary.publishedArticles}
+        articlesList={data.diary.drafts}
         rowsPerPage={perPage}
         currentPage={currentPage}
         onChangePage={handleChangePage}
@@ -71,14 +71,14 @@ const Content: FC = () => {
   );
 };
 
-export const ListArticlesPage: FC = () => (
+export const ListDraftsPage: FC = () => (
   <>
     <Helmet>
-      <title>日記一覧 - hibi</title>
+      <title>下書き一覧 - hibi</title>
     </Helmet>
     <Layout>
       <Grid item xs={12} spacing={0}>
-        <Typography variant="h4">日記一覧</Typography>
+        <Typography variant="h4">下書き一覧</Typography>
         <ProvideAuthenApolloClientOrRedirect
           onLoading={() => <LinearProgress />}
         >

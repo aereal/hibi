@@ -8,27 +8,38 @@ import { ArticleEditor } from "../organisms/ArticleEditor";
 import { CompletedNotification } from "../organisms/CompletedNotification";
 
 const NewArticlePageContent: FC = () => {
-  const [completed, setCompleted] = useState(false);
+  const [published, setPublished] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
 
-  const onSubmit = (): void => {
-    setCompleted(true);
+  const onPublished = (): void => {
+    setPublished(true);
   };
 
-  const onCloseNotification = () => {
-    setCompleted(false);
+  const onClosePublishedNotification = () => {
+    setPublished(false);
   };
+
+  const onDraftSaved = (): void => setDraftSaved(true);
+
+  const onCloseSavedNotification = (): void => setDraftSaved(false);
 
   return (
     <>
       <ArticleEditor
-        onSubmit={onSubmit}
+        onPublished={onPublished}
+        onDraftSaved={onDraftSaved}
         defaultTitle=""
         defaultBodyHTML="<p> </p>\n"
       />
       <CompletedNotification
-        open={completed}
-        onClose={onCloseNotification}
+        open={published}
+        onClose={onClosePublishedNotification}
         message="公開しました"
+      />
+      <CompletedNotification
+        open={draftSaved}
+        onClose={onCloseSavedNotification}
+        message="保存しました"
       />
     </>
   );

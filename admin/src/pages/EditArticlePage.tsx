@@ -33,7 +33,8 @@ const EditArticlePageContent: FC<EditArticlePageContentProps> = ({
       articleID,
     },
   });
-  const [completed, setCompleted] = useState(false);
+  const [published, setPublished] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
 
   if (error) {
     return <>! ${JSON.stringify(error)}</>;
@@ -47,26 +48,30 @@ const EditArticlePageContent: FC<EditArticlePageContentProps> = ({
     return <>Not Found</>;
   }
 
-  const onSubmit = (): void => {
-    setCompleted(true);
-  };
+  const onPublished = (): void => setPublished(true);
+  const onClosePublishedNotification = (): void => setPublished(false);
 
-  const onCloseNotification = () => {
-    setCompleted(false);
-  };
+  const onDraftSaved = (): void => setDraftSaved(true);
+  const onCloseSavedNotification = (): void => setDraftSaved(false);
 
   return (
     <>
       <ArticleEditor
-        onSubmit={onSubmit}
+        onPublished={onPublished}
+        onDraftSaved={onDraftSaved}
         defaultTitle={data.diary.article.title ?? ""}
         defaultBodyHTML={data.diary.article.body.html}
         articleID={articleID}
       />
       <CompletedNotification
-        open={completed}
-        onClose={onCloseNotification}
+        open={published}
+        onClose={onClosePublishedNotification}
         message="公開しました"
+      />
+      <CompletedNotification
+        open={draftSaved}
+        onClose={onCloseSavedNotification}
+        message="保存しました"
       />
     </>
   );

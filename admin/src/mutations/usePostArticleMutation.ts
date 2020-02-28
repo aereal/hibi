@@ -13,6 +13,7 @@ import updateMutation from "./UpdateArticleMutation.gql";
 interface ArticleUpdatePayload {
   readonly title: string;
   readonly bodyHTML: string;
+  readonly saveAsDraft?: boolean;
 }
 
 export const usePostMutation = (diaryID: string, articleID?: string) => {
@@ -29,7 +30,10 @@ export const usePostMutation = (diaryID: string, articleID?: string) => {
           variables: {
             diaryID,
             articleID,
-            articleToUpdate: toUpdate,
+            articleToUpdate: {
+              title: toUpdate.title,
+              bodyHTML: toUpdate.bodyHTML,
+            },
           },
         }),
     };
@@ -46,7 +50,9 @@ export const usePostMutation = (diaryID: string, articleID?: string) => {
           variables: {
             newArticle: {
               diaryID,
-              ...newArticle,
+              title: newArticle.title,
+              bodyHTML: newArticle.bodyHTML,
+              isDraft: newArticle.saveAsDraft ?? false,
             },
           },
         }),

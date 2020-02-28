@@ -1,12 +1,12 @@
-#import "../fragments/ListArticlesFragment.gql"
+#import "../fragments/ListDraftsFragment.gql"
 
-query ListArticlesQuery(
+query ListDraftsQuery(
   $diaryID: ID!,
   $currentPage: Int!,
   $perPage: Int!,
   $order: ArticleOrder!
 ) {
   diary(id: $diaryID) {
-    ...ListArticlesFragment
+    ...ListDraftsFragment
   }
 }

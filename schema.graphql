@@ -15,15 +15,22 @@ type Mutation {
   updateArticle(diaryID: ID!, articleID: ID!, article: ArticleToPost!): Boolean! @hasRole(role: ADMIN)
 }
 
+enum PublishState {
+  PUBLISHED
+  DRAFT
+}
+
 input ArticleToPost {
   title: String!
   bodyHTML: String!
+  publishState: PublishState
 }
 
 input NewArticle {
   diaryID: ID!
   title: String!
   bodyHTML: String!
+  isDraft: Boolean!
 }
 
 input DiarySettings {
@@ -33,7 +40,9 @@ input DiarySettings {
 type Diary {
   id: ID!
   name: String!
-  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder): ArticleConnection!
+  publishedArticles(page: Int!, perPage: Int!, orderBy: ArticleOrder): PublishedArticleConnection!
+  articles(page: Int!, perPage: Int!, orderBy: ArticleOrder, states: [PublishState!]): ArticleConnection!
+  drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
   owner: User!
 }
@@ -44,12 +53,25 @@ input ArticleOrder {
 }
 
 enum ArticleOrderField {
-  PUBLISHED_AT
+  CREATED_AT
+  UPDATED_AT
 }
 
 enum OrderDirection {
   ASC
   DESC
+}
+
+type DraftConnection {
+  nodes: [Draft!]!
+  pageInfo: OffsetBasePageInfo!
+  totalCount: Int!
+}
+
+type PublishedArticleConnection {
+  nodes: [PublishedArticle!]!
+  pageInfo: OffsetBasePageInfo!
+  totalCount: Int!
 }
 
 type ArticleConnection {
@@ -58,12 +80,32 @@ type ArticleConnection {
   totalCount: Int!
 }
 
-type Article {
+interface Article {
+  id: ID!
+  title: String
+  body: ArticleBody!
+  author: User!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Draft implements Article {
+  id: ID!
+  title: String
+  body: ArticleBody!
+  author: User!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type PublishedArticle implements Article {
   id: ID!
   title: String
   body: ArticleBody!
   publishedAt: Time!
   author: User!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type ArticleBody {
