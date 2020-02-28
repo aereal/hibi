@@ -1,0 +1,13 @@
+#import "../fragments/ListArticlesFragment.gql"
+
+query ListArticlesQuery(
+  $diaryID: ID!,
+  $currentPage: Int!,
+  $perPage: Int!,
+  $order: ArticleOrder!,
+  $states: [PublishState!]
+) {
+  diary(id: $diaryID) {
+    ...ListArticlesFragment
+  }
+}
