@@ -5,14 +5,18 @@ import (
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"go.opencensus.io/trace"
 )
 
 type (
-	Tracer struct{}
+	Tracer struct {
+		es graphql.ExecutableSchema
+	}
 )
 
 var _ interface {
+	graphql.HandlerExtension
 	graphql.FieldInterceptor
 	graphql.OperationInterceptor
 } = Tracer{}
@@ -22,6 +26,7 @@ func (a Tracer) ExtensionName() string {
 }
 
 func (a Tracer) Validate(schema graphql.ExecutableSchema) error {
+	a.es = schema
 	return nil
 }
 
@@ -73,7 +78,10 @@ func (a Tracer) InterceptOperation(ctx context.Context, next graphql.OperationHa
 	}
 	span.AddAttributes(trace.StringAttribute("request.query", oc.RawQuery))
 
-	// TODO: complexity limit
+	if stats := extension.GetComplexityStats(ctx); stats != nil {
+		span.AddAttributes(trace.Int64Attribute("request.complexity.actual", int64(stats.Complexity)))
+		span.AddAttributes(trace.Int64Attribute("request.complexity.limit", int64(stats.ComplexityLimit)))
+	}
 
 	for k, v := range oc.Variables {
 		span.AddAttributes(trace.StringAttribute(fmt.Sprintf("request.variables.%s", k), fmt.Sprintf("%+v", v)))
