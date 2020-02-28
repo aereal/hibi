@@ -26,13 +26,14 @@ func (a Tracer) Validate(schema graphql.ExecutableSchema) error {
 }
 
 func (a Tracer) InterceptField(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
-	span := trace.FromContext(ctx)
+	fc := graphql.GetFieldContext(ctx)
+
+	ctx, span := trace.StartSpan(ctx, fmt.Sprintf("field.%s", fc.Field.Name))
 	defer span.End()
 	if !span.IsRecordingEvents() {
 		return next(ctx)
 	}
 
-	fc := graphql.GetFieldContext(ctx)
 	span.AddAttributes(trace.StringAttribute("resolver.path", fc.Path().String()))
 	field := fc.Field
 	span.AddAttributes(
