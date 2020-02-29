@@ -595,6 +595,7 @@ input ArticleOrder {
 enum ArticleOrderField {
   CREATED_AT
   UPDATED_AT
+  PUBLISHED_AT
 }
 
 enum OrderDirection {

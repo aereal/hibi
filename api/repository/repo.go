@@ -227,14 +227,16 @@ func (r *Repository) FindArticleOrDraftByID(ctx context.Context, diaryID string,
 type ArticleOrderField string
 
 const (
-	ArticleOrderFieldCreatedAt = ArticleOrderField("CREATED_AT")
-	ArticleOrderFieldUpdatedAt = ArticleOrderField("UPDATED_AT")
+	ArticleOrderFieldCreatedAt   = ArticleOrderField("CREATED_AT")
+	ArticleOrderFieldUpdatedAt   = ArticleOrderField("UPDATED_AT")
+	ArticleOrderFieldPublishedAt = ArticleOrderField("PUBLISHED_AT")
 )
 
 var (
 	articleFieldMapping = map[ArticleOrderField]string{
-		ArticleOrderFieldCreatedAt: "CreatedAt",
-		ArticleOrderFieldUpdatedAt: "UpdatedAt",
+		ArticleOrderFieldCreatedAt:   "CreatedAt",
+		ArticleOrderFieldUpdatedAt:   "UpdatedAt",
+		ArticleOrderFieldPublishedAt: "PublishedAt",
 	}
 )
 
