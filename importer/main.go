@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aereal/hibi/api/models"
 	"github.com/soh335/mtexport/ast"
 	"github.com/soh335/mtexport/parser"
 )
@@ -20,6 +21,11 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+var (
+	StatusPublic = "Publish"
+	StatusDraft  = "Draft"
+)
 
 type Entry struct {
 	Author        string
@@ -158,8 +164,36 @@ func run(argv []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse statements: %w", err)
 	}
-	if err := json.NewEncoder(os.Stdout).Encode(entries); err != nil {
-		return fmt.Errorf("failed to encode as JSON: %w", err)
+	if os.Getenv("DEBUG") != "" {
+		if err := json.NewEncoder(os.Stdout).Encode(entries); err != nil {
+			return fmt.Errorf("failed to encode as JSON: %w", err)
+		}
 	}
+	publics, drafts, err := convertExportDataToModels(entries)
+	if err != nil {
+		return fmt.Errorf("failed to convert export data: %w", err)
+	}
+	log.Printf("total %d entries; %d published articles; %d drafts", len(publics)+len(drafts), len(publics), len(drafts))
 	return nil
+}
+
+func convertExportDataToModels(entries []*Entry) ([]*models.PublishedArticle, []*models.Draft, error) {
+	articles := []*models.PublishedArticle{}
+	drafts := []*models.Draft{}
+	for _, entry := range entries {
+		switch entry.Status {
+		case StatusPublic:
+			articles = append(articles, &models.PublishedArticle{
+				// TODO
+			})
+		case StatusDraft:
+			drafts = append(drafts, &models.Draft{
+				// TODO
+			})
+		default:
+			return nil, nil, fmt.Errorf("unkonwn status: %q", entry.Status)
+		}
+	}
+
+	return articles, drafts, nil
 }
