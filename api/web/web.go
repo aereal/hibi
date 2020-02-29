@@ -13,7 +13,7 @@ import (
 	"github.com/aereal/hibi/api/auth"
 	"github.com/aereal/hibi/api/gqlopencensus"
 	"github.com/aereal/hibi/api/logging"
-	"github.com/dimfeld/httptreemux"
+	"github.com/dimfeld/httptreemux/v5"
 	"github.com/rs/cors"
 	"go.opencensus.io/plugin/ochttp"
 )
