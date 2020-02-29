@@ -41,11 +41,11 @@ func parseEntryStatement(e *Entry, stmt *ast.EntryStmt) error {
 		switch t := stmt.(type) {
 		case *ast.MultilineSectionStmt:
 			if err := parseMultilineSectionStatement(e, t); err != nil {
-				return err
+				return fmt.Errorf("failed to parse multiline section statement: %w", err)
 			}
 		case *ast.NormalSectionStmt:
 			if err := parseNormalSectionStatement(e, t); err != nil {
-				return err
+				return fmt.Errorf("failed to parse normal section statement: %w", err)
 			}
 		}
 	}
@@ -58,7 +58,7 @@ func parseMultilineSectionStatement(e *Entry, stmt *ast.MultilineSectionStmt) er
 	}
 	for _, stmt := range stmt.FieldStmts {
 		if err := parseFieldStatement(e, stmt.(*ast.FieldStmt)); err != nil {
-			return err
+			return fmt.Errorf("failed to parse field statement: %w", err)
 		}
 	}
 	return nil
@@ -83,7 +83,7 @@ func parseFieldStatement(e *Entry, stmt *ast.FieldStmt) error {
 	case "IMAGE":
 		u, err := url.Parse(value)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to parse field as URL: %w", err)
 		}
 		e.Image = u
 	case "CATEGORY":
@@ -91,7 +91,7 @@ func parseFieldStatement(e *Entry, stmt *ast.FieldStmt) error {
 	case "DATE":
 		t, err := time.ParseInLocation("01/02/2006 15:04:05", value, time.Local)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to parse date: %w", err)
 		}
 		e.Date = t
 	case "AUTHOR":
@@ -147,19 +147,19 @@ func run(argv []string) error {
 	importFilePath := argv[1]
 	f, err := os.Open(importFilePath)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot open import file %s: %w", importFilePath, err)
 	}
-	stmts, err := parser.Parse(f, []string{"IMAGE"})
+	stmts, err := parser.Parse(f, []string{"IMAGE", "URL"})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse: %w", err)
 	}
 	log.Printf("%d statements found", len(stmts))
 	entries, err := parseStatements(os.Stdout, stmts)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse statements: %w", err)
 	}
 	if err := json.NewEncoder(os.Stdout).Encode(entries); err != nil {
-		return err
+		return fmt.Errorf("failed to encode as JSON: %w", err)
 	}
 	return nil
 }
