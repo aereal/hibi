@@ -32,6 +32,8 @@ type Entry struct {
 	Image         *url.URL
 	Categorires   []string
 	Body          string
+	URL           string `json:"omitempty"`
+	Email         string `json:"omitempty"`
 }
 
 func parseEntryStatement(e *Entry, stmt *ast.EntryStmt) error {
@@ -100,6 +102,10 @@ func parseFieldStatement(e *Entry, stmt *ast.FieldStmt) error {
 		e.Basename = value
 	case "STATUS":
 		e.Status = value
+	case "URL":
+		e.URL = value
+	case "EMAIL":
+		e.Email = value
 	default:
 		return fmt.Errorf("unknown field: %q", stmt.Key)
 	}
