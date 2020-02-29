@@ -10,7 +10,7 @@ require (
 	github.com/99designs/gqlgen v0.11.1
 	github.com/aws/aws-sdk-go v1.29.12 // indirect
 	github.com/dgryski/trifles v0.0.0-20191129005055-5a6159895336 // indirect
-	github.com/dimfeld/httptreemux v5.0.1+incompatible
+	github.com/dimfeld/httptreemux v5.0.2+incompatible
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
