@@ -63,10 +63,10 @@ export const ArticlesPage: FC = () => {
         <Typography className={classes.pageTitle} variant="h3">
           {data.diary.name}
         </Typography>
-        <ArticleList articles={data.diary.articles.nodes} />
+        <ArticleList articles={data.diary.publishedArticles.nodes} />
         <MonodirectionalPager
           baseURL="/"
-          pageInfo={data.diary.articles.pageInfo}
+          pageInfo={data.diary.publishedArticles.pageInfo}
         />
       </Container>
     </>
