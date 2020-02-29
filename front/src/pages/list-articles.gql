@@ -4,7 +4,7 @@
 query ListArticles($diaryID: ID!, $articlesCount: Int!, $currentPage: Int!) {
   diary(id: $diaryID) {
     name
-    articles(page: $currentPage, perPage: $articlesCount, orderBy: { direction: DESC, field: PUBLISHED_AT }) {
+    publishedArticles(page: $currentPage, perPage: $articlesCount, orderBy: { direction: DESC, field: PUBLISHED_AT }) {
       nodes {
         ...ArticleFragment
       }

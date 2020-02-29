@@ -1,4 +1,4 @@
-fragment ArticleFragment on Article {
+fragment ArticleFragment on PublishedArticle {
   id
   title
   publishedAt

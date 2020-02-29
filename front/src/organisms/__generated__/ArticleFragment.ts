@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+// @generated
 // This file was automatically generated and should not be edited.
 
 // ====================================================
@@ -12,7 +13,7 @@ export interface ArticleFragment_body {
 }
 
 export interface ArticleFragment {
-  readonly __typename: "Article";
+  readonly __typename: "PublishedArticle";
   readonly id: string;
   readonly title: string | null;
   readonly publishedAt: any;
