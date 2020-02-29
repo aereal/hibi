@@ -40,20 +40,20 @@ export const ArticlePermalinkPage: FC = () => {
   if (!data) {
     return null;
   }
-  if (!data.diary?.article) {
+  if (!data.diary?.publishedArticle) {
     return <>Not found</>;
   }
   return (
     <>
       <Head>
         <title>
-          {data.diary.article.title} - {data.diary.name}
+          {data.diary.publishedArticle.title} - {data.diary.name}
         </title>
         <meta key="og-type" property="og:type" content="article" />
         <meta
           key="og-title"
           property="og:title"
-          content={`${data.diary.article.title} - ${data.diary.name}`}
+          content={`${data.diary.publishedArticle.title} - ${data.diary.name}`}
         />
         <meta
           key="og-site-name"
@@ -66,7 +66,7 @@ export const ArticlePermalinkPage: FC = () => {
         <Typography className={classes.pageTitle} variant="h3">
           {data.diary.name}
         </Typography>
-        <Article article={data.diary.article} />
+        <Article article={data.diary.publishedArticle} />
       </Container>
     </>
   );

@@ -1,34 +1,29 @@
 /* tslint:disable */
 /* eslint-disable */
+// @generated
 // This file was automatically generated and should not be edited.
 
 // ====================================================
 // GraphQL query operation: PermalinkQuery
 // ====================================================
 
-export interface PermalinkQuery_diary_article_Draft {
-  readonly __typename: "Draft";
-}
-
-export interface PermalinkQuery_diary_article_PublishedArticle_body {
+export interface PermalinkQuery_diary_publishedArticle_body {
   readonly __typename: "ArticleBody";
   readonly html: string;
 }
 
-export interface PermalinkQuery_diary_article_PublishedArticle {
+export interface PermalinkQuery_diary_publishedArticle {
   readonly __typename: "PublishedArticle";
   readonly id: string;
   readonly title: string | null;
   readonly publishedAt: any;
-  readonly body: PermalinkQuery_diary_article_PublishedArticle_body;
+  readonly body: PermalinkQuery_diary_publishedArticle_body;
 }
-
-export type PermalinkQuery_diary_article = PermalinkQuery_diary_article_Draft | PermalinkQuery_diary_article_PublishedArticle;
 
 export interface PermalinkQuery_diary {
   readonly __typename: "Diary";
   readonly name: string;
-  readonly article: PermalinkQuery_diary_article | null;
+  readonly publishedArticle: PermalinkQuery_diary_publishedArticle | null;
 }
 
 export interface PermalinkQuery {

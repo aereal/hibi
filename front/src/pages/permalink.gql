@@ -3,7 +3,7 @@
 query PermalinkQuery($diaryID: ID!, $articleID: ID!) {
   diary(id: $diaryID) {
     name
-    article(id: $articleID) {
+    publishedArticle(id: $articleID) {
       ...ArticleFragment
     }
   }
