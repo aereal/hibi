@@ -1,4 +1,4 @@
-import React, { FC, TimeHTMLAttributes } from "react";
+import React, { FC, useRef, useEffect } from "react";
 import Typography from "@material-ui/core/Typography";
 
 interface DateTimeProps {
@@ -11,15 +11,14 @@ export const DateTime: FC<DateTimeProps> = ({
   formatter: format,
 }) => {
   const dt = guessDate(datetime);
+  const ref = useRef<HTMLTimeElement | null>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.dateTime = dt.toISOString();
+    }
+  }, []);
   return (
-    <Typography
-      ref={el =>
-        el !== undefined &&
-        el !== null &&
-        ((el as TimeHTMLAttributes<HTMLElement>).dateTime = dt.toISOString())
-      }
-      component="time"
-    >
+    <Typography ref={ref} component="time">
       {format.format(dt)}
     </Typography>
   );
