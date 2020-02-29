@@ -69,6 +69,7 @@ type ComplexityRoot struct {
 		ID                func(childComplexity int) int
 		Name              func(childComplexity int) int
 		Owner             func(childComplexity int) int
+		PublishedArticle  func(childComplexity int, id string) int
 		PublishedArticles func(childComplexity int, page int, perPage int, orderBy *dto.ArticleOrder) int
 	}
 
@@ -129,6 +130,7 @@ type DiaryResolver interface {
 	Articles(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder, states []models.PublishState) (*dto.ArticleConnection, error)
 	Drafts(ctx context.Context, obj *models.Diary, page int, perPage int, orderBy *dto.ArticleOrder) (*dto.DraftConnection, error)
 	Article(ctx context.Context, obj *models.Diary, id string) (models.Article, error)
+	PublishedArticle(ctx context.Context, obj *models.Diary, id string) (*models.PublishedArticle, error)
 	Owner(ctx context.Context, obj *models.Diary) (*models.User, error)
 }
 type DraftResolver interface {
@@ -252,6 +254,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Diary.Owner(childComplexity), true
+
+	case "Diary.publishedArticle":
+		if e.complexity.Diary.PublishedArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Diary_publishedArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Diary.PublishedArticle(childComplexity, args["id"].(string)), true
 
 	case "Diary.publishedArticles":
 		if e.complexity.Diary.PublishedArticles == nil {
@@ -584,6 +598,7 @@ type Diary {
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder, states: [PublishState!]): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
+  publishedArticle(id: ID!): PublishedArticle
   owner: User!
 }
 
@@ -766,6 +781,20 @@ func (ec *executionContext) field_Diary_drafts_args(ctx context.Context, rawArgs
 		}
 	}
 	args["orderBy"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Diary_publishedArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1326,6 +1355,44 @@ func (ec *executionContext) _Diary_article(ctx context.Context, field graphql.Co
 	res := resTmp.(models.Article)
 	fc.Result = res
 	return ec.marshalOArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Diary_publishedArticle(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Diary",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Diary_publishedArticle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Diary().PublishedArticle(rctx, obj, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.PublishedArticle)
+	fc.Result = res
+	return ec.marshalOPublishedArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishedArticle(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Diary_owner(ctx context.Context, field graphql.CollectedField, obj *models.Diary) (ret graphql.Marshaler) {
@@ -3770,6 +3837,17 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 				res = ec._Diary_article(ctx, field, obj)
 				return res
 			})
+		case "publishedArticle":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Diary_publishedArticle(ctx, field, obj)
+				return res
+			})
 		case "owner":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5116,6 +5194,17 @@ func (ec *executionContext) marshalOPublishState2ᚖgithubᚗcomᚋaerealᚋhibi
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalOPublishedArticle2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishedArticle(ctx context.Context, sel ast.SelectionSet, v models.PublishedArticle) graphql.Marshaler {
+	return ec._PublishedArticle(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOPublishedArticle2ᚖgithubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐPublishedArticle(ctx context.Context, sel ast.SelectionSet, v *models.PublishedArticle) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._PublishedArticle(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalORole2githubᚗcomᚋaerealᚋhibiᚋapiᚋmodelsᚐRole(ctx context.Context, v interface{}) (models.Role, error) {

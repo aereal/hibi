@@ -62,6 +62,10 @@ func (r *diaryResolver) Article(ctx context.Context, diary *models.Diary, articl
 	return r.repo.FindArticle(ctx, diary.ID, articleID)
 }
 
+func (r *diaryResolver) PublishedArticle(ctx context.Context, diary *models.Diary, id string) (*models.PublishedArticle, error) {
+	return r.repo.FindArticle(ctx, diary.ID, id)
+}
+
 func paging(page int, perPage int) (countToFetch int, offset int, err error) {
 	if perPage > maxPerPage {
 		err = fmt.Errorf("perPage parameter too large")

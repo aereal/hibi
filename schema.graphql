@@ -44,6 +44,7 @@ type Diary {
   articles(page: Int!, perPage: Int!, orderBy: ArticleOrder, states: [PublishState!]): ArticleConnection!
   drafts(page: Int!, perPage: Int!, orderBy: ArticleOrder): DraftConnection!
   article(id: ID!): Article
+  publishedArticle(id: ID!): PublishedArticle
   owner: User!
 }
 
