@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"time"
@@ -238,6 +239,8 @@ var (
 		ArticleOrderFieldUpdatedAt:   "UpdatedAt",
 		ArticleOrderFieldPublishedAt: "PublishedAt",
 	}
+
+	errInvalidOrderField = errors.New("invalid order field")
 )
 
 func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.PublishedArticle, error) {
@@ -248,16 +251,6 @@ func (r *Repository) FindLatestArticlesOf(ctx context.Context, diaryID string, l
 		Offset(offset).
 		Documents(ctx)
 	return r.populateArticles(iter)
-}
-
-func (r *Repository) findDrafts(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Draft, error) {
-	iter := r.drafts().
-		OrderBy(articleFieldMapping[orderField], firestoreOrderDirectionMapping[dir]).
-		Where("DiaryID", "==", diaryID).
-		Limit(limit).
-		Offset(offset).
-		Documents(ctx)
-	return populateDrafts(iter)
 }
 
 func (r *Repository) FindArticlesOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection, states []models.PublishState) ([]models.Article, error) {
@@ -277,7 +270,7 @@ func (r *Repository) FindArticlesOf(ctx context.Context, diaryID string, limit, 
 		case models.PublishStateDraft:
 			eg.Go(func() error {
 				var err error
-				drafts, err = r.findDrafts(ctx, diaryID, limit, offset, orderField, dir)
+				drafts, err = r.FindDraftsOf(ctx, diaryID, limit, offset, orderField, dir)
 				return err
 			})
 		}
@@ -307,7 +300,10 @@ func (a byCreatedAt) Len() int           { return len(a) }
 func (a byCreatedAt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byCreatedAt) Less(i, j int) bool { return a[i].GetCreatedAt().Before(a[j].GetCreatedAt()) }
 
-func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit, offset int) ([]*models.Draft, error) {
+func (r *Repository) FindDraftsOf(ctx context.Context, diaryID string, limit, offset int, orderField ArticleOrderField, dir OrderDirection) ([]*models.Draft, error) {
+	if orderField == ArticleOrderFieldPublishedAt {
+		return nil, fmt.Errorf("%w: cannot use %s on drafts", errInvalidOrderField, ArticleOrderFieldPublishedAt)
+	}
 	iter := r.drafts().Where("DiaryID", "==", diaryID).Limit(limit).Offset(offset).Documents(ctx)
 	return populateDrafts(iter)
 }

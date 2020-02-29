@@ -177,7 +177,7 @@ func (r *diaryResolver) Drafts(ctx context.Context, diary *models.Diary, page in
 		return nil, err
 	}
 
-	drafts, err := r.repo.FindDraftsOf(ctx, diary.ID, countToFetch, offset)
+	drafts, err := r.repo.FindDraftsOf(ctx, diary.ID, countToFetch, offset, orderBy.Field, orderBy.Direction)
 	if err != nil {
 		return nil, err
 	}
