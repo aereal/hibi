@@ -94,13 +94,16 @@ type Article interface {
 }
 
 type PublishedArticle struct {
-	ID          string
-	Title       *string
-	Body        *ArticleBody
-	PublishedAt time.Time
-	AuthorID    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            string
+	Title         *string
+	Body          *ArticleBody
+	PublishedAt   time.Time
+	AuthorID      string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EyecatchImage string
+	Slug          string
+	Categories    []string
 }
 
 func (PublishedArticle) IsArticle() {}
@@ -134,12 +137,15 @@ func (PublishedArticle) GetPublishState() PublishState {
 }
 
 type Draft struct {
-	ID        string
-	Title     *string
-	Body      *ArticleBody
-	AuthorID  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID            string
+	Title         *string
+	Body          *ArticleBody
+	AuthorID      string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EyecatchImage string
+	Slug          string
+	Categories    []string
 }
 
 func (Draft) IsArticle() {}

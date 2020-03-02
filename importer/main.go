@@ -186,20 +186,26 @@ func convertExportDataToModels(entries []*Entry) ([]*models.PublishedArticle, []
 			body := &models.ArticleBody{}
 			body.SetHTML(entry.Body)
 			articles = append(articles, &models.PublishedArticle{
-				Title:       &entry.Title,
-				Body:        body,
-				PublishedAt: time.Time(entry.Date),
-				CreatedAt:   time.Time(entry.Date),
-				UpdatedAt:   time.Time(entry.Date),
+				Title:         &entry.Title,
+				Body:          body,
+				PublishedAt:   time.Time(entry.Date),
+				CreatedAt:     time.Time(entry.Date),
+				UpdatedAt:     time.Time(entry.Date),
+				Categories:    entry.Categorires,
+				Slug:          entry.Basename,
+				EyecatchImage: entry.Image,
 			})
 		case StatusDraft:
 			body := &models.ArticleBody{}
 			body.SetHTML(entry.Body)
 			drafts = append(drafts, &models.Draft{
-				Title:     &entry.Title,
-				Body:      body,
-				CreatedAt: time.Time(entry.Date),
-				UpdatedAt: time.Time(entry.Date),
+				Title:         &entry.Title,
+				Body:          body,
+				CreatedAt:     time.Time(entry.Date),
+				UpdatedAt:     time.Time(entry.Date),
+				Categories:    entry.Categorires,
+				Slug:          entry.Basename,
+				EyecatchImage: entry.Image,
 			})
 		default:
 			return nil, nil, fmt.Errorf("unkonwn status: %q", entry.Status)
