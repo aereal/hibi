@@ -174,6 +174,18 @@ func run(argv []string) error {
 		return fmt.Errorf("failed to convert export data: %w", err)
 	}
 	log.Printf("total %d entries; %d published articles; %d drafts", len(publics)+len(drafts), len(publics), len(drafts))
+	if os.Getenv("DUMP_ENTRIES") != "" {
+		aggr := struct {
+			PublicArticles []*models.PublishedArticle
+			Drafts         []*models.Draft
+		}{
+			PublicArticles: publics,
+			Drafts:         drafts,
+		}
+		if err := json.NewEncoder(os.Stdout).Encode(aggr); err != nil {
+			return fmt.Errorf("failed to encode as JSON: %w", err)
+		}
+	}
 	return nil
 }
 
