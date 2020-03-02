@@ -35,7 +35,7 @@ type Entry struct {
 	AllowComments bool
 	ConvertBreaks bool
 	Date          ISO8601DateTime
-	Image         *JsonableURL
+	Image         string
 	Categorires   []string
 	Body          string
 	URL           string `json:"omitempty"`
@@ -87,12 +87,11 @@ func parseFieldStatement(e *Entry, stmt *ast.FieldStmt) error {
 	case "CONVERT BREAKS":
 		e.ConvertBreaks = value == "1"
 	case "IMAGE":
-		parsed, err := url.Parse(value)
+		_, err := url.Parse(value)
 		if err != nil {
 			return fmt.Errorf("failed to parse field as URL: %w", err)
 		}
-		u := JsonableURL(*parsed)
-		e.Image = &u
+		e.Image = value
 	case "CATEGORY":
 		e.Categorires = append(e.Categorires, value)
 	case "DATE":
