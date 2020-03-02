@@ -184,12 +184,23 @@ func convertExportDataToModels(entries []*Entry) ([]*models.PublishedArticle, []
 	for _, entry := range entries {
 		switch entry.Status {
 		case StatusPublic:
+			body := &models.ArticleBody{}
+			body.SetHTML(entry.Body)
 			articles = append(articles, &models.PublishedArticle{
-				// TODO
+				Title:       &entry.Title,
+				Body:        body,
+				PublishedAt: time.Time(entry.Date),
+				CreatedAt:   time.Time(entry.Date),
+				UpdatedAt:   time.Time(entry.Date),
 			})
 		case StatusDraft:
+			body := &models.ArticleBody{}
+			body.SetHTML(entry.Body)
 			drafts = append(drafts, &models.Draft{
-				// TODO
+				Title:     &entry.Title,
+				Body:      body,
+				CreatedAt: time.Time(entry.Date),
+				UpdatedAt: time.Time(entry.Date),
 			})
 		default:
 			return nil, nil, fmt.Errorf("unkonwn status: %q", entry.Status)
