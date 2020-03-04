@@ -76,6 +76,13 @@ func (r *Repository) ImportPublishedArticles(ctx context.Context, articles []*Pu
 			buf = []*PublishedArticleToImport{}
 		}
 	}
+	if len(buf) > 0 {
+		b := make([]*PublishedArticleToImport, len(buf))
+		copy(b, buf)
+		eg.Go(func() error {
+			return r.importArticles(ctx, r.articles(), b)
+		})
+	}
 
 	return eg.Wait()
 }
