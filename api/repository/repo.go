@@ -59,6 +59,22 @@ func (a *PublishedArticleToImport) SafeKey() string {
 	return url.PathEscape(a.Slug)
 }
 
+type DraftToImport struct {
+	DiaryID       string
+	Title         string
+	BodyHTML      string
+	AuthorID      string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Categories    []string
+	Slug          string
+	EyecatchImage string
+}
+
+func (a *DraftToImport) SafeKey() string {
+	return url.PathEscape(a.Slug)
+}
+
 var reqsPerBatch = 500
 
 func (r *Repository) ImportPublishedArticles(ctx context.Context, articles []*PublishedArticleToImport) error {
@@ -97,6 +113,48 @@ func (r *Repository) importArticles(ctx context.Context, coll *firestore.Collect
 	_, err := batch.Commit(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to import articles: %w", err)
+	}
+	return nil
+}
+
+func (r *Repository) ImportDrafts(ctx context.Context, drafts []*DraftToImport) error {
+	log.Printf("%d drafts", len(drafts))
+	eg, ctx := errgroup.WithContext(ctx)
+
+	buf := []*DraftToImport{}
+	for _, a := range drafts {
+		buf = append(buf, a)
+		if len(buf) == reqsPerBatch {
+			b := make([]*DraftToImport, len(buf))
+			copy(b, buf)
+			eg.Go(func() error {
+				return r.importDrafts(ctx, r.drafts(), b)
+			})
+			buf = []*DraftToImport{}
+		}
+	}
+	if len(buf) > 0 {
+		b := make([]*DraftToImport, len(buf))
+		copy(b, buf)
+		eg.Go(func() error {
+			return r.importDrafts(ctx, r.drafts(), b)
+		})
+		buf = []*DraftToImport{}
+	}
+
+	return eg.Wait()
+}
+
+func (r *Repository) importDrafts(ctx context.Context, coll *firestore.CollectionRef, drafts []*DraftToImport) error {
+	log.Printf("import drafts: first id: %s", drafts[0].SafeKey())
+	batch := r.client.Batch()
+	for _, a := range drafts {
+		doc := coll.Doc(a.SafeKey())
+		batch.Set(doc, a)
+	}
+	_, err := batch.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to import drafts: %w", err)
 	}
 	return nil
 }

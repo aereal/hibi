@@ -208,7 +208,7 @@ func run(argv []string) error {
 	if os.Getenv("DUMP_ENTRIES") != "" {
 		aggr := struct {
 			PublicArticles []*repository.PublishedArticleToImport
-			Drafts         []*models.Draft
+			Drafts         []*repository.DraftToImport
 		}{
 			PublicArticles: publics,
 			Drafts:         drafts,
@@ -221,12 +221,17 @@ func run(argv []string) error {
 	if err := repo.ImportPublishedArticles(ctx, publics); err != nil {
 		return fmt.Errorf("failed to import public articles: %w", err)
 	}
+
+	if err := repo.ImportDrafts(ctx, drafts); err != nil {
+		return fmt.Errorf("failed to import drafts: %w", err)
+	}
+
 	return nil
 }
 
-func convertExportDataToModels(entries []*Entry) ([]*repository.PublishedArticleToImport, []*models.Draft, error) {
+func convertExportDataToModels(entries []*Entry) ([]*repository.PublishedArticleToImport, []*repository.DraftToImport, error) {
 	articles := []*repository.PublishedArticleToImport{}
-	drafts := []*models.Draft{}
+	drafts := []*repository.DraftToImport{}
 	for _, entry := range entries {
 		switch entry.Status {
 		case StatusPublic:
@@ -247,9 +252,11 @@ func convertExportDataToModels(entries []*Entry) ([]*repository.PublishedArticle
 		case StatusDraft:
 			body := &models.ArticleBody{}
 			body.SetHTML(entry.Body)
-			drafts = append(drafts, &models.Draft{
-				Title:         &entry.Title,
-				Body:          body,
+			drafts = append(drafts, &repository.DraftToImport{
+				DiaryID:       diaryID,
+				AuthorID:      authorID,
+				Title:         entry.Title,
+				BodyHTML:      body.HTML(),
 				CreatedAt:     time.Time(entry.Date),
 				UpdatedAt:     time.Time(entry.Date),
 				Categories:    entry.Categorires,
