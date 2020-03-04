@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"net/url"
 	"sort"
 	"time"
 
@@ -38,6 +40,58 @@ type ArticleToPost struct {
 
 func (r *Repository) diaries() *firestore.CollectionRef {
 	return r.client.Collection("diaries")
+}
+
+type PublishedArticleToImport struct {
+	DiaryID       string
+	Title         string
+	BodyHTML      string
+	AuthorID      string
+	PublishedAt   time.Time
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Categories    []string
+	Slug          string
+	EyecatchImage string
+}
+
+func (a *PublishedArticleToImport) SafeKey() string {
+	return url.PathEscape(a.Slug)
+}
+
+var reqsPerBatch = 500
+
+func (r *Repository) ImportPublishedArticles(ctx context.Context, articles []*PublishedArticleToImport) error {
+	eg, ctx := errgroup.WithContext(ctx)
+
+	buf := []*PublishedArticleToImport{}
+	for _, a := range articles {
+		buf = append(buf, a)
+		if len(buf) == reqsPerBatch {
+			b := make([]*PublishedArticleToImport, len(buf))
+			copy(b, buf)
+			eg.Go(func() error {
+				return r.importArticles(ctx, r.articles(), b)
+			})
+			buf = []*PublishedArticleToImport{}
+		}
+	}
+
+	return eg.Wait()
+}
+
+func (r *Repository) importArticles(ctx context.Context, coll *firestore.CollectionRef, articles []*PublishedArticleToImport) error {
+	log.Printf("import articles: first id: %s", articles[0].SafeKey())
+	batch := r.client.Batch()
+	for _, a := range articles {
+		doc := coll.Doc(a.SafeKey())
+		batch.Set(doc, a)
+	}
+	_, err := batch.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to import articles: %w", err)
+	}
+	return nil
 }
 
 func (r *Repository) CreateArticle(ctx context.Context, author *models.User, newArticle NewArticle) (string, error) {

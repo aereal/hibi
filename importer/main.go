@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,7 +12,9 @@ import (
 	"strings"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/aereal/hibi/api/models"
+	"github.com/aereal/hibi/api/repository"
 	"github.com/soh335/mtexport/ast"
 	"github.com/soh335/mtexport/parser"
 )
@@ -25,6 +29,9 @@ func main() {
 var (
 	StatusPublic = "Publish"
 	StatusDraft  = "Draft"
+
+	diaryID  = "gZJXFGCS7fONfpIKXWYn"
+	authorID = "V5boZkasQvUGXC6AqtZZHVQe4oi1"
 )
 
 type Entry struct {
@@ -150,6 +157,30 @@ func run(argv []string) error {
 	if len(argv) < 2 {
 		return fmt.Errorf("IMPORT_FILE_PATH required")
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
+	if projectID == "" {
+		return errors.New("GOOGLE_CLOUD_PROJECT must be defined")
+	}
+
+	app, err := firebase.NewApp(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to initialize firebase admin SDK: %w", err)
+	}
+
+	firestoreClient, err := app.Firestore(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to build firestore client: %w", err)
+	}
+
+	repo, err := repository.New(firestoreClient)
+	if err != nil {
+		return fmt.Errorf("failed to build repository: %w", err)
+	}
+
 	importFilePath := argv[1]
 	f, err := os.Open(importFilePath)
 	if err != nil {
@@ -176,7 +207,7 @@ func run(argv []string) error {
 	log.Printf("total %d entries; %d published articles; %d drafts", len(publics)+len(drafts), len(publics), len(drafts))
 	if os.Getenv("DUMP_ENTRIES") != "" {
 		aggr := struct {
-			PublicArticles []*models.PublishedArticle
+			PublicArticles []*repository.PublishedArticleToImport
 			Drafts         []*models.Draft
 		}{
 			PublicArticles: publics,
@@ -186,20 +217,26 @@ func run(argv []string) error {
 			return fmt.Errorf("failed to encode as JSON: %w", err)
 		}
 	}
+
+	if err := repo.ImportPublishedArticles(ctx, publics); err != nil {
+		return fmt.Errorf("failed to import public articles: %w", err)
+	}
 	return nil
 }
 
-func convertExportDataToModels(entries []*Entry) ([]*models.PublishedArticle, []*models.Draft, error) {
-	articles := []*models.PublishedArticle{}
+func convertExportDataToModels(entries []*Entry) ([]*repository.PublishedArticleToImport, []*models.Draft, error) {
+	articles := []*repository.PublishedArticleToImport{}
 	drafts := []*models.Draft{}
 	for _, entry := range entries {
 		switch entry.Status {
 		case StatusPublic:
 			body := &models.ArticleBody{}
 			body.SetHTML(entry.Body)
-			articles = append(articles, &models.PublishedArticle{
-				Title:         &entry.Title,
-				Body:          body,
+			articles = append(articles, &repository.PublishedArticleToImport{
+				DiaryID:       diaryID,
+				AuthorID:      authorID,
+				Title:         entry.Title,
+				BodyHTML:      body.HTML(),
 				PublishedAt:   time.Time(entry.Date),
 				CreatedAt:     time.Time(entry.Date),
 				UpdatedAt:     time.Time(entry.Date),
