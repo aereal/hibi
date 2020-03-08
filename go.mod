@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/firestore v1.1.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.0
 	firebase.google.com/go v3.12.0+incompatible
-	github.com/99designs/gqlgen v0.11.1
+	github.com/99designs/gqlgen v0.11.2
 	github.com/aws/aws-sdk-go v1.29.14 // indirect
 	github.com/dgryski/trifles v0.0.0-20191129005055-5a6159895336 // indirect
 	github.com/dimfeld/httptreemux/v5 v5.0.2
@@ -17,7 +17,6 @@ require (
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/rs/cors v1.7.0
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/soh335/mtexport v0.0.0-20160510011016-e2434569f78d
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
