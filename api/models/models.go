@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -93,13 +94,16 @@ type Article interface {
 }
 
 type PublishedArticle struct {
-	ID          string
-	Title       *string
-	Body        *ArticleBody
-	PublishedAt time.Time
-	AuthorID    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            string
+	Title         *string
+	Body          *ArticleBody
+	PublishedAt   time.Time
+	AuthorID      string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EyecatchImage string
+	Slug          string
+	Categories    []string
 }
 
 func (PublishedArticle) IsArticle() {}
@@ -133,12 +137,15 @@ func (PublishedArticle) GetPublishState() PublishState {
 }
 
 type Draft struct {
-	ID        string
-	Title     *string
-	Body      *ArticleBody
-	AuthorID  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID            string
+	Title         *string
+	Body          *ArticleBody
+	AuthorID      string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	EyecatchImage string
+	Slug          string
+	Categories    []string
 }
 
 func (Draft) IsArticle() {}
@@ -186,6 +193,29 @@ func (b *ArticleBody) HTML() string {
 		return string(rendered)
 	}
 	return b.html
+}
+
+func (a *ArticleBody) UnmarshalJSON(b []byte) error {
+	var m map[string]string
+	if err := json.Unmarshal(b, &m); err != nil {
+		return err
+	}
+	a.Markdown = m["Markdown"]
+	if v, ok := m["HTML"]; ok {
+		a.SetHTML(v)
+	}
+	return nil
+}
+
+func (a ArticleBody) MarshalJSON() ([]byte, error) {
+	s := struct {
+		Markdown string
+		HTML     string
+	}{
+		Markdown: a.Markdown,
+		HTML:     a.html,
+	}
+	return json.Marshal(s)
 }
 
 type User struct {
