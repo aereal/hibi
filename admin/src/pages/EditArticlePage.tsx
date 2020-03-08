@@ -30,7 +30,7 @@ const EditArticlePageContent: FC<EditArticlePageContentProps> = ({
   >(query, {
     variables: {
       diaryID,
-      articleID,
+      articleID: normalizeArticleID(articleID),
     },
   });
   const [published, setPublished] = useState(false);
@@ -104,3 +104,6 @@ export const EditArticlePage: FC<EditArticlePageProps> = ({
     </Layout>
   </>
 );
+
+const normalizeArticleID = (id: string): string =>
+  !id.includes("%") ? encodeURIComponent(id) : id;
