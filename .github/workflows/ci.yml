@@ -1,6 +1,6 @@
 ---
 
-name: app
+name: ci
 
 on:
   pull_request:
