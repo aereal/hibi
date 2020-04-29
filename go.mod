@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/firestore v1.1.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.0
 	firebase.google.com/go v3.12.0+incompatible
-	github.com/99designs/gqlgen v0.11.2
+	github.com/99designs/gqlgen v0.11.3
 	github.com/aws/aws-sdk-go v1.29.14 // indirect
 	github.com/dgryski/trifles v0.0.0-20191129005055-5a6159895336 // indirect
 	github.com/dimfeld/httptreemux/v5 v5.0.2
