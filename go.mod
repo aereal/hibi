@@ -20,7 +20,7 @@ require (
 	github.com/soh335/mtexport v0.0.0-20160510011016-e2434569f78d
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
-	github.com/yfuruyama/stackdriver-request-context-log v0.0.0-20181011004750-72ecb0f55398
+	github.com/yfuruyama/stackdriver-request-context-log v0.0.1
 	go.opencensus.io v0.22.3
 	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
