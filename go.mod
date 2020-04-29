@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.5.0 // indirect
 	cloud.google.com/go/firestore v1.1.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
-	firebase.google.com/go v3.12.0+incompatible
+	firebase.google.com/go v3.12.1+incompatible
 	github.com/99designs/gqlgen v0.11.3
 	github.com/aws/aws-sdk-go v1.29.14 // indirect
 	github.com/dgryski/trifles v0.0.0-20191129005055-5a6159895336 // indirect
