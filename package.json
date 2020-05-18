@@ -15,7 +15,9 @@
     "admin"
   ],
   "resolutions": {
-    "merge-anything": "2.4.4"
+    "merge-anything": "2.4.4",
+    "react-dom": "16.13.1",
+    "react": "16.13.1"
   },
   "devDependencies": {
     "wsrun": "^5.2.0"
