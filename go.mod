@@ -23,7 +23,7 @@ require (
 	github.com/yfuruyama/stackdriver-request-context-log v0.0.1
 	go.opencensus.io v0.22.3
 	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
 	golang.org/x/tools v0.0.0-20200228224639-71482053b885 // indirect
 	google.golang.org/api v0.19.0
 	google.golang.org/grpc v1.27.1
