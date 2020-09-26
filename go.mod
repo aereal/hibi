@@ -3,7 +3,6 @@ module github.com/aereal/hibi
 go 1.13
 
 require (
-	cloud.google.com/go/bigquery v1.5.0 // indirect
 	cloud.google.com/go/firestore v1.1.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
 	firebase.google.com/go v3.12.1+incompatible
@@ -21,12 +20,10 @@ require (
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
 	github.com/yfuruyama/stackdriver-request-context-log v0.0.1
-	go.opencensus.io v0.22.3
-	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
+	go.opencensus.io v0.22.4
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
-	golang.org/x/tools v0.0.0-20200228224639-71482053b885 // indirect
-	google.golang.org/api v0.19.0
-	google.golang.org/grpc v1.27.1
+	google.golang.org/api v0.32.0
+	google.golang.org/grpc v1.31.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/russross/blackfriday.v2 v2.0.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
