@@ -75,9 +75,17 @@ jobs:
       - run: |
           echo '{}' | jq --arg apiKey '${{ secrets.FIREBASE_API_KEY }}' --arg authDomain '${{ secrets.FIREBASE_AUTH_DOMAIN }}' --arg appId '${{ secrets.FIREBASE_APP_ID }}' '{FIREBASE_API_KEY: $apiKey, FIREBASE_AUTH_DOMAIN: $authDomain, FIREBASE_APP_ID: $appId}' > front/firebase-config.json
           cat front/firebase-config.json | jq --arg apiEndpoint 'https://api-dot-hibi-260613.appspot.com/graphql' '.API_ENDPOINT = $apiEndpoint' | tee front/firebase-config.json
+      - name: delete old versions
+        run: |
+          gcloud app versions list --service=default --format=json --filter='traffic_split<1' --sort-by='~version.createTime' > default.versions.json
+          jq . default.versions.json
+          if [[ $(jq '. | length') > 10 ]]; then
+            gcloud app versions delete --quiet --service=default $(jq -r '.[9:-1][].id' default.versions.json)
+          fi
+          rm default.versions.json
       - name: deploy
         run: |
-          gcloud app deploy --quiet --project hibi-260613 --stop-previous-version ./front.app.yml
+          gcloud app deploy --quiet --project hibi-260613 ./front.app.yml
         env:
           CI: true
   admin-build:
@@ -153,8 +161,16 @@ jobs:
         with:
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
           version: '272.0.0'
+      - name: delete old versions
+        run: |
+          gcloud app versions list --service=api --format=json --filter='traffic_split<1' --sort-by='~version.createTime' > api.versions.json
+          jq . api.versions.json
+          if [[ $(jq '. | length') > 10 ]]; then
+            gcloud app versions delete --quiet --service=api $(jq -r '.[9:-1][].id' api.versions.json)
+          fi
+          rm api.versions.json
       - name: deploy
         run: |
-          gcloud app deploy --quiet --project hibi-260613 --stop-previous-version ./api.app.yml
+          gcloud app deploy --quiet --project hibi-260613 ./api.app.yml
         env:
           CI: true
