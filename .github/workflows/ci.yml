@@ -65,6 +65,8 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs: front-build
     runs-on: ubuntu-latest
+    env:
+      CLOUDSDK_CORE_PROJECT: hibi-260613
     steps:
       - uses: actions/checkout@v2
       - name: setup gcloud
@@ -85,7 +87,7 @@ jobs:
           rm default.versions.json
       - name: deploy
         run: |
-          gcloud app deploy --quiet --project hibi-260613 ./front.app.yml
+          gcloud app deploy --quiet ./front.app.yml
         env:
           CI: true
   admin-build:
@@ -154,6 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - api-build
+    env:
+      CLOUDSDK_CORE_PROJECT: hibi-260613
     steps:
       - uses: actions/checkout@v2
       - name: setup gcloud
@@ -171,6 +175,6 @@ jobs:
           rm api.versions.json
       - name: deploy
         run: |
-          gcloud app deploy --quiet --project hibi-260613 ./api.app.yml
+          gcloud app deploy --quiet ./api.app.yml
         env:
           CI: true
