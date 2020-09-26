@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	cloud.google.com/go/firestore v1.1.1
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.1
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.4
 	firebase.google.com/go v3.12.1+incompatible
 	github.com/99designs/gqlgen v0.11.3
 	github.com/aws/aws-sdk-go v1.29.14 // indirect
