@@ -53,7 +53,7 @@ jobs:
       - name: install
         run: yarn install --frozen-lockfile
       - name: lint
-        uses: reviewdog/action-eslint@v1.0.0
+        uses: reviewdog/action-eslint@v1.0.1
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
@@ -112,7 +112,7 @@ jobs:
       - name: install
         run: yarn install --frozen-lockfile
       - name: lint
-        uses: reviewdog/action-eslint@v1.0.0
+        uses: reviewdog/action-eslint@v1.0.1
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
