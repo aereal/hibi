@@ -16,8 +16,8 @@
   ],
   "resolutions": {
     "merge-anything": "2.4.4",
-    "react-dom": "16.13.1",
-    "react": "16.13.1"
+    "react-dom": "16.14.0",
+    "react": "16.14.0"
   },
   "devDependencies": {
     "wsrun": "^5.2.2"
