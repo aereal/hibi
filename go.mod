@@ -20,7 +20,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.1.0
 	github.com/yfuruyama/stackdriver-request-context-log v0.0.1
 	go.opencensus.io v0.22.5
-	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
+	golang.org/x/sync 036812b2e83c
 	golang.org/x/tools v0.0.0-20200925191224-5d1fdd8fa346 // indirect
 	google.golang.org/api v0.32.0
 	google.golang.org/grpc v1.32.0
