@@ -20,6 +20,6 @@
     "react": "16.13.1"
   },
   "devDependencies": {
-    "wsrun": "^5.2.2"
+    "wsrun": "^5.2.4"
   }
 }
