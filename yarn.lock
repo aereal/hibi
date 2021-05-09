@@ -15638,10 +15638,10 @@ ws@^7.0.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.2.1.tgz#03ed52423cd744084b2cf42ed197c8b65a936b8e"
   integrity sha512-sucePNSafamSKoOqoNfBd8V0StlkzJKL2ZAhGQinCfNQ+oacw+Pk7lcdAElecBF2VkLNZRiIb5Oi1Q5lVUVt2A==
 
-wsrun@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/wsrun/-/wsrun-5.2.2.tgz#3711d9fc0a0daba45178f097e2b062ca5bd18f4a"
-  integrity sha512-Mje5UJdqwHREqrzpDj/vWr5wd+0PDLqztfD7lSeyM14aNQdMegoLCGFL8Ux5drKxFnu7Ep75B17vFtx/orSzug==
+wsrun@^5.2.4:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/wsrun/-/wsrun-5.2.4.tgz#6eb6c3ccd3327721a8df073a5e3578fb0dea494e"
+  integrity sha512-akv3WtKBohdHsD/5uqhYRHw6GXeCXe87FsSg28Szq+2cpoqRW2SY4yPfm1D0za1cS6MgNy5hPgzS5SqYJaGUxg==
   dependencies:
     bluebird "^3.5.1"
     chalk "^2.3.0"
